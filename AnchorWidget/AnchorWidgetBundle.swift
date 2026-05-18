@@ -10,5 +10,6 @@ import WidgetKit
 struct AnchorWidgetBundle: WidgetBundle {
     var body: some Widget {
         TodayProgressWidget()
+        LockStatusWidget()
     }
 }

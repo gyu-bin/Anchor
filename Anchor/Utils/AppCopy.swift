@@ -87,11 +87,6 @@ enum AppCopy {
         static let notificationOff = "알림을 켜면 루틴을 놓치지 않아요"
         static let notificationDenied = "설정 앱에서 알림을 허용해 주세요"
         static let screenTime = "Screen Time"
-        static let shieldTitle = "잠금 화면 문구"
-        static let shieldSubtitle = "차단된 앱을 열 때 보여요"
-        static let shieldTitlePlaceholder = "제목"
-        static let shieldSubtitlePlaceholder = "부제"
-        static let shieldSave = "문구 저장"
         static let about = "앱 정보"
         static let aboutBody = "루틴이 끝날 때까지 선택한 앱을 잠가 드리고, 완료하면 바로 풀어 드려요."
         static let contact = "문의하기"
@@ -190,7 +185,6 @@ enum AppCopy {
         static let reasonApp = "막을 앱을 더 선택하려면 전체 기능을 열어 주세요."
         static let reasonWeb = "웹 차단을 더 쓰려면 전체 기능을 열어 주세요."
         static let reasonHistory = "30일이 넘은 기록을 보려면 전체 기능을 열어 주세요."
-        static let reasonShield = "잠금 화면 문구를 바꾸려면 전체 기능을 열어 주세요."
         static let reasonWeekly = "주간 요약 알림은 전체 기능에서 쓸 수 있어요."
         static let reasonGeneral = "루틴·잠금·기록 제한 없이 쓰실 수 있어요."
         static let freeTierTitle = "지금 무료로 쓰는 것"
@@ -200,7 +194,6 @@ enum AppCopy {
             "앱·웹 차단 무제한",
             "전체 기록·항목별 통계",
             "주간 요약 알림",
-            "잠금 화면 문구 바꾸기",
         ]
         static func purchase(price: String) -> String {
             "\(price)에 평생 열기"
@@ -212,7 +205,6 @@ enum AppCopy {
         static let settingsLocked = "1회 결제로 제한 없이"
         static let settingsOpen = "전체 기능 열기"
         static let historyBanner = "30일이 지난 기록은 전체 기능에서 볼 수 있어요."
-        static let shieldLocked = "전체 기능을 열면 문구를 바꿀 수 있어요."
         static let weeklyLocked = "전체 기능"
         static let productUnavailable = "결제 정보를 불러오지 못했어요. Xcode에서 Scheme → Run → StoreKit Configuration이 Products.storekit인지 확인한 뒤 앱을 다시 실행해 주세요."
         static let loadingProduct = "결제 정보를 불러오는 중이에요…"
@@ -224,6 +216,7 @@ enum AppCopy {
         static let alreadyUnlocked = "이미 열려 있어요"
         static let appLimitHint = "무료는 앱 \(PremiumLimits.maxAppsPerRoutine)개까지예요."
         static let webLimitHint = "무료는 사이트 \(PremiumLimits.maxWebDomainsPerRoutine)개까지예요."
+        static let webDomainNote = "도메인 칩은 Safari 등 브라우저에서 막혀요. 차단 화면은 「사이트 선택」으로 추가해요."
     }
 
     enum Notification {

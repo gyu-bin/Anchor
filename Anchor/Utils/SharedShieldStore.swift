@@ -19,11 +19,7 @@ enum SharedShieldStore {
     static let appGroupID = "group.com.rbqls6651.anchor"
     static let mergedSelectionKey = "mergedShieldSelection"
     static let scheduleKey = "scheduledRoutineShields"
-    static let shieldTitleKey = "shield.title"
-    static let shieldSubtitleKey = "shield.subtitle"
-
-    static let defaultShieldTitle = "루틴을 먼저 완료해 주세요"
-    static let defaultShieldSubtitle = "끝나면 바로 열어 드릴게요"
+    static let blockedWebDomainsKey = "blockedWebDomains"
 
     static var suite: UserDefaults? {
         UserDefaults(suiteName: appGroupID)
@@ -48,6 +44,14 @@ enum SharedShieldStore {
         suite?.removeObject(forKey: mergedSelectionKey)
     }
 
+    static func saveBlockedWebDomainStrings(_ domains: [String]) {
+        suite?.set(domains, forKey: blockedWebDomainsKey)
+    }
+
+    static func loadBlockedWebDomainStrings() -> [String] {
+        suite?.stringArray(forKey: blockedWebDomainsKey) ?? []
+    }
+
     static func clearSchedule() {
         suite?.removeObject(forKey: scheduleKey)
     }
@@ -55,20 +59,7 @@ enum SharedShieldStore {
     static func clearAll() {
         clearMergedSelection()
         clearSchedule()
+        suite?.removeObject(forKey: blockedWebDomainsKey)
     }
 
-    static var shieldTitle: String {
-        let value = suite?.string(forKey: shieldTitleKey)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return (value?.isEmpty == false) ? value! : defaultShieldTitle
-    }
-
-    static var shieldSubtitle: String {
-        let value = suite?.string(forKey: shieldSubtitleKey)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return (value?.isEmpty == false) ? value! : defaultShieldSubtitle
-    }
-
-    static func saveShieldMessages(title: String, subtitle: String) {
-        suite?.set(title, forKey: shieldTitleKey)
-        suite?.set(subtitle, forKey: shieldSubtitleKey)
-    }
 }

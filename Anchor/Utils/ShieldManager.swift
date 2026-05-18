@@ -48,6 +48,8 @@ enum ShieldManager {
 
     /// 오늘 기준으로 아직 끝나지 않은 루틴들의 차단을 시스템에 반영합니다.
     static func refresh(modelContext: ModelContext) async {
+        defer { syncWidgetLockStatus(modelContext: modelContext) }
+
         guard authorizationStatus() == .approved else {
             settings.clearAllSettings()
             if let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) {
@@ -80,21 +82,38 @@ enum ShieldManager {
             calendar: calendar,
             modelContext: modelContext
         )
-        let webs = activeBlockedWebDomainTokens(
+        let webTokens = activeBlockedWebDomainTokens(
+            routines: routines,
+            dayStart: dayStart,
+            calendar: calendar,
+            modelContext: modelContext
+        )
+        let webDomainStrings = activeBlockedWebDomainStrings(
             routines: routines,
             dayStart: dayStart,
             calendar: calendar,
             modelContext: modelContext
         )
 
-        if apps.isEmpty && webs.isEmpty {
+        SharedShieldStore.saveBlockedWebDomainStrings(webDomainStrings)
+
+        if apps.isEmpty && webTokens.isEmpty && webDomainStrings.isEmpty {
             settings.clearAllSettings()
         } else {
             settings.shield.applications = apps.isEmpty ? nil : Set(apps)
-            settings.shield.webDomains = webs.isEmpty ? nil : Set(webs)
+            WebDomainBlocking.apply(
+                to: settings,
+                webTokens: Set(webTokens),
+                domainStrings: webDomainStrings
+            )
         }
 
         await DeviceActivityScheduleManager.sync(modelContext: modelContext)
+    }
+
+    private static func syncWidgetLockStatus(modelContext: ModelContext) {
+        guard let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) else { return }
+        WidgetSync.refresh(modelContext: modelContext, routines: routines)
     }
 
     /// 오늘 루틴 시작 시각(시·분)이 지났는지.
@@ -297,6 +316,29 @@ enum ShieldManager {
             tokens.formUnion(decodeSelection(routine.shieldSelectionData).webDomainTokens)
         }
         return tokens.sorted { String(describing: $0) < String(describing: $1) }
+    }
+
+    private static func activeBlockedWebDomainStrings(
+        routines: [Routine],
+        dayStart: Date,
+        calendar: Calendar,
+        modelContext: ModelContext
+    ) -> [String] {
+        var domains: [String] = []
+        for routine in routines where RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) && !routine.items.isEmpty {
+            let complete = (try? routineIsFullyCompleteToday(
+                routine,
+                dayStart: dayStart,
+                calendar: calendar,
+                modelContext: modelContext
+            )) ?? false
+            if complete { continue }
+            guard hasRoutineStartedToday(routine, calendar: calendar) else { continue }
+            for domain in routine.blockedWebs where !domains.contains(domain) {
+                domains.append(domain)
+            }
+        }
+        return domains
     }
 
     private static func routineIsFullyCompleteToday(

@@ -11,8 +11,23 @@ enum WidgetSync {
     static func refresh(modelContext: ModelContext, routines: [Routine]) {
         let vm = TodayViewModel()
         let withItems = vm.routinesForToday(routines)
+        let actionable = vm.actionableRoutinesForToday(routines)
+        let isLockActive = ShieldManager.isAnyActivelyLocking(
+            routines: actionable,
+            modelContext: modelContext
+        )
+        let lockRoutine = actionable.first {
+            ShieldManager.isActivelyLocking(routine: $0, modelContext: modelContext)
+        }
+
         guard !withItems.isEmpty else {
-            WidgetDataStore.publish(progressPercent: 0, nextItemName: nil, nextRoutineName: nil)
+            WidgetDataStore.publish(
+                progressPercent: 0,
+                nextItemName: nil,
+                nextRoutineName: nil,
+                isLockActive: isLockActive,
+                lockRoutineName: isLockActive ? lockRoutine?.name : nil
+            )
             return
         }
 
@@ -34,7 +49,9 @@ enum WidgetSync {
         WidgetDataStore.publish(
             progressPercent: progress,
             nextItemName: nextItem?.name,
-            nextRoutineName: nextRoutine?.name
+            nextRoutineName: nextRoutine?.name,
+            isLockActive: isLockActive,
+            lockRoutineName: isLockActive ? lockRoutine?.name : nil
         )
     }
 }

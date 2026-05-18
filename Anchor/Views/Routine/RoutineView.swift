@@ -57,7 +57,12 @@ struct RoutineView: View {
                                             }
                                         }
                                     ),
-                                    focusNameOnAppear: focusNameRoutineID == routine.id
+                                    focusNameOnAppear: focusNameRoutineID == routine.id,
+                                    onFinishEditing: {
+                                        if focusNameRoutineID == routine.id {
+                                            focusNameRoutineID = nil
+                                        }
+                                    }
                                 )
                                 .listRowInsets(EdgeInsets(
                                     top: 6,
@@ -82,9 +87,6 @@ struct RoutineView: View {
                 RoutineItemEditSheet(payload: payload)
                     .presentationDetents([.large])
                     .presentationCornerRadius(28)
-                    .onDisappear {
-                        collapseRoutine(payload.routine.id)
-                    }
             }
             .sheet(item: $paywallReason) { reason in
                 PaywallSheet(reason: reason)
@@ -164,12 +166,6 @@ struct RoutineView: View {
         focusNameRoutineID = routine.id
         withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             expandedRoutineIDs = [routine.id]
-        }
-    }
-
-    private func collapseRoutine(_ id: UUID) {
-        _ = withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-            expandedRoutineIDs.remove(id)
         }
     }
 }

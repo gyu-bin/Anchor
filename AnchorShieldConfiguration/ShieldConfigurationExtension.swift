@@ -7,29 +7,27 @@ import ManagedSettings
 import ManagedSettingsUI
 import UIKit
 
-private enum ShieldCopy {
-    static let appGroupID = "group.com.rbqls6651.anchor"
-    static let titleKey = "shield.title"
-    static let subtitleKey = "shield.subtitle"
+private enum ShieldMessagePresets {
+    static let pairs: [(title: String, subtitle: String)] = [
+        ("오늘 루틴을 먼저 마쳐 주세요", "다 하시면 바로 열어 드릴게요"),
+        ("잠깐만, 루틴이 먼저예요", "체크 끝나면 이 앱도 쓸 수 있어요"),
+        ("키링 루틴이 남아 있어요", "완료하면 잠금이 풀려요"),
+    ]
 
-    static var title: String {
-        UserDefaults(suiteName: appGroupID)?.string(forKey: titleKey)
-            ?? "루틴을 먼저 완료해 주세요"
-    }
-
-    static var subtitle: String {
-        UserDefaults(suiteName: appGroupID)?.string(forKey: subtitleKey)
-            ?? "끝나면 바로 열어 드릴게요"
+    static var random: (title: String, subtitle: String) {
+        pairs.randomElement() ?? pairs[0]
     }
 }
 
 final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     override func configuration(shielding application: Application) -> ShieldConfiguration {
-        makeConfig(title: ShieldCopy.title, subtitle: ShieldCopy.subtitle)
+        let message = ShieldMessagePresets.random
+        return makeConfig(title: message.title, subtitle: message.subtitle)
     }
 
     override func configuration(shielding application: Application, in category: ActivityCategory) -> ShieldConfiguration {
-        makeConfig(title: ShieldCopy.title, subtitle: ShieldCopy.subtitle)
+        let message = ShieldMessagePresets.random
+        return makeConfig(title: message.title, subtitle: message.subtitle)
     }
 
     private func makeConfig(title: String, subtitle: String) -> ShieldConfiguration {

@@ -17,6 +17,7 @@ struct RoutineCardView: View {
     @Binding var paywallReason: PaywallReason?
     @Binding var isExpanded: Bool
     var focusNameOnAppear: Bool = false
+    var onFinishEditing: (() -> Void)? = nil
 
     @State private var editingName: String = ""
     @State private var scheduleDraft = RoutineScheduleDraft()
@@ -51,8 +52,9 @@ struct RoutineCardView: View {
     private var header: some View {
         HStack(alignment: .center, spacing: 12) {
             Button {
+                guard !isExpanded else { return }
                 withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-                    isExpanded.toggle()
+                    isExpanded = true
                 }
             } label: {
                 HStack(alignment: .center, spacing: 12) {
@@ -78,6 +80,18 @@ struct RoutineCardView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+
+            if isExpanded {
+                Button {
+                    finishEditing()
+                } label: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(Color.anchorAccent(scheme))
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel("편집 완료")
+            }
 
             Button(role: .destructive) {
                 vm.deleteRoutine(routine, context: modelContext)
@@ -116,18 +130,11 @@ struct RoutineCardView: View {
                         }
                     }
                     .onSubmit {
+                        nameFieldFocused = false
                         commitRoutineName()
-                        collapseCard()
                     }
                     .onChange(of: nameFieldFocused) { _, focused in
                         if !focused { commitRoutineName() }
-                    }
-                    .onChange(of: editingName) { _, newValue in
-                        let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                        guard !trimmed.isEmpty else { return }
-                        routine.name = trimmed
-                        try? modelContext.save()
-                        try? NotificationManager.rescheduleAll(modelContext: modelContext)
                     }
             }
 
@@ -218,7 +225,10 @@ struct RoutineCardView: View {
         try? NotificationManager.rescheduleAll(modelContext: modelContext)
     }
 
-    private func collapseCard() {
+    private func finishEditing() {
+        nameFieldFocused = false
+        commitRoutineName()
+        onFinishEditing?()
         withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             isExpanded = false
         }

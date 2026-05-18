@@ -28,11 +28,42 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
             store.shield.applications = selection.applicationTokens
         }
 
-        if selection.webDomainTokens.isEmpty {
-            store.shield.webDomains = nil
-        } else {
-            store.shield.webDomains = selection.webDomainTokens
+        let domainStrings = SharedShieldStoreAppGroup.loadBlockedWebDomainStrings()
+        DeviceActivityWebBlocking.apply(
+            to: store,
+            webTokens: selection.webDomainTokens,
+            domainStrings: domainStrings
+        )
+    }
+}
+
+private enum DeviceActivityWebBlocking {
+    static func apply(
+        to store: ManagedSettingsStore,
+        webTokens: Set<WebDomainToken>,
+        domainStrings: [String]
+    ) {
+        var managed = Set<WebDomain>()
+        for raw in domainStrings {
+            let base = raw
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+                .replacingOccurrences(of: "https://", with: "")
+                .replacingOccurrences(of: "http://", with: "")
+                .split(separator: "/").first.map(String.init) ?? ""
+            guard !base.isEmpty else { continue }
+            managed.insert(WebDomain(domain: base))
+            if !base.hasPrefix("www.") {
+                managed.insert(WebDomain(domain: "www.\(base)"))
+            }
+            if base == "youtube.com" {
+                managed.insert(WebDomain(domain: "m.youtube.com"))
+                managed.insert(WebDomain(domain: "youtu.be"))
+            }
         }
+
+        store.shield.webDomains = webTokens.isEmpty ? nil : webTokens
+        store.webContent.blockedByFilter = managed.isEmpty ? .none : .specific(managed)
     }
 }
 
@@ -48,6 +79,7 @@ enum SharedShieldStoreAppGroup {
     static let id = "group.com.rbqls6651.anchor"
     static let mergedSelectionKey = "mergedShieldSelection"
     static let scheduleKey = "scheduledRoutineShields"
+    static let blockedWebDomainsKey = "blockedWebDomains"
 
     static func activeSelection(at now: Date) -> FamilyActivitySelection {
         guard let items = loadSchedule(), !items.isEmpty else {
@@ -83,6 +115,10 @@ enum SharedShieldStoreAppGroup {
     private static func loadSchedule() -> [ScheduledRoutineShield]? {
         guard let data = UserDefaults(suiteName: id)?.data(forKey: scheduleKey) else { return nil }
         return try? JSONDecoder().decode([ScheduledRoutineShield].self, from: data)
+    }
+
+    static func loadBlockedWebDomainStrings() -> [String] {
+        UserDefaults(suiteName: id)?.stringArray(forKey: blockedWebDomainsKey) ?? []
     }
 
     private static func loadMergedSelection() -> FamilyActivitySelection {

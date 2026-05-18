@@ -39,6 +39,10 @@ struct BlockedWebSection: View {
                 .font(.headline)
                 .foregroundStyle(Color.anchorText(scheme))
 
+            Text(AppCopy.Premium.webDomainNote)
+                .font(.caption)
+                .foregroundStyle(Color.anchorSub(scheme))
+
             if !premium.isPremium {
                 Text(AppCopy.Premium.webLimitHint)
                     .font(.caption)

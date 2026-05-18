@@ -146,8 +146,10 @@ struct TodayView: View {
             .toolbar(.hidden, for: .navigationBar)
             .onAppear {
                 refreshCompletionBannerState()
-                syncWidgetAndNotifications()
-                Task { await ShieldManager.refresh(modelContext: modelContext) }
+                Task {
+                    await ShieldManager.refresh(modelContext: modelContext)
+                    syncWidgetAndNotifications()
+                }
             }
             .onChange(of: routines.map(\.id)) { _, _ in
                 refreshCompletionBannerState()

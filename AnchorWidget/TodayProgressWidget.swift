@@ -11,6 +11,8 @@ private enum WidgetKeys {
     static let progress = "widget.progressPercent"
     static let nextItem = "widget.nextItemName"
     static let nextRoutine = "widget.nextRoutineName"
+    static let lockActive = "widget.lockActive"
+    static let lockRoutine = "widget.lockRoutineName"
     static let premiumUnlocked = "premium.isUnlocked"
 }
 

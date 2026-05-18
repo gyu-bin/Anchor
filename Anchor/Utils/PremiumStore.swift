@@ -13,7 +13,6 @@ enum PaywallReason: String, Identifiable {
     case appLimit
     case webLimit
     case history
-    case shieldMessage
     case weeklyNotification
     case general
 

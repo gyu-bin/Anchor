@@ -20,8 +20,6 @@ struct SettingsView: View {
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
 
     @State private var showGuide = false
-    @State private var shieldTitle: String = SharedShieldStore.shieldTitle
-    @State private var shieldSubtitle: String = SharedShieldStore.shieldSubtitle
     @State private var screenTimeStatus: AuthorizationStatus = .notDetermined
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @State private var paywallReason: PaywallReason?
@@ -38,7 +36,6 @@ struct SettingsView: View {
                     dataPrivacySection
                     notificationsSection
                     screenTimeSection
-                    shieldMessageSection
                     aboutSection
                 }
                 .padding(.horizontal, AnchorLayout.screenHorizontal)
@@ -221,43 +218,6 @@ struct SettingsView: View {
                     .font(.caption.weight(.semibold))
                 }
             }
-        }
-    }
-
-    private var shieldMessageSection: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 12) {
-                AnchorSectionHeader(
-                    title: AppCopy.Settings.shieldTitle,
-                    subtitle: AppCopy.Settings.shieldSubtitle
-                )
-
-                if premium.isPremium {
-                    TextField(AppCopy.Settings.shieldTitlePlaceholder, text: $shieldTitle)
-                        .anchorInsetField()
-                    TextField(AppCopy.Settings.shieldSubtitlePlaceholder, text: $shieldSubtitle)
-                        .anchorInsetField()
-
-                    Button(AppCopy.Settings.shieldSave) {
-                        let title = shieldTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                        let subtitle = shieldSubtitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                        SharedShieldStore.saveShieldMessages(
-                            title: title.isEmpty ? SharedShieldStore.defaultShieldTitle : title,
-                            subtitle: subtitle.isEmpty ? SharedShieldStore.defaultShieldSubtitle : subtitle
-                        )
-                    }
-                    .buttonStyle(AnchorSecondaryButtonStyle())
-                } else {
-                    Text(AppCopy.Premium.shieldLocked)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.anchorSub(scheme))
-                    Button(AppCopy.Premium.settingsOpen) {
-                        paywallReason = .shieldMessage
-                    }
-                    .buttonStyle(AnchorSecondaryButtonStyle())
-                }
-            }
-            .padding(AnchorLayout.cardPadding)
         }
     }
 
