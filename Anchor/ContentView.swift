@@ -17,19 +17,19 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if !hasCompletedOnboarding {
-                OnboardingView {
-                    hasCompletedOnboarding = true
-                    showFocusSplash = true
-                }
-            } else if showFocusSplash {
+            if showFocusSplash {
                 PremiumFocusSplash {
                     showFocusSplash = false
+                }
+            } else if !hasCompletedOnboarding {
+                OnboardingView {
+                    hasCompletedOnboarding = true
                 }
             } else {
                 mainTabs
             }
         }
+        .preferredColorScheme(.light)
         .onReceive(NotificationCenter.default.publisher(for: .anchorOpenTodayTab)) { _ in
             tabRouter.openToday()
         }

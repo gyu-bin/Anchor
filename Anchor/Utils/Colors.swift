@@ -27,15 +27,18 @@ extension Color {
     }
 
     static func anchorText(_ scheme: ColorScheme) -> Color {
-        scheme == .dark ? Color.white.opacity(0.95) : Color(hex: "1A1A1A")
+        _ = scheme
+        return Color(hex: "1A1A1A")
     }
 
     static func anchorSub(_ scheme: ColorScheme) -> Color {
-        scheme == .dark ? Color.white.opacity(0.55) : Color(hex: "6B6560")
+        _ = scheme
+        return Color(hex: "6B6560")
     }
 
     static func anchorBorder(_ scheme: ColorScheme) -> Color {
-        scheme == .dark ? Color.white.opacity(0.12) : Color(hex: "E0D9CF")
+        _ = scheme
+        return Color(hex: "E0D9CF")
     }
 
     static let anchorSuccess = Color.green
