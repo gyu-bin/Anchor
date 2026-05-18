@@ -32,7 +32,7 @@ enum WebDomainBlocking {
         }
 
         if managed.isEmpty {
-            store.webContent.blockedByFilter = .none
+            store.webContent.blockedByFilter = WebContentSettings.FilterPolicy.none
         } else {
             store.webContent.blockedByFilter = .specific(managed)
         }
@@ -40,7 +40,7 @@ enum WebDomainBlocking {
 
     static func clear(from store: ManagedSettingsStore) {
         store.shield.webDomains = nil
-        store.webContent.blockedByFilter = .none
+        store.webContent.blockedByFilter = WebContentSettings.FilterPolicy.none
     }
 
   private static func expandedHosts(from raw: String) -> [String] {

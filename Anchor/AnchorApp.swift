@@ -22,9 +22,9 @@ struct AnchorApp: App {
 }
 
 enum AppModelContainer {
-    private static let appGroupID = "group.com.rbqls6651.anchor"
+    nonisolated private static let appGroupID = "group.com.rbqls6651.anchor"
 
-    static func make() -> ModelContainer {
+    nonisolated static func make() -> ModelContainer {
         let schema = Schema([
             Routine.self,
             RoutineItem.self,
@@ -49,7 +49,7 @@ enum AppModelContainer {
     }
 
     /// 마이그레이션 실패로 열리지 않는 SQLite 저장소를 제거합니다 (시뮬레이터·개발 복구용).
-    private static func removePersistedStoreFiles() {
+    nonisolated private static func removePersistedStoreFiles() {
         guard let containerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupID
         ) else { return }

@@ -64,7 +64,7 @@ private enum DeviceActivityWebBlocking {
         }
 
         store.shield.webDomains = webTokens.isEmpty ? nil : webTokens
-        store.webContent.blockedByFilter = managed.isEmpty ? .none : .specific(managed)
+        store.webContent.blockedByFilter = managed.isEmpty ? WebContentSettings.FilterPolicy.none : .specific(managed)
     }
 }
 
