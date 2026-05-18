@@ -11,8 +11,10 @@ import SwiftUI
 struct BlockedWebSection: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var premium: PremiumStore
 
     @Bindable var routine: Routine
+    @Binding var paywallReason: PaywallReason?
     @StateObject private var vm = RoutineViewModel()
 
     @State private var selection = FamilyActivitySelection()
@@ -37,6 +39,12 @@ struct BlockedWebSection: View {
                 .font(.headline)
                 .foregroundStyle(Color.anchorText(scheme))
 
+            if !premium.isPremium {
+                Text(AppCopy.Premium.webLimitHint)
+                    .font(.caption)
+                    .foregroundStyle(Color.anchorSub(scheme))
+            }
+
             HStack(spacing: 10) {
                 Button(savedWebTokens.isEmpty ? "사이트 선택" : "사이트 수정") {
                     syncSelectionFromRoutine()
@@ -60,9 +68,7 @@ struct BlockedWebSection: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
                 Button("추가") {
-                    vm.addBlockedWeb(domainInput, to: routine, context: modelContext)
-                    domainInput = ""
-                    Task { await ShieldManager.refresh(modelContext: modelContext) }
+                    addDomain(domainInput)
                 }
                 .buttonStyle(.bordered)
                 .disabled(vm.normalizeDomain(domainInput).isEmpty)
@@ -121,13 +127,29 @@ struct BlockedWebSection: View {
         }
     }
 
+    private func addDomain(_ raw: String) {
+        let domain = vm.normalizeDomain(raw)
+        guard !domain.isEmpty else { return }
+        if routine.blockedWebs.contains(domain) { return }
+        guard PremiumLimits.canAddWebDomain(
+            currentCount: routine.blockedWebs.count,
+            isPremium: premium.isPremium
+        ) else {
+            paywallReason = .webLimit
+            return
+        }
+        vm.addBlockedWeb(raw, to: routine, context: modelContext)
+        domainInput = ""
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
+    }
+
     private func presetChip(_ domain: String) -> some View {
         let added = routine.blockedWebs.contains(domain)
         return Button {
             if added {
                 vm.removeBlockedWeb(domain, from: routine, context: modelContext)
             } else {
-                vm.addBlockedWeb(domain, to: routine, context: modelContext)
+                addDomain(domain)
             }
             Task { await ShieldManager.refresh(modelContext: modelContext) }
         } label: {

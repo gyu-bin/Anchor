@@ -11,19 +11,22 @@ private enum WidgetKeys {
     static let progress = "widget.progressPercent"
     static let nextItem = "widget.nextItemName"
     static let nextRoutine = "widget.nextRoutineName"
+    static let premiumUnlocked = "premium.isUnlocked"
 }
 
 struct WidgetSnapshot {
     let progress: Int
     let nextItem: String?
     let nextRoutine: String?
+    let isPremium: Bool
 
     static func load() -> WidgetSnapshot {
         let suite = UserDefaults(suiteName: WidgetKeys.appGroupID)
         return WidgetSnapshot(
             progress: suite?.integer(forKey: WidgetKeys.progress) ?? 0,
             nextItem: suite?.string(forKey: WidgetKeys.nextItem),
-            nextRoutine: suite?.string(forKey: WidgetKeys.nextRoutine)
+            nextRoutine: suite?.string(forKey: WidgetKeys.nextRoutine),
+            isPremium: suite?.bool(forKey: WidgetKeys.premiumUnlocked) == true
         )
     }
 }
@@ -35,7 +38,7 @@ struct TodayProgressEntry: TimelineEntry {
 
 struct TodayProgressProvider: TimelineProvider {
     func placeholder(in context: Context) -> TodayProgressEntry {
-        TodayProgressEntry(date: Date(), snapshot: WidgetSnapshot(progress: 42, nextItem: "독서", nextRoutine: "아침"))
+        TodayProgressEntry(date: Date(), snapshot: WidgetSnapshot(progress: 42, nextItem: "독서", nextRoutine: "아침", isPremium: true))
     }
 
     func getSnapshot(in context: Context, completion: @escaping (TodayProgressEntry) -> Void) {
@@ -69,7 +72,7 @@ struct TodayProgressWidgetView: View {
     let snapshot: WidgetSnapshot
 
     var body: some View {
-        if widgetFamily == .systemMedium {
+        if widgetFamily == .systemMedium, snapshot.isPremium {
             mediumBody
         } else {
             smallBody
@@ -120,5 +123,5 @@ struct TodayProgressWidgetView: View {
 #Preview(as: .systemSmall) {
     TodayProgressWidget()
 } timeline: {
-    TodayProgressEntry(date: Date(), snapshot: WidgetSnapshot(progress: 60, nextItem: nil, nextRoutine: nil))
+    TodayProgressEntry(date: Date(), snapshot: WidgetSnapshot(progress: 60, nextItem: nil, nextRoutine: nil, isPremium: false))
 }

@@ -1,0 +1,43 @@
+{
+  "identifier" : "D4E8F2A1-9B3C-4D5E-8F7A-1C2B3D4E5F60",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "1900",
+      "familyShareable" : false,
+      "internalID" : "6751000001",
+      "localizations" : [
+        {
+          "description" : "루틴·잠금·기록 제한 없이 평생 이용",
+          "displayName" : "전체 기능 열기",
+          "locale" : "ko_KR"
+        },
+        {
+          "description" : "Unlimited routines, locks, and history",
+          "displayName" : "Unlock Full Access",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.rbqls6651.anchor.unlock",
+      "referenceName" : "Full Unlock",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "ko_KR",
+    "_storefront" : "KOR",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

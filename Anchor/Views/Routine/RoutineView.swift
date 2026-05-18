@@ -9,6 +9,7 @@ import SwiftUI
 struct RoutineView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var premium: PremiumStore
 
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
     @StateObject private var vm = RoutineViewModel()
@@ -16,6 +17,7 @@ struct RoutineView: View {
     @State private var editPayload: RoutineItemEditPayload?
     @State private var expandedRoutineIDs: Set<UUID> = []
     @State private var focusNameRoutineID: UUID?
+    @State private var paywallReason: PaywallReason?
 
     private var orderedRoutines: [Routine] {
         vm.sortedRoutines(routines)
@@ -44,6 +46,7 @@ struct RoutineView: View {
                                     routine: routine,
                                     vm: vm,
                                     editPayload: $editPayload,
+                                    paywallReason: $paywallReason,
                                     isExpanded: Binding(
                                         get: { expandedRoutineIDs.contains(routine.id) },
                                         set: { expanded in
@@ -82,6 +85,9 @@ struct RoutineView: View {
                     .onDisappear {
                         collapseRoutine(payload.routine.id)
                     }
+            }
+            .sheet(item: $paywallReason) { reason in
+                PaywallSheet(reason: reason)
             }
             .onChange(of: routines.map(\.id)) { _, _ in
                 expandedRoutineIDs = expandedRoutineIDs.filter { id in
@@ -145,6 +151,10 @@ struct RoutineView: View {
     }
 
     private func addNewRoutine() {
+        guard PremiumLimits.canAddRoutine(currentCount: routines.count, isPremium: premium.isPremium) else {
+            paywallReason = .routineLimit
+            return
+        }
         let routine = vm.addRoutine(
             name: "새 루틴",
             schedule: RoutineScheduleDraft(),
@@ -166,5 +176,6 @@ struct RoutineView: View {
 
 #Preview {
     RoutineView()
+        .environmentObject(PremiumStore())
         .modelContainer(PreviewData.container)
 }

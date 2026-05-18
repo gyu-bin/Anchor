@@ -10,12 +10,27 @@ struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
     @EnvironmentObject private var tabRouter: TabRouter
+    @EnvironmentObject private var premium: PremiumStore
 
     @Query(sort: [SortDescriptor(\DailyLog.date, order: .reverse)]) private var logs: [DailyLog]
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
 
+    @State private var paywallReason: PaywallReason?
+
     private var routinesWithItems: [Routine] {
         routines.filter { !$0.items.isEmpty }
+    }
+
+    private var effectiveLogs: [DailyLog] {
+        guard !premium.isPremium else { return logs }
+        let cutoff = PremiumLimits.historyCutoffDate()
+        return logs.filter { $0.date >= cutoff }
+    }
+
+    private var hasOlderHistory: Bool {
+        guard !premium.isPremium else { return false }
+        let cutoff = PremiumLimits.historyCutoffDate()
+        return logs.contains { $0.date < cutoff }
     }
 
     var body: some View {
@@ -31,12 +46,15 @@ struct HistoryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
             .onAppear { refreshWeeklyNotification() }
+            .sheet(item: $paywallReason) { reason in
+                PaywallSheet(reason: reason)
+            }
         }
     }
 
     private var weeklySummaryBanner: some View {
         let fullDays = Self.weekFullDaysCount(
-            logs: logs,
+            logs: effectiveLogs,
             routines: routinesWithItems,
             now: Date(),
             cal: .current
@@ -52,7 +70,7 @@ struct HistoryView: View {
 
     private func refreshWeeklyNotification() {
         let fullDays = Self.weekFullDaysCount(
-            logs: logs,
+            logs: effectiveLogs,
             routines: routinesWithItems,
             now: Date(),
             cal: .current
@@ -88,6 +106,10 @@ struct HistoryView: View {
 
                 weeklySummaryBanner
 
+                if hasOlderHistory {
+                    historyPremiumBanner
+                }
+
                 metricsGrid
                 weeklyCard
                 itemTotalsCard
@@ -98,9 +120,30 @@ struct HistoryView: View {
         }
     }
 
+    private var historyPremiumBanner: some View {
+        Button {
+            paywallReason = .history
+        } label: {
+            AnchorCard {
+                HStack {
+                    Text(AppCopy.Premium.historyBanner)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.anchorText(scheme))
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.anchorSub(scheme))
+                }
+                .padding(AnchorLayout.cardPadding)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
     private var metricsGrid: some View {
-        let streak = Self.streak(logs: logs, routines: routinesWithItems, cal: .current)
-        let rate = Self.monthCompletionRate(logs: logs, routines: routinesWithItems, now: Date(), cal: .current)
+        let streak = Self.streak(logs: effectiveLogs, routines: routinesWithItems, cal: .current)
+        let rate = Self.monthCompletionRate(logs: effectiveLogs, routines: routinesWithItems, now: Date(), cal: .current)
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             metricTile(title: AppCopy.History.streak, value: "\(streak)", unit: "일", icon: "flame.fill")
@@ -140,14 +183,14 @@ struct HistoryView: View {
         AnchorCard {
             VStack(alignment: .leading, spacing: 14) {
                 AnchorSectionHeader(title: AppCopy.History.thisWeek)
-                WeeklyBarChart(bars: Self.weekBars(logs: logs, routines: routinesWithItems, now: Date(), cal: .current))
+                WeeklyBarChart(bars: Self.weekBars(logs: effectiveLogs, routines: routinesWithItems, now: Date(), cal: .current))
             }
             .padding(AnchorLayout.cardPadding)
         }
     }
 
     private var itemTotalsCard: some View {
-        let totals = Self.itemCompletionCounts(logs: logs, routines: routines)
+        let totals = Self.itemCompletionCounts(logs: effectiveLogs, routines: routines)
         return AnchorCard {
             VStack(alignment: .leading, spacing: 14) {
                 AnchorSectionHeader(title: AppCopy.History.byItem)
@@ -208,7 +251,7 @@ struct HistoryView: View {
         var statuses: [Int: WeekdayCompletion] = [:]
         for day in 1...daysInMonth {
             guard let d = cal.date(byAdding: .day, value: day - 1, to: monthStart) else { continue }
-            statuses[day] = Self.dayStatus(logs: logs, routines: routinesWithItems, day: d, cal: cal)
+            statuses[day] = Self.dayStatus(logs: effectiveLogs, routines: routinesWithItems, day: d, cal: cal)
         }
 
         return AnchorCard {
@@ -363,5 +406,6 @@ extension HistoryView {
 #Preview {
     HistoryView()
         .environmentObject(TabRouter())
+        .environmentObject(PremiumStore())
         .modelContainer(PreviewData.container)
 }

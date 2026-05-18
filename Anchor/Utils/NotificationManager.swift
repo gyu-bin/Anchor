@@ -63,7 +63,7 @@ enum NotificationManager {
             }
         }
 
-        if NotificationPreferences.weeklySummaryEnabled {
+        if NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium {
             scheduleWeeklySummary()
         }
     }
@@ -243,7 +243,7 @@ enum NotificationManager {
 
     /// 앱 실행 시 이번 주 완료 일수로 주간 알림 문구 갱신
     static func updateWeeklySummaryContent(fullDays: Int) {
-        guard NotificationPreferences.weeklySummaryEnabled else { return }
+        guard NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium else { return }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["weekly-summary"])
 
         var comps = DateComponents()

@@ -31,12 +31,17 @@ struct TodayView: View {
         vm.sortedRoutines(routines)
     }
 
-    private var routinesWithItems: [Routine] {
+    /// 오늘 일정에 맞는 루틴 (항목 없어도 표시).
+    private var scheduledRoutinesToday: [Routine] {
         vm.routinesForToday(sortedRoutines)
     }
 
+    private var actionableRoutinesToday: [Routine] {
+        vm.actionableRoutinesForToday(sortedRoutines)
+    }
+
     private var todayLogs: [DailyLog] {
-        routinesWithItems.compactMap { routine in
+        actionableRoutinesToday.compactMap { routine in
             try? vm.todayLog(for: routine, context: modelContext)
         }
     }
@@ -65,30 +70,39 @@ struct TodayView: View {
                         VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
                             AnchorScreenHeader(title: greeting, subtitle: dateTitle)
 
-                            if !routinesWithItems.isEmpty {
+                            if !scheduledRoutinesToday.isEmpty {
                                 restDayControl
                             }
 
-                            if routinesWithItems.isEmpty {
+                            if routines.isEmpty {
                                 emptyState
+                            } else if scheduledRoutinesToday.isEmpty {
+                                noScheduleTodayState
                             } else if isRestToday {
                                 restDayCard
                             } else {
-                                OverallProgressCard(
-                                    routines: routinesWithItems,
-                                    logs: todayLogs,
-                                    blockSummary: ShieldManager.aggregatedDisplaySummary(
-                                        routines: routinesWithItems,
-                                        modelContext: modelContext
-                                    ),
-                                    isActivelyLocking: ShieldManager.isAnyActivelyLocking(
-                                        routines: routinesWithItems,
-                                        modelContext: modelContext
+                                if !actionableRoutinesToday.isEmpty {
+                                    OverallProgressCard(
+                                        routines: actionableRoutinesToday,
+                                        logs: todayLogs,
+                                        blockSummary: ShieldManager.aggregatedDisplaySummary(
+                                            routines: actionableRoutinesToday,
+                                            modelContext: modelContext
+                                        ),
+                                        isActivelyLocking: ShieldManager.isAnyActivelyLocking(
+                                            routines: actionableRoutinesToday,
+                                            modelContext: modelContext
+                                        )
                                     )
-                                )
+                                }
 
-                                ForEach(routinesWithItems, id: \.id) { routine in
-                                    if let log = try? vm.todayLog(for: routine, context: modelContext) {
+                                ForEach(scheduledRoutinesToday, id: \.id) { routine in
+                                    if routine.items.isEmpty {
+                                        TodayRoutineSetupCard(routine: routine) {
+                                            tabRouter.selectedTab = 1
+                                        }
+                                        .id(routine.id)
+                                    } else if let log = try? vm.todayLog(for: routine, context: modelContext) {
                                         RoutineSectionCard(
                                             routine: routine,
                                             log: log,
@@ -184,6 +198,23 @@ struct TodayView: View {
         }
     }
 
+    private var noScheduleTodayState: some View {
+        AnchorCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(AppCopy.Today.noScheduleTitle)
+                    .font(.headline)
+                    .foregroundStyle(Color.anchorText(scheme))
+                Text(AppCopy.Today.noScheduleBody)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.anchorSub(scheme))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(AnchorLayout.cardPadding)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+    }
+
     private var emptyState: some View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
@@ -226,7 +257,10 @@ struct TodayView: View {
                     scrollTarget = next.id
                 }
 
-                let allDone = (try? vm.allRoutinesFullyCompletedToday(routines: routines, context: modelContext)) ?? false
+                let allDone = (try? vm.allRoutinesFullyCompletedToday(
+                    routines: sortedRoutines,
+                    context: modelContext
+                )) ?? false
                 if allDone && !wasAllComplete {
                     showCompletionSheet = true
                 }

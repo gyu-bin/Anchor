@@ -11,6 +11,7 @@ import UserNotifications
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var premium: PremiumStore
 
     @AppStorage(NotificationPreferencesKey.enabled) private var notificationsEnabled = true
     @AppStorage(NotificationPreferencesKey.routineStart) private var routineStartEnabled = true
@@ -23,6 +24,7 @@ struct SettingsView: View {
     @State private var shieldSubtitle: String = SharedShieldStore.shieldSubtitle
     @State private var screenTimeStatus: AuthorizationStatus = .notDetermined
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+    @State private var paywallReason: PaywallReason?
 
     var body: some View {
         NavigationStack {
@@ -30,6 +32,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
                     AnchorScreenHeader(title: AppCopy.Settings.title, subtitle: AppCopy.Settings.subtitle)
 
+                    premiumSection
                     appearanceSection
                     guideSection
                     dataPrivacySection
@@ -48,6 +51,10 @@ struct SettingsView: View {
                 screenTimeStatus = ShieldManager.authorizationStatus()
                 refreshNotificationStatus()
                 syncNotificationPrefs()
+                if !premium.isPremium, weeklySummaryEnabled {
+                    weeklySummaryEnabled = false
+                    applyNotificationPrefs()
+                }
             }
             .onChange(of: notificationsEnabled) { _, _ in applyNotificationPrefs() }
             .onChange(of: routineStartEnabled) { _, _ in applyNotificationPrefs() }
@@ -58,6 +65,39 @@ struct SettingsView: View {
                     showGuide = false
                 }
             }
+            .sheet(item: $paywallReason) { reason in
+                PaywallSheet(reason: reason)
+            }
+        }
+    }
+
+    private var premiumSection: some View {
+        AnchorCard {
+            VStack(alignment: .leading, spacing: 12) {
+                AnchorSectionHeader(title: AppCopy.Premium.settingsTitle)
+
+                if premium.isPremium {
+                    Label(AppCopy.Premium.settingsUnlocked, systemImage: "checkmark.seal.fill")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Color.anchorSuccess(scheme))
+                } else {
+                    Text(AppCopy.Premium.settingsLocked)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.anchorSub(scheme))
+
+                    Button(AppCopy.Premium.settingsOpen) {
+                        paywallReason = .general
+                    }
+                    .buttonStyle(AnchorButtonStyle())
+
+                    Button(AppCopy.Premium.restore) {
+                        Task { await premium.restore() }
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.anchorAccent(scheme))
+                }
+            }
+            .padding(AnchorLayout.cardPadding)
         }
     }
 
@@ -118,7 +158,7 @@ struct SettingsView: View {
                 if notificationsEnabled {
                     Toggle(AppCopy.Settings.routineStart, isOn: $routineStartEnabled)
                     Toggle(AppCopy.Settings.reminder, isOn: $reminderEnabled)
-                    Toggle(AppCopy.Settings.weeklySummary, isOn: $weeklySummaryEnabled)
+                    weeklySummaryToggle
                 }
 
                 Text(notificationStatusText)
@@ -162,6 +202,28 @@ struct SettingsView: View {
         }
     }
 
+    private var weeklySummaryToggle: some View {
+        Group {
+            if premium.isPremium {
+                Toggle(AppCopy.Settings.weeklySummary, isOn: $weeklySummaryEnabled)
+            } else {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(AppCopy.Settings.weeklySummary)
+                        Text(AppCopy.Premium.weeklyLocked)
+                            .font(.caption)
+                            .foregroundStyle(Color.anchorSub(scheme))
+                    }
+                    Spacer()
+                    Button(AppCopy.Premium.settingsOpen) {
+                        paywallReason = .weeklyNotification
+                    }
+                    .font(.caption.weight(.semibold))
+                }
+            }
+        }
+    }
+
     private var shieldMessageSection: some View {
         AnchorCard {
             VStack(alignment: .leading, spacing: 12) {
@@ -170,20 +232,30 @@ struct SettingsView: View {
                     subtitle: AppCopy.Settings.shieldSubtitle
                 )
 
-                TextField(AppCopy.Settings.shieldTitlePlaceholder, text: $shieldTitle)
-                    .anchorInsetField()
-                TextField(AppCopy.Settings.shieldSubtitlePlaceholder, text: $shieldSubtitle)
-                    .anchorInsetField()
+                if premium.isPremium {
+                    TextField(AppCopy.Settings.shieldTitlePlaceholder, text: $shieldTitle)
+                        .anchorInsetField()
+                    TextField(AppCopy.Settings.shieldSubtitlePlaceholder, text: $shieldSubtitle)
+                        .anchorInsetField()
 
-                Button(AppCopy.Settings.shieldSave) {
-                    let title = shieldTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                    let subtitle = shieldSubtitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                    SharedShieldStore.saveShieldMessages(
-                        title: title.isEmpty ? SharedShieldStore.defaultShieldTitle : title,
-                        subtitle: subtitle.isEmpty ? SharedShieldStore.defaultShieldSubtitle : subtitle
-                    )
+                    Button(AppCopy.Settings.shieldSave) {
+                        let title = shieldTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let subtitle = shieldSubtitle.trimmingCharacters(in: .whitespacesAndNewlines)
+                        SharedShieldStore.saveShieldMessages(
+                            title: title.isEmpty ? SharedShieldStore.defaultShieldTitle : title,
+                            subtitle: subtitle.isEmpty ? SharedShieldStore.defaultShieldSubtitle : subtitle
+                        )
+                    }
+                    .buttonStyle(AnchorSecondaryButtonStyle())
+                } else {
+                    Text(AppCopy.Premium.shieldLocked)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.anchorSub(scheme))
+                    Button(AppCopy.Premium.settingsOpen) {
+                        paywallReason = .shieldMessage
+                    }
+                    .buttonStyle(AnchorSecondaryButtonStyle())
                 }
-                .buttonStyle(AnchorSecondaryButtonStyle())
             }
             .padding(AnchorLayout.cardPadding)
         }

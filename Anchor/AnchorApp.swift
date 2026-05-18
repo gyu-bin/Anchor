@@ -10,6 +10,7 @@ import SwiftUI
 struct AnchorApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var tabRouter = TabRouter()
+    @StateObject private var premiumStore = PremiumStore()
 
     private var sharedModelContainer: ModelContainer = {
         AppModelContainer.make()
@@ -19,7 +20,11 @@ struct AnchorApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(tabRouter)
+                .environmentObject(premiumStore)
                 .modelContainer(sharedModelContainer)
+                .task {
+                    await premiumStore.bootstrap()
+                }
         }
     }
 }

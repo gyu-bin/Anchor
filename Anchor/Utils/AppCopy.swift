@@ -35,6 +35,10 @@ enum AppCopy {
         static let emptyTitle = "아직 루틴이 없어요"
         static let emptyBody = "루틴 탭에서 첫 루틴을 만들어 주세요"
         static let emptyAction = "루틴 만들기"
+        static let noScheduleTitle = "오늘은 예정된 루틴이 없어요"
+        static let noScheduleBody = "루틴 탭에서 반복 요일이나 특정 날을 확인해 보세요"
+        static let setupItemsBody = "루틴 탭에서 할 일을 추가하면 오늘부터 체크할 수 있어요"
+        static let setupItemsAction = "루틴 탭으로"
 
         static let completeTitle = "오늘도 해내셨네요"
         static let completeBody = "잠금을 풀어 두었어요. 편히 쉬세요"
@@ -177,6 +181,49 @@ enum AppCopy {
             if denied { return "설정 → Screen Time에서 허용해 주실 수 있어요." }
             return "한 번만 허용하시면 이후엔 자동이에요."
         }
+    }
+
+    enum Premium {
+        static let title = "전체 기능 열기"
+        static let reasonRoutine = "루틴을 더 만들고 싶을 때 전체 기능을 열 수 있어요."
+        static let reasonItem = "항목을 더 추가하려면 전체 기능이 필요해요."
+        static let reasonApp = "막을 앱을 더 선택하려면 전체 기능을 열어 주세요."
+        static let reasonWeb = "웹 차단을 더 쓰려면 전체 기능을 열어 주세요."
+        static let reasonHistory = "30일이 넘은 기록을 보려면 전체 기능을 열어 주세요."
+        static let reasonShield = "잠금 화면 문구를 바꾸려면 전체 기능을 열어 주세요."
+        static let reasonWeekly = "주간 요약 알림은 전체 기능에서 쓸 수 있어요."
+        static let reasonGeneral = "루틴·잠금·기록 제한 없이 쓰실 수 있어요."
+        static let freeTierTitle = "지금 무료로 쓰는 것"
+        static let freeTierSummary = "루틴 3개 · 항목 5개 · 앱 8개 · 웹 3개 · 기록 30일"
+        static let benefits = [
+            "루틴·항목 무제한",
+            "앱·웹 차단 무제한",
+            "전체 기록·항목별 통계",
+            "주간 요약 알림",
+            "잠금 화면 문구 바꾸기",
+        ]
+        static func purchase(price: String) -> String {
+            "\(price)에 평생 열기"
+        }
+        static let restore = "구매 복원"
+        static let footnote = "구독이 아니에요. 한 번만 결제하면 이 기기에서 계속 쓸 수 있어요."
+        static let settingsTitle = "전체 기능"
+        static let settingsUnlocked = "전체 기능을 쓰고 있어요"
+        static let settingsLocked = "1회 결제로 제한 없이"
+        static let settingsOpen = "전체 기능 열기"
+        static let historyBanner = "30일이 지난 기록은 전체 기능에서 볼 수 있어요."
+        static let shieldLocked = "전체 기능을 열면 문구를 바꿀 수 있어요."
+        static let weeklyLocked = "전체 기능"
+        static let productUnavailable = "결제 정보를 불러오지 못했어요. Xcode에서 Scheme → Run → StoreKit Configuration이 Products.storekit인지 확인한 뒤 앱을 다시 실행해 주세요."
+        static let loadingProduct = "결제 정보를 불러오는 중이에요…"
+        static let retryLoad = "다시 불러오기"
+        static let purchaseFailed = "결제에 실패했어요. 다시 시도해 주세요."
+        static let purchasePending = "결제 승인을 기다리는 중이에요."
+        static let restoreFailed = "복원에 실패했어요."
+        static let restoreEmpty = "복원할 구매 내역이 없어요."
+        static let alreadyUnlocked = "이미 열려 있어요"
+        static let appLimitHint = "무료는 앱 \(PremiumLimits.maxAppsPerRoutine)개까지예요."
+        static let webLimitHint = "무료는 사이트 \(PremiumLimits.maxWebDomainsPerRoutine)개까지예요."
     }
 
     enum Notification {

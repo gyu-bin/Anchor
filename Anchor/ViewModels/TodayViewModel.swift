@@ -13,8 +13,16 @@ final class TodayViewModel {
         routines.sorted { $0.order < $1.order }
     }
 
+    /// 오늘 일정에 해당하는 루틴 전부 (항목 없어도 포함).
     func routinesForToday(_ routines: [Routine], calendar: Calendar = .current) -> [Routine] {
-        sortedRoutines(routines).filter { RoutineSchedule.isVisibleToday($0, calendar: calendar) }
+        sortedRoutines(routines).filter {
+            RoutineSchedule.isActive($0, on: Date(), calendar: calendar)
+        }
+    }
+
+    /// 잠금·위젯 등 실제로 수행할 항목이 있는 오늘 루틴.
+    func actionableRoutinesForToday(_ routines: [Routine], calendar: Calendar = .current) -> [Routine] {
+        routinesForToday(routines, calendar: calendar).filter { !$0.items.isEmpty }
     }
 
     func sortedItems(for routine: Routine) -> [RoutineItem] {

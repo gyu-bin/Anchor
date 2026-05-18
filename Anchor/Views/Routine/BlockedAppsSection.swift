@@ -11,8 +11,10 @@ import SwiftUI
 struct BlockedAppsSection: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var premium: PremiumStore
 
     @Bindable var routine: Routine
+    @Binding var paywallReason: PaywallReason?
 
     @State private var selection = FamilyActivitySelection()
     @State private var showPicker = false
@@ -23,11 +25,21 @@ struct BlockedAppsSection: View {
         Array(ShieldManager.decodeSelection(routine.shieldSelectionData).applicationTokens)
     }
 
+    private var maxApps: Int {
+        PremiumLimits.allowedAppCount(isPremium: premium.isPremium)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("앱 차단")
                 .font(.headline)
                 .foregroundStyle(Color.anchorText(scheme))
+
+            if !premium.isPremium {
+                Text(AppCopy.Premium.appLimitHint)
+                    .font(.caption)
+                    .foregroundStyle(Color.anchorSub(scheme))
+            }
 
             HStack(spacing: 10) {
                 Button("권한") {
@@ -89,6 +101,11 @@ struct BlockedAppsSection: View {
     }
 
     private func applyAppSelection() {
+        let count = selection.applicationTokens.count
+        if !premium.isPremium && count > maxApps {
+            paywallReason = .appLimit
+            return
+        }
         do {
             var merged = ShieldManager.decodeSelection(routine.shieldSelectionData)
             merged.applicationTokens = selection.applicationTokens

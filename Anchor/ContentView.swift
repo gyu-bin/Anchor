@@ -131,5 +131,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(TabRouter())
+        .environmentObject(PremiumStore())
         .modelContainer(PreviewData.container)
 }

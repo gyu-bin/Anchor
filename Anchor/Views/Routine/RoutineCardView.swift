@@ -9,9 +9,12 @@ import SwiftUI
 struct RoutineCardView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var premium: PremiumStore
+
     @Bindable var routine: Routine
     @ObservedObject var vm: RoutineViewModel
     @Binding var editPayload: RoutineItemEditPayload?
+    @Binding var paywallReason: PaywallReason?
     @Binding var isExpanded: Bool
     var focusNameOnAppear: Bool = false
 
@@ -184,6 +187,13 @@ struct RoutineCardView: View {
                 }
 
                 Button {
+                    guard PremiumLimits.canAddItem(
+                        currentCount: routine.items.count,
+                        isPremium: premium.isPremium
+                    ) else {
+                        paywallReason = .itemLimit
+                        return
+                    }
                     editPayload = RoutineItemEditPayload(routine: routine, item: nil)
                 } label: {
                     Label(AppCopy.Routine.addItem, systemImage: "plus.circle.fill")
@@ -192,8 +202,8 @@ struct RoutineCardView: View {
                 .tint(Color.anchorAccent(scheme))
             }
 
-            BlockedAppsSection(routine: routine)
-            BlockedWebSection(routine: routine)
+            BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
+            BlockedWebSection(routine: routine, paywallReason: $paywallReason)
         }
         .alert(AppCopy.Routine.weekdayRequired, isPresented: $weekdayAlert) {
             Button("확인", role: .cancel) {}

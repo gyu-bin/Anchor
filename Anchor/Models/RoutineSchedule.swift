@@ -112,7 +112,7 @@ enum RoutineSchedule {
         }
     }
 
-    /// 오늘 탭·잠금·알림에 노출할지
+    /// 잠금·위젯·알림 등 — 오늘 일정이고 항목이 있을 때만
     static func isVisibleToday(_ routine: Routine, calendar: Calendar = .current) -> Bool {
         guard !routine.items.isEmpty else { return false }
         return isActive(routine, on: Date(), calendar: calendar)

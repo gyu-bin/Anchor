@@ -59,6 +59,7 @@
 
 /* Begin PBXFileReference section */
 		1D1FC0B62FBA9D1500375B72 /* AnchorShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = AnchorShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D1FD3C62FBAE04B00375B72 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text.storekit; path = Products.storekit; sourceTree = "<group>"; };
 		1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "키링: Keyring.app"; path = Keyring.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00ABC2FB55D3E00D55358 /* AnchorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00AC62FB55D3E00D55358 /* AnchorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -179,6 +180,7 @@
 		1DD00AA62FB55D3C00D55358 = {
 			isa = PBXGroup;
 			children = (
+				1D1FD3C62FBAE04B00375B72 /* Products.storekit */,
 				1DD00AB12FB55D3C00D55358 /* Anchor */,
 				A10000102FB55D3E00D55358 /* AnchorShieldConfiguration */,
 				A10000112FB55D3E00D55358 /* AnchorShieldAction */,
