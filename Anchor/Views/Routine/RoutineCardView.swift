@@ -9,14 +9,15 @@ import SwiftUI
 struct RoutineCardView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
-    @Environment(\.editMode) private var editMode
-
     @Bindable var routine: Routine
     @ObservedObject var vm: RoutineViewModel
     @Binding var editPayload: RoutineItemEditPayload?
     @Binding var isExpanded: Bool
+    var focusNameOnAppear: Bool = false
 
     @State private var editingName: String = ""
+    @State private var scheduleDraft = RoutineScheduleDraft()
+    @State private var weekdayAlert = false
     @FocusState private var nameFieldFocused: Bool
 
     private var itemCount: Int { routine.items.count }
@@ -28,21 +29,20 @@ struct RoutineCardView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header
+        AnchorCard {
+            VStack(alignment: .leading, spacing: 0) {
+                header
 
-            if isExpanded {
-                Divider()
-                    .padding(.horizontal, 16)
+                if isExpanded {
+                    Divider()
+                        .padding(.horizontal, AnchorLayout.cardPadding)
 
-                expandedContent
-                    .padding(16)
-                    .padding(.top, 4)
+                    expandedContent
+                        .padding(AnchorLayout.cardPadding)
+                        .padding(.top, 4)
+                }
             }
         }
-        .background(Color("AnchorCard"))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
     }
 
     private var header: some View {
@@ -55,7 +55,7 @@ struct RoutineCardView: View {
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(routine.name)
-                            .font(.headline)
+                            .font(AnchorTypography.cardTitle(scheme))
                             .foregroundStyle(Color.anchorText(scheme))
                             .lineLimit(1)
                             .multilineTextAlignment(.leading)
@@ -88,10 +88,7 @@ struct RoutineCardView: View {
     }
 
     private var summarySubtitle: String {
-        if itemCount == 0 {
-            return startTimeText
-        }
-        return "\(itemCount)개 항목 · \(startTimeText)"
+        RoutineSchedule.cardSubtitle(for: routine, itemCount: itemCount, startTimeText: startTimeText)
     }
 
     @ViewBuilder
@@ -106,10 +103,15 @@ struct RoutineCardView: View {
                     .foregroundStyle(Color.anchorText(scheme))
                     .submitLabel(.done)
                     .focused($nameFieldFocused)
-                    .padding(12)
-                    .background(Color.anchorSubBg(scheme))
-                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                    .onAppear { editingName = routine.name }
+                    .anchorInsetField()
+                    .onAppear {
+                        editingName = routine.name
+                        if focusNameOnAppear {
+                            DispatchQueue.main.async {
+                                nameFieldFocused = true
+                            }
+                        }
+                    }
                     .onSubmit {
                         commitRoutineName()
                         collapseCard()
@@ -126,16 +128,19 @@ struct RoutineCardView: View {
                     }
             }
 
-            DatePicker(
-                "시작 시간",
-                selection: $routine.startTime,
-                displayedComponents: .hourAndMinute
-            )
-            .environment(\.locale, Locale(identifier: "ko_KR"))
-            .onChange(of: routine.startTime) { _, _ in
-                try? modelContext.save()
-                try? NotificationManager.rescheduleAll(modelContext: modelContext)
-            }
+            RoutineScheduleEditor(draft: $scheduleDraft)
+                .onAppear {
+                    scheduleDraft = RoutineSchedule.draft(from: routine)
+                }
+                .onChange(of: scheduleDraft) { _, newValue in
+                    guard newValue.kind != .weekdays || !newValue.activeWeekdays.isEmpty else {
+                        weekdayAlert = true
+                        scheduleDraft = RoutineSchedule.draft(from: routine)
+                        return
+                    }
+                    vm.updateSchedule(routine, draft: newValue, context: modelContext)
+                    Task { await ShieldManager.refresh(modelContext: modelContext) }
+                }
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("항목")
@@ -144,7 +149,7 @@ struct RoutineCardView: View {
 
                 let sorted = routine.items.sorted { $0.order < $1.order }
                 if sorted.isEmpty {
-                    Text("항목이 없습니다")
+                    Text(AppCopy.Routine.noItems)
                         .font(.subheadline)
                         .foregroundStyle(Color.anchorSub(scheme))
                 } else {
@@ -173,21 +178,15 @@ struct RoutineCardView: View {
                                 Divider()
                             }
                         }
-                        .onMove { from, to in
-                            vm.moveItem(from: from, to: to, in: routine, context: modelContext)
-                        }
-                        .onDelete { offsets in
-                            vm.deleteItems(at: offsets, in: routine, context: modelContext)
-                        }
                     }
-                    .background(Color.anchorSubBg(scheme).opacity(0.5))
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(Color.anchorSubBg(scheme))
+                    .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
                 }
 
                 Button {
                     editPayload = RoutineItemEditPayload(routine: routine, item: nil)
                 } label: {
-                    Label("항목 추가", systemImage: "plus.circle.fill")
+                    Label(AppCopy.Routine.addItem, systemImage: "plus.circle.fill")
                         .font(.subheadline.weight(.semibold))
                 }
                 .tint(Color.anchorAccent(scheme))
@@ -195,6 +194,9 @@ struct RoutineCardView: View {
 
             BlockedAppsSection(routine: routine)
             BlockedWebSection(routine: routine)
+        }
+        .alert(AppCopy.Routine.weekdayRequired, isPresented: $weekdayAlert) {
+            Button("확인", role: .cancel) {}
         }
     }
 

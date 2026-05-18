@@ -7,19 +7,29 @@ import ManagedSettings
 import ManagedSettingsUI
 import UIKit
 
+private enum ShieldCopy {
+    static let appGroupID = "group.com.rbqls6651.anchor"
+    static let titleKey = "shield.title"
+    static let subtitleKey = "shield.subtitle"
+
+    static var title: String {
+        UserDefaults(suiteName: appGroupID)?.string(forKey: titleKey)
+            ?? "루틴을 먼저 완료해 주세요"
+    }
+
+    static var subtitle: String {
+        UserDefaults(suiteName: appGroupID)?.string(forKey: subtitleKey)
+            ?? "끝나면 바로 열어 드릴게요"
+    }
+}
+
 final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     override func configuration(shielding application: Application) -> ShieldConfiguration {
-        makeConfig(
-            title: "루틴을 먼저 완료해보세요",
-            subtitle: "키링에서 루틴을 완료하면 바로 열려요"
-        )
+        makeConfig(title: ShieldCopy.title, subtitle: ShieldCopy.subtitle)
     }
 
     override func configuration(shielding application: Application, in category: ActivityCategory) -> ShieldConfiguration {
-        makeConfig(
-            title: "루틴을 먼저 완료해보세요",
-            subtitle: "이 카테고리는 루틴 완료 후 사용 가능해요"
-        )
+        makeConfig(title: ShieldCopy.title, subtitle: ShieldCopy.subtitle)
     }
 
     private func makeConfig(title: String, subtitle: String) -> ShieldConfiguration {

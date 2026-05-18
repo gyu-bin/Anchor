@@ -22,8 +22,14 @@ struct PremiumFocusSplash: View {
     var body: some View {
         ZStack {
             Color.anchorBg(scheme).ignoresSafeArea()
+            LinearGradient(
+                colors: [Color.anchorAccent(scheme).opacity(0.08), Color.clear],
+                startPoint: .top,
+                endPoint: .center
+            )
+            .ignoresSafeArea()
 
-            VStack(spacing: 28) {
+            VStack(spacing: 32) {
                 ZStack {
                     Circle()
                         .stroke(Color.anchorBorder(scheme), lineWidth: ringWidth)
@@ -47,7 +53,7 @@ struct PremiumFocusSplash: View {
                 }
 
                 Text(AppBrand.displayName)
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 24, weight: .bold))
                     .foregroundStyle(Color.anchorText(scheme))
                     .opacity(contentOpacity)
             }

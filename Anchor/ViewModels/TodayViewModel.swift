@@ -13,6 +13,10 @@ final class TodayViewModel {
         routines.sorted { $0.order < $1.order }
     }
 
+    func routinesForToday(_ routines: [Routine], calendar: Calendar = .current) -> [Routine] {
+        sortedRoutines(routines).filter { RoutineSchedule.isVisibleToday($0, calendar: calendar) }
+    }
+
     func sortedItems(for routine: Routine) -> [RoutineItem] {
         routine.items.sorted { $0.order < $1.order }
     }
@@ -55,6 +59,34 @@ final class TodayViewModel {
         refreshCompletionState(log: log, routine: routine)
     }
 
+    func setCompletion(
+        item: RoutineItem,
+        routine: Routine,
+        completed: Bool,
+        context: ModelContext
+    ) throws {
+        let log = try todayLog(for: routine, context: context)
+        var set = Set(log.completedItems)
+        if completed {
+            set.insert(item.id)
+        } else {
+            set.remove(item.id)
+        }
+        log.completedItems = Array(set)
+        refreshCompletionState(log: log, routine: routine)
+    }
+
+    func completeNextItem(routines: [Routine], context: ModelContext) throws -> Bool {
+        for routine in routinesForToday(routines) {
+            let log = try todayLog(for: routine, context: context)
+            if let item = firstIncompleteItem(routine: routine, log: log) {
+                try setCompletion(item: item, routine: routine, completed: true, context: context)
+                return true
+            }
+        }
+        return false
+    }
+
     func isCompleted(_ item: RoutineItem, log: DailyLog) -> Bool {
         log.completedItems.contains(item.id)
     }
@@ -72,7 +104,7 @@ final class TodayViewModel {
 
     /// 목록 순서대로, 아직 끝내지 않은 첫 루틴을 "진행 중"으로 선택합니다.
     func headlineRoutine(routines: [Routine], context: ModelContext) throws -> Routine? {
-        let sorted = sortedRoutines(routines).filter { !$0.items.isEmpty }
+        let sorted = routinesForToday(routines)
         for r in sorted {
             let log = try todayLog(for: r, context: context)
             if !log.isFullyCompleted { return r }
@@ -81,7 +113,7 @@ final class TodayViewModel {
     }
 
     func allRoutinesFullyCompletedToday(routines: [Routine], context: ModelContext) throws -> Bool {
-        let withItems = routines.filter { !$0.items.isEmpty }
+        let withItems = routinesForToday(routines)
         guard !withItems.isEmpty else { return false }
         for r in withItems {
             let log = try todayLog(for: r, context: context)

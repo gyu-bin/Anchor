@@ -27,21 +27,31 @@ extension Color {
     }
 
     static func anchorText(_ scheme: ColorScheme) -> Color {
-        _ = scheme
-        return Color(hex: "1A1A1A")
+        scheme == .dark ? Color(hex: "F2EDE6") : Color(hex: "1C1C1E")
     }
 
     static func anchorSub(_ scheme: ColorScheme) -> Color {
-        _ = scheme
-        return Color(hex: "6B6560")
+        scheme == .dark ? Color(hex: "A8A39C") : Color(hex: "8E8A84")
     }
 
     static func anchorBorder(_ scheme: ColorScheme) -> Color {
-        _ = scheme
-        return Color(hex: "E0D9CF")
+        scheme == .dark ? Color(hex: "3A3834") : Color(hex: "E8E4DD")
     }
 
-    static let anchorSuccess = Color.green
-    static let anchorDanger = Color.red
-    static let anchorInfo = Color.blue
+    static func anchorSuccess(_ scheme: ColorScheme) -> Color {
+        _ = scheme
+        return Color(hex: "3D8B5A")
+    }
+
+    static func anchorWarning(_ scheme: ColorScheme) -> Color {
+        _ = scheme
+        return Color(hex: "D4843A")
+    }
+
+    static func anchorHighlight(_ scheme: ColorScheme) -> Color {
+        _ = scheme
+        return Color.anchorAccent(scheme).opacity(0.1)
+    }
+
+    static let anchorDanger = Color(hex: "D64545")
 }

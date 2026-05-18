@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B2DAM0202FBAE00100D55358 /* AnchorDeviceActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B2DAM0022FBAE00100D55358 /* AnchorDeviceActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C1WGT00A2FBAE00100D55358 /* AnchorWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C1WGT0022FBAE00100D55358 /* AnchorWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +33,13 @@
 			remoteGlobalIDString = B2DAM0032FBAE00100D55358;
 			remoteInfo = AnchorDeviceActivityMonitor;
 		};
+		C1WGT00C2FBAE00100D55358 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1DD00AA72FB55D3C00D55358 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1WGT0032FBAE00100D55358;
+			remoteInfo = AnchorWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,6 +50,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				B2DAM0202FBAE00100D55358 /* AnchorDeviceActivityMonitor.appex in Embed Foundation Extensions */,
+				C1WGT00A2FBAE00100D55358 /* AnchorWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -50,11 +59,12 @@
 
 /* Begin PBXFileReference section */
 		1D1FC0B62FBA9D1500375B72 /* AnchorShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = AnchorShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "키링: Keyring.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "키링: Keyring.app"; path = Keyring.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00ABC2FB55D3E00D55358 /* AnchorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00AC62FB55D3E00D55358 /* AnchorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000202FB55D3E00D55358 /* AnchorShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AnchorShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2DAM0022FBAE00100D55358 /* AnchorDeviceActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AnchorDeviceActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1WGT0022FBAE00100D55358 /* AnchorWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AnchorWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -106,6 +116,11 @@
 			path = AnchorDeviceActivityMonitor;
 			sourceTree = "<group>";
 		};
+		C1WGT0012FBAE00100D55358 /* AnchorWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AnchorWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +166,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1WGT0062FBAE00100D55358 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -164,6 +186,7 @@
 				1DD00AC92FB55D3E00D55358 /* AnchorUITests */,
 				1D1FC0B72FBA9D1500375B72 /* AnchorShieldAction */,
 				B2DAM0012FBAE00100D55358 /* AnchorDeviceActivityMonitor */,
+				C1WGT0012FBAE00100D55358 /* AnchorWidget */,
 				1DD00AB02FB55D3C00D55358 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -177,6 +200,7 @@
 				1DD00AC62FB55D3E00D55358 /* AnchorUITests.xctest */,
 				1D1FC0B62FBA9D1500375B72 /* AnchorShieldAction.appex */,
 				B2DAM0022FBAE00100D55358 /* AnchorDeviceActivityMonitor.appex */,
+				C1WGT0022FBAE00100D55358 /* AnchorWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -219,6 +243,7 @@
 			);
 			dependencies = (
 				B2DAM0112FBAE00100D55358 /* PBXTargetDependency */,
+				C1WGT00B2FBAE00100D55358 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1DD00AB12FB55D3C00D55358 /* Anchor */,
@@ -320,6 +345,28 @@
 			productReference = B2DAM0022FBAE00100D55358 /* AnchorDeviceActivityMonitor.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		C1WGT0032FBAE00100D55358 /* AnchorWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1WGT0072FBAE00100D55358 /* Build configuration list for PBXNativeTarget "AnchorWidgetExtension" */;
+			buildPhases = (
+				C1WGT0042FBAE00100D55358 /* Sources */,
+				C1WGT0062FBAE00100D55358 /* Frameworks */,
+				C1WGT0052FBAE00100D55358 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C1WGT0012FBAE00100D55358 /* AnchorWidget */,
+			);
+			name = AnchorWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = AnchorWidgetExtension;
+			productReference = C1WGT0022FBAE00100D55358 /* AnchorWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -372,6 +419,7 @@
 				1DD00AC52FB55D3E00D55358 /* AnchorUITests */,
 				1D1FC0B52FBA9D1500375B72 /* AnchorShieldAction */,
 				B2DAM0032FBAE00100D55358 /* AnchorDeviceActivityMonitor */,
+				C1WGT0032FBAE00100D55358 /* AnchorWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -413,6 +461,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B2DAM0052FBAE00100D55358 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1WGT0052FBAE00100D55358 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -464,6 +519,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C1WGT0042FBAE00100D55358 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -481,6 +543,11 @@
 			isa = PBXTargetDependency;
 			target = B2DAM0032FBAE00100D55358 /* AnchorDeviceActivityMonitor */;
 			targetProxy = B2DAM0122FBAE00100D55358 /* PBXContainerItemProxy */;
+		};
+		C1WGT00B2FBAE00100D55358 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1WGT0032FBAE00100D55358 /* AnchorWidgetExtension */;
+			targetProxy = C1WGT00C2FBAE00100D55358 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -551,7 +618,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -616,7 +682,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -673,6 +738,7 @@
 		1DD00AD12FB55D3E00D55358 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Anchor/AnchorDebug.entitlements;
@@ -686,10 +752,10 @@
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "루틴 시작 알림과 미완료 리마인더를 보내기 위해 알림 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -710,6 +776,7 @@
 		1DD00AD22FB55D3E00D55358 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Anchor/Anchor.entitlements;
@@ -722,11 +789,11 @@
 				INFOPLIST_KEY_NSFamilyControlsUsageDescription = "루틴이 끝나기 전까지 선택한 앱(예: Safari) 사용을 제한하기 위해 Screen Time 연동이 필요합니다.";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "루틴 시작 알림과 미완료 리마인더를 보내기 위해 알림 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -944,6 +1011,62 @@
 			};
 			name = Release;
 		};
+		C1WGT0082FBAE00100D55358 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = AnchorWidget/AnchorWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6YASPU77L7;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AnchorWidgetInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AnchorWidget;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rbqls6651.anchor.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C1WGT0092FBAE00100D55358 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = AnchorWidget/AnchorWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6YASPU77L7;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AnchorWidgetInfo.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AnchorWidget;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rbqls6651.anchor.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1006,6 +1129,15 @@
 			buildConfigurations = (
 				B2DAM0082FBAE00100D55358 /* Debug */,
 				B2DAM0092FBAE00100D55358 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C1WGT0072FBAE00100D55358 /* Build configuration list for PBXNativeTarget "AnchorWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1WGT0082FBAE00100D55358 /* Debug */,
+				C1WGT0092FBAE00100D55358 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

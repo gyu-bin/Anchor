@@ -31,35 +31,33 @@ struct WeeklyBarChart: View {
                 y: .value("진행", bar.value)
             )
             .foregroundStyle(color(for: bar.status))
-            .cornerRadius(6)
+            .cornerRadius(8)
         }
         .chartYScale(domain: 0...3)
         .chartYAxis(.hidden)
-        .frame(height: 160)
-        .padding(.vertical, 6)
+        .chartXAxis {
+            AxisMarks { value in
+                AxisValueLabel {
+                    if let label = value.as(String.self) {
+                        Text(label)
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(Color.anchorSub(scheme))
+                    }
+                }
+            }
+        }
+        .frame(height: 148)
+        .padding(.top, 4)
     }
 
     private func color(for status: WeekdayCompletion) -> Color {
         switch status {
         case .full:
-            return Color.anchorSuccess
+            return Color.anchorSuccess(scheme)
         case .partial:
-            return Color.yellow
+            return Color.anchorAccent(scheme).opacity(0.65)
         case .none:
-            return Color.anchorSub(scheme).opacity(0.35)
+            return Color.anchorSubBg(scheme)
         }
     }
-}
-
-#Preview {
-    WeeklyBarChart(bars: [
-        WeekdayBar(label: "월", value: 3, status: .full),
-        WeekdayBar(label: "화", value: 2, status: .partial),
-        WeekdayBar(label: "수", value: 0.8, status: .none),
-        WeekdayBar(label: "목", value: 3, status: .full),
-        WeekdayBar(label: "금", value: 2, status: .partial),
-        WeekdayBar(label: "토", value: 1, status: .none),
-        WeekdayBar(label: "일", value: 3, status: .full),
-    ])
-    .padding()
 }

@@ -31,56 +31,37 @@ struct OverallProgressCard: View {
         totalRoutines == 0 ? 0 : Double(completedRoutines) / Double(totalRoutines)
     }
 
-    private var headerText: String {
-        if completedRoutines == totalRoutines && totalRoutines > 0 {
-            return "오늘 모두 완료했어요 🎉"
-        }
-        let hour = Calendar.current.component(.hour, from: Date())
-        return hour < 12 ? "좋은 아침이에요" : "수고했어요"
-    }
-
     var body: some View {
         AnchorCard {
-            HStack(alignment: .top, spacing: 16) {
+            HStack(alignment: .center, spacing: 18) {
                 ZStack {
-                    Circle()
-                        .stroke(Color.anchorSubBg(scheme), lineWidth: 6)
-                    Circle()
-                        .trim(from: 0, to: progress)
-                        .stroke(
-                            Color("AnchorAccent"),
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .animation(.spring(response: 0.6), value: progress)
+                    ProgressRingView(progress: progress, lineWidth: 6)
                     Text("\(Int(progress * 100))%")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color.anchorText(scheme))
                 }
-                .frame(width: 56, height: 56)
+                .frame(width: 64, height: 64)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(headerText)
-                        .font(.headline)
+                    Text(AppCopy.Today.progressTitle(completed: completedRoutines, total: totalRoutines))
+                        .font(AnchorTypography.cardTitle(scheme))
                         .foregroundStyle(Color.anchorText(scheme))
-                    Text("\(completedRoutines)/\(totalRoutines) 루틴 완료")
-                        .font(.caption)
+
+                    Text(AppCopy.Today.progressSubtitle(completed: completedRoutines, total: totalRoutines))
+                        .font(.subheadline)
                         .foregroundStyle(Color.anchorSub(scheme))
 
                     if completedRoutines < totalRoutines, blockSummary.hasAnyBlock {
-                        Label(
-                            isActivelyLocking ? "잠금 중" : "잠금 예정",
-                            systemImage: isActivelyLocking ? "lock.fill" : "lock"
-                        )
-                        .font(.caption2)
-                        .foregroundStyle(isActivelyLocking ? .orange : Color.anchorSub(scheme))
+                        Text(isActivelyLocking ? AppCopy.Today.lockActive : AppCopy.Today.lockScheduled)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(isActivelyLocking ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
 
-                        BlockedShieldDisplay(summary: blockSummary, maxApps: 8, maxWebs: 8)
+                        BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6)
                     }
                 }
                 Spacer(minLength: 0)
             }
-            .padding(16)
+            .padding(AnchorLayout.cardPadding)
         }
     }
 }

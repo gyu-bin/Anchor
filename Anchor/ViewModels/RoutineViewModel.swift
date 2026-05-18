@@ -25,15 +25,30 @@ final class RoutineViewModel: ObservableObject {
         (allRoutines.map(\.order).max() ?? -1) + 1
     }
 
-    func addRoutine(name: String, startTime: Date, context: ModelContext, routines: [Routine]) {
+    @discardableResult
+    func addRoutine(
+        name: String,
+        schedule: RoutineScheduleDraft,
+        context: ModelContext,
+        routines: [Routine]
+    ) -> Routine {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let displayName = trimmed.isEmpty ? "새 루틴" : trimmed
         let r = Routine(
             name: displayName,
-            startTime: startTime,
+            startTime: schedule.startTime,
             order: nextOrder(in: routines)
         )
+        RoutineSchedule.apply(schedule, to: r)
         context.insert(r)
+        try? context.save()
+        try? NotificationManager.rescheduleAll(modelContext: context)
+        return r
+    }
+
+    func updateSchedule(_ routine: Routine, draft: RoutineScheduleDraft, context: ModelContext) {
+        guard draft.kind != .weekdays || !draft.activeWeekdays.isEmpty else { return }
+        RoutineSchedule.apply(draft, to: routine)
         try? context.save()
         try? NotificationManager.rescheduleAll(modelContext: context)
     }
@@ -80,6 +95,15 @@ final class RoutineViewModel: ObservableObject {
         items.move(fromOffsets: source, toOffset: destination)
         for (index, item) in items.enumerated() {
             item.order = index
+        }
+        try? context.save()
+    }
+
+    func moveRoutine(from source: IndexSet, to destination: Int, routines: [Routine], context: ModelContext) {
+        var ordered = sortedRoutines(routines)
+        ordered.move(fromOffsets: source, toOffset: destination)
+        for (index, routine) in ordered.enumerated() {
+            routine.order = index
         }
         try? context.save()
     }

@@ -35,64 +35,56 @@ struct RoutineSectionCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(routine.name)
-                        .font(.headline)
-                        .foregroundStyle(Color.anchorText(scheme))
-                    Text("\(completedCount)/\(totalCount) 완료")
-                        .font(.caption)
-                        .foregroundStyle(Color.anchorSub(scheme))
+        AnchorCard {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(routine.name)
+                            .font(AnchorTypography.cardTitle(scheme))
+                            .foregroundStyle(Color.anchorText(scheme))
+                        Text(AppCopy.Routine.sectionProgress(done: completedCount, total: totalCount))
+                            .font(.subheadline)
+                            .foregroundStyle(Color.anchorSub(scheme))
+                    }
+                    Spacer()
+                    if isFullyDone {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.title3)
+                            .foregroundStyle(Color.anchorSuccess(scheme))
+                            .symbolRenderingMode(.hierarchical)
+                    }
                 }
-                Spacer()
-                if isFullyDone {
-                    Label("완료", systemImage: "checkmark.seal.fill")
-                        .font(.caption)
-                        .foregroundStyle(.green)
+                .padding(AnchorLayout.cardPadding)
+
+                if !isFullyDone, blockSummary.hasAnyBlock {
+                    Text(isActivelyLocking ? AppCopy.Routine.lockActive : AppCopy.Routine.lockScheduled)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(isActivelyLocking ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
+                        .padding(.horizontal, AnchorLayout.cardPadding)
+                        .padding(.bottom, 4)
+
+                    BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6, iconSize: 26)
+                        .padding(.horizontal, AnchorLayout.cardPadding)
+                        .padding(.bottom, 10)
                 }
-            }
-            .padding(16)
 
-            if !isFullyDone, blockSummary.hasAnyBlock {
-                HStack(spacing: 4) {
-                    Image(systemName: isActivelyLocking ? "lock.fill" : "lock")
-                        .font(.caption2)
-                    Text(isActivelyLocking ? "잠금 중" : "잠금 예정")
-                        .font(.caption2)
+                VStack(spacing: 4) {
+                    ForEach(sortedItems, id: \.id) { item in
+                        RoutineItemRow(
+                            item: item,
+                            isCompleted: log.completedItems.contains(item.id),
+                            isCurrent: item.id == firstIncompleteId,
+                            onTap: { onToggle(item) }
+                        )
+                    }
                 }
-                .foregroundStyle(isActivelyLocking ? .orange : Color.anchorSub(scheme))
-                .padding(.horizontal, 16)
-                .padding(.bottom, 4)
-
-                BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6, iconSize: 26)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
-            }
-
-            Divider()
-                .padding(.horizontal, 16)
-
-            ForEach(sortedItems, id: \.id) { item in
-                RoutineItemRow(
-                    item: item,
-                    isCompleted: log.completedItems.contains(item.id),
-                    isCurrent: item.id == firstIncompleteId,
-                    onTap: { onToggle(item) }
-                )
-                if item.id != sortedItems.last?.id {
-                    Divider()
-                        .padding(.leading, 52)
-                }
+                .padding(.bottom, 8)
             }
         }
-        .background(Color("AnchorCard"))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: AnchorLayout.cardRadius, style: .continuous)
                 .stroke(
-                    isFullyDone ? Color.green.opacity(0.3) : Color.clear,
+                    isFullyDone ? Color.anchorSuccess(scheme).opacity(0.4) : Color.clear,
                     lineWidth: 1.5
                 )
         )

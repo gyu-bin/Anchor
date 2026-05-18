@@ -44,5 +44,8 @@ extension Date {
 
 extension Notification.Name {
     static let anchorOpenTodayTab = Notification.Name("anchorOpenTodayTab")
+    static let anchorOpenHistoryTab = Notification.Name("anchorOpenHistoryTab")
     static let anchorRefreshShield = Notification.Name("anchorRefreshShield")
+    static let anchorCompleteNextItem = Notification.Name("anchorCompleteNextItem")
+    static let anchorRegisterRemotePush = Notification.Name("anchorRegisterRemotePush")
 }

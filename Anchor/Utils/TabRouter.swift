@@ -13,4 +13,12 @@ final class TabRouter: ObservableObject {
     func openToday() {
         selectedTab = 0
     }
+
+    func openHistory() {
+        selectedTab = 2
+    }
+
+    func openSettings() {
+        selectedTab = 3
+    }
 }

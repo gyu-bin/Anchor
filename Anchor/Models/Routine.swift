@@ -19,6 +19,13 @@ final class Routine {
     /// `FamilyActivitySelection` PropertyList 인코딩 (차단할 앱 토큰).
     var shieldSelectionData: Data?
 
+    /// `RoutineScheduleKind` raw value (마이그레이션 호환을 위해 optional)
+    var scheduleKindRaw: String?
+    /// `Calendar.weekday` 1=일 … 7=토 (마이그레이션 호환을 위해 optional)
+    var activeWeekdays: [Int]?
+    /// `once` 일정의 당일 0시
+    var oneTimeDate: Date?
+
     init(
         id: UUID = UUID(),
         name: String,
@@ -27,7 +34,10 @@ final class Routine {
         items: [RoutineItem] = [],
         blockedApps: [String] = [],
         blockedWebs: [String] = [],
-        shieldSelectionData: Data? = nil
+        shieldSelectionData: Data? = nil,
+        scheduleKindRaw: String? = RoutineScheduleKind.daily.rawValue,
+        activeWeekdays: [Int]? = Array(1...7),
+        oneTimeDate: Date? = nil
     ) {
         self.id = id
         self.name = name
@@ -37,5 +47,8 @@ final class Routine {
         self.blockedApps = blockedApps
         self.blockedWebs = blockedWebs
         self.shieldSelectionData = shieldSelectionData
+        self.scheduleKindRaw = scheduleKindRaw
+        self.activeWeekdays = activeWeekdays
+        self.oneTimeDate = oneTimeDate
     }
 }

@@ -17,52 +17,60 @@ struct RoutineItemRow: View {
         Button(action: onTap) {
             HStack(spacing: 14) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(
-                            isCompleted
-                                ? Color("AnchorAccent").opacity(0.15)
-                                : Color("AnchorSubBg")
-                        )
-                        .frame(width: 36, height: 36)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(iconBackground)
+                        .frame(width: 40, height: 40)
                     Image(systemName: item.icon)
-                        .font(.system(size: 16))
-                        .foregroundStyle(
-                            isCompleted ? Color("AnchorAccent") : Color.anchorSub(scheme)
-                        )
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundStyle(iconForeground)
                 }
 
                 Text(item.name)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(isCompleted ? Color.anchorSub(scheme) : Color.anchorText(scheme))
-                    .strikethrough(isCompleted, color: Color.anchorSub(scheme))
+                    .strikethrough(isCompleted, color: Color.anchorSub(scheme).opacity(0.6))
 
                 Spacer()
 
-                checkmarkIcon
+                Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 24))
+                    .foregroundStyle(
+                        isCompleted ? Color.anchorAccent(scheme) : Color.anchorSub(scheme).opacity(0.3)
+                    )
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 13)
+            .padding(.horizontal, AnchorLayout.cardPadding)
+            .padding(.vertical, 14)
+            .background(rowBackground)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .overlay(alignment: .leading) {
-            if isCurrent {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(Color.anchorInfo.opacity(0.85), lineWidth: 2)
-            }
+    }
+
+    private var iconBackground: Color {
+        if isCompleted {
+            return Color.anchorAccent(scheme).opacity(0.14)
         }
+        if isCurrent {
+            return Color.anchorHighlight(scheme)
+        }
+        return Color.anchorSubBg(scheme)
+    }
+
+    private var iconForeground: Color {
+        if isCompleted || isCurrent {
+            return Color.anchorAccent(scheme)
+        }
+        return Color.anchorSub(scheme)
     }
 
     @ViewBuilder
-    private var checkmarkIcon: some View {
-        let image = Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-            .font(.system(size: 22))
-            .foregroundStyle(isCompleted ? Color("AnchorAccent") : Color.anchorSub(scheme).opacity(0.45))
-
-        if #available(iOS 17.0, *) {
-            image.animation(.spring(response: 0.3), value: isCompleted)
+    private var rowBackground: some View {
+        if isCurrent {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.anchorHighlight(scheme))
+                .padding(.horizontal, 8)
         } else {
-            image
+            Color.clear
         }
     }
 }

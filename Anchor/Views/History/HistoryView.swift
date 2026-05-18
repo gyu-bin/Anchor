@@ -9,6 +9,7 @@ import SwiftUI
 struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var tabRouter: TabRouter
 
     @Query(sort: [SortDescriptor(\DailyLog.date, order: .reverse)]) private var logs: [DailyLog]
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
@@ -19,21 +20,81 @@ struct HistoryView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    metricsGrid
-
-                    weeklyCard
-
-                    itemTotalsCard
-
-                    calendarCard
+            Group {
+                if routinesWithItems.isEmpty {
+                    emptyState
+                } else {
+                    historyContent
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 24)
             }
-            .background(Color.anchorBg(scheme).ignoresSafeArea())
-            .navigationTitle("기록")
+            .anchorScreenBackground()
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .navigationBar)
+            .onAppear { refreshWeeklyNotification() }
+        }
+    }
+
+    private var weeklySummaryBanner: some View {
+        let fullDays = Self.weekFullDaysCount(
+            logs: logs,
+            routines: routinesWithItems,
+            now: Date(),
+            cal: .current
+        )
+        return AnchorCard {
+            Text(AppCopy.History.weeklySummary(fullDays: fullDays))
+                .font(.subheadline)
+                .foregroundStyle(Color.anchorText(scheme))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(AnchorLayout.cardPadding)
+        }
+    }
+
+    private func refreshWeeklyNotification() {
+        let fullDays = Self.weekFullDaysCount(
+            logs: logs,
+            routines: routinesWithItems,
+            now: Date(),
+            cal: .current
+        )
+        NotificationManager.updateWeeklySummaryContent(fullDays: fullDays)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            VStack(spacing: 8) {
+                Text(AppCopy.History.emptyTitle)
+                    .font(.title3.bold())
+                    .foregroundStyle(Color.anchorText(scheme))
+                Text(AppCopy.History.emptyBody)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.anchorSub(scheme))
+                    .multilineTextAlignment(.center)
+            }
+
+            Button(AppCopy.History.emptyAction) {
+                tabRouter.selectedTab = 1
+            }
+            .buttonStyle(AnchorButtonStyle())
+            .padding(.horizontal, 32)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var historyContent: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
+                AnchorScreenHeader(title: AppCopy.History.title, subtitle: AppCopy.History.subtitle)
+
+                weeklySummaryBanner
+
+                metricsGrid
+                weeklyCard
+                itemTotalsCard
+                calendarCard
+            }
+            .padding(.horizontal, AnchorLayout.screenHorizontal)
+            .padding(.bottom, 36)
         }
     }
 
@@ -42,70 +103,91 @@ struct HistoryView: View {
         let rate = Self.monthCompletionRate(logs: logs, routines: routinesWithItems, now: Date(), cal: .current)
 
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            metricTile(title: "연속 완료", value: "\(streak)일")
-            metricTile(title: "이번 달 완료율", value: "\(rate)%")
+            metricTile(title: AppCopy.History.streak, value: "\(streak)", unit: "일", icon: "flame.fill")
+            metricTile(title: AppCopy.History.monthRate, value: "\(rate)", unit: "%", icon: "chart.pie.fill")
         }
     }
 
-    private func metricTile(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.anchorSub(scheme))
-            Text(value)
-                .font(.title2.bold())
-                .foregroundStyle(Color.anchorText(scheme))
+    private func metricTile(title: String, value: String, unit: String, icon: String) -> some View {
+        AnchorCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Image(systemName: icon)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Color.anchorAccent(scheme))
+                    Spacer()
+                }
+
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text(value)
+                        .font(AnchorTypography.metricValue(scheme))
+                        .foregroundStyle(Color.anchorText(scheme))
+                    Text(unit)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.anchorSub(scheme))
+                }
+
+                Text(title)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Color.anchorSub(scheme))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(AnchorLayout.cardPadding)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(Color.anchorCard(scheme))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var weeklyCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("이번 주")
-                .font(.headline)
-                .foregroundStyle(Color.anchorText(scheme))
-
-            WeeklyBarChart(bars: Self.weekBars(logs: logs, routines: routinesWithItems, now: Date(), cal: .current))
+        AnchorCard {
+            VStack(alignment: .leading, spacing: 14) {
+                AnchorSectionHeader(title: AppCopy.History.thisWeek)
+                WeeklyBarChart(bars: Self.weekBars(logs: logs, routines: routinesWithItems, now: Date(), cal: .current))
+            }
+            .padding(AnchorLayout.cardPadding)
         }
-        .padding(14)
-        .background(Color.anchorCard(scheme))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var itemTotalsCard: some View {
         let totals = Self.itemCompletionCounts(logs: logs, routines: routines)
-        return VStack(alignment: .leading, spacing: 12) {
-            Text("항목별 완료 횟수")
-                .font(.headline)
-                .foregroundStyle(Color.anchorText(scheme))
+        return AnchorCard {
+            VStack(alignment: .leading, spacing: 14) {
+                AnchorSectionHeader(title: AppCopy.History.byItem)
 
-            if totals.isEmpty {
-                Text("아직 기록이 없습니다")
-                    .font(.subheadline)
-                    .foregroundStyle(Color.anchorSub(scheme))
-            } else {
-                ForEach(totals, id: \.id) { row in
-                    HStack {
-                        Image(systemName: row.icon)
-                            .foregroundStyle(Color.anchorAccent(scheme))
-                            .frame(width: 28)
-                        Text(row.name)
-                            .foregroundStyle(Color.anchorText(scheme))
-                        Spacer()
-                        Text(row.formatted)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color.anchorSub(scheme))
+                if totals.isEmpty {
+                    Text(AppCopy.History.noLogs)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.anchorSub(scheme))
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(totals, id: \.id) { row in
+                            HStack(spacing: 12) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .fill(Color.anchorHighlight(scheme))
+                                        .frame(width: 36, height: 36)
+                                    Image(systemName: row.icon)
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundStyle(Color.anchorAccent(scheme))
+                                }
+                                Text(row.name)
+                                    .font(.body.weight(.medium))
+                                    .foregroundStyle(Color.anchorText(scheme))
+                                Spacer()
+                                Text(row.formatted)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(Color.anchorSub(scheme))
+                            }
+                            .padding(.vertical, 11)
+
+                            if row.id != totals.last?.id {
+                                Divider()
+                                    .padding(.leading, 48)
+                            }
+                        }
                     }
-                    .padding(.vertical, 6)
                 }
             }
+            .padding(AnchorLayout.cardPadding)
         }
-        .padding(14)
-        .background(Color.anchorCard(scheme))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var calendarCard: some View {
@@ -115,8 +197,7 @@ struct HistoryView: View {
         let monthStart = cal.date(from: comps) ?? now
         let range = cal.range(of: .day, in: .month, for: monthStart) ?? 1..<32
         let daysInMonth = range.count
-
-        let firstWeekday = cal.component(.weekday, from: monthStart) // 1 Sun
+        let firstWeekday = cal.component(.weekday, from: monthStart)
         let leading = (firstWeekday - 1) % 7
 
         let df = DateFormatter()
@@ -130,12 +211,15 @@ struct HistoryView: View {
             statuses[day] = Self.dayStatus(logs: logs, routines: routinesWithItems, day: d, cal: cal)
         }
 
-        return CalendarMonthView(
-            monthTitle: title,
-            daysInMonth: daysInMonth,
-            firstWeekdayIndex: leading,
-            dayStatuses: statuses
-        )
+        return AnchorCard {
+            CalendarMonthView(
+                monthTitle: title,
+                daysInMonth: daysInMonth,
+                firstWeekdayIndex: leading,
+                dayStatuses: statuses
+            )
+            .padding(AnchorLayout.cardPadding)
+        }
     }
 }
 
@@ -152,14 +236,16 @@ struct ItemTotalRow: Identifiable {
 
 extension HistoryView {
     static func dayStatus(logs: [DailyLog], routines: [Routine], day: Date, cal: Calendar) -> WeekdayCompletion {
-        guard !routines.isEmpty else { return .none }
+        let scheduled = RoutineSchedule.scheduledRoutines(routines, on: day, calendar: cal)
+        guard !scheduled.isEmpty else { return .none }
+        if RestDayStore.isRestDay(day, calendar: cal) { return .full }
         let start = day.startOfDay(in: cal)
         let dayLogs = logs.filter { cal.isDate($0.date, inSameDayAs: start) }
         let map = Dictionary(uniqueKeysWithValues: dayLogs.map { ($0.routineId, $0) })
 
         var anyProgress = false
         var allFull = true
-        for r in routines {
+        for r in scheduled {
             guard let log = map[r.id] else {
                 allFull = false
                 continue
@@ -171,6 +257,12 @@ extension HistoryView {
         if allFull { return .full }
         if anyProgress { return .partial }
         return .none
+    }
+
+    static func weekFullDaysCount(logs: [DailyLog], routines: [Routine], now: Date, cal: Calendar) -> Int {
+        weekBars(logs: logs, routines: routines, now: now, cal: cal)
+            .filter { $0.status == .full }
+            .count
     }
 
     static func weekBars(logs: [DailyLog], routines: [Routine], now: Date, cal: Calendar) -> [WeekdayBar] {
@@ -200,7 +292,13 @@ extension HistoryView {
         var count = 0
         var day = cal.startOfDay(for: Date())
         while true {
-            let status = dayStatus(logs: logs, routines: routines, day: day, cal: cal)
+            let scheduled = RoutineSchedule.scheduledRoutines(routines, on: day, calendar: cal)
+            let status: WeekdayCompletion
+            if scheduled.isEmpty {
+                status = .full
+            } else {
+                status = dayStatus(logs: logs, routines: routines, day: day, cal: cal)
+            }
             if status == .full {
                 count += 1
             } else {
@@ -226,11 +324,12 @@ extension HistoryView {
         for day in monthRange where day <= todayDay {
             guard let d = cal.date(byAdding: .day, value: day - 1, to: monthStart) else { continue }
             if d > todayStart { break }
-            denom += routines.count
+            let scheduled = RoutineSchedule.scheduledRoutines(routines, on: d, calendar: cal)
+            denom += scheduled.count
             let start = d.startOfDay(in: cal)
             let dayLogs = logs.filter { cal.isDate($0.date, inSameDayAs: start) }
             let map = Dictionary(uniqueKeysWithValues: dayLogs.map { ($0.routineId, $0) })
-            for r in routines {
+            for r in scheduled {
                 if let log = map[r.id], log.isFullyCompleted {
                     numer += 1
                 }
@@ -263,5 +362,6 @@ extension HistoryView {
 
 #Preview {
     HistoryView()
+        .environmentObject(TabRouter())
         .modelContainer(PreviewData.container)
 }

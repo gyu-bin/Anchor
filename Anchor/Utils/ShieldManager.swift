@@ -59,6 +59,16 @@ enum ShieldManager {
 
         let calendar = Calendar.current
         let dayStart = calendar.startOfDay(for: Date())
+
+        if RestDayStore.isRestToday(calendar: calendar) {
+            settings.clearAllSettings()
+            if let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) {
+                DeviceActivityScheduleManager.stopAllMonitoring(routines: routines)
+            }
+            SharedShieldStore.clearMergedSelection()
+            return
+        }
+
         guard let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) else {
             settings.clearAllSettings()
             return
@@ -107,6 +117,7 @@ enum ShieldManager {
     /// 지금 실제로 잠금이 걸려야 하는지(시작 후 + 미완료).
     static func isActivelyLocking(routine: Routine, modelContext: ModelContext) -> Bool {
         let calendar = Calendar.current
+        guard RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) else { return false }
         let dayStart = calendar.startOfDay(for: Date())
         let complete = (try? routineIsFullyCompleteToday(
             routine,
@@ -146,6 +157,9 @@ enum ShieldManager {
 
     static func blockedSummary(for routine: Routine, modelContext: ModelContext) -> BlockedShieldSummary {
         let calendar = Calendar.current
+        guard RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) else {
+            return BlockedShieldSummary(appTokens: [], webTokens: [], webDomains: [])
+        }
         let dayStart = calendar.startOfDay(for: Date())
         let complete = (try? routineIsFullyCompleteToday(
             routine,
@@ -173,6 +187,9 @@ enum ShieldManager {
     /// 오늘 탭 표시용 — 시작 전에도 설정된 차단 목록을 보여줍니다.
     static func displaySummary(for routine: Routine, modelContext: ModelContext) -> BlockedShieldSummary {
         let calendar = Calendar.current
+        guard RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) else {
+            return BlockedShieldSummary(appTokens: [], webTokens: [], webDomains: [])
+        }
         let dayStart = calendar.startOfDay(for: Date())
         let complete = (try? routineIsFullyCompleteToday(
             routine,
@@ -196,7 +213,7 @@ enum ShieldManager {
         var webs = Set<WebDomainToken>()
         var domains: [String] = []
 
-        for routine in routines where !routine.items.isEmpty {
+        for routine in routines where RoutineSchedule.isVisibleToday(routine) {
             let summary = displaySummary(for: routine, modelContext: modelContext)
             apps.formUnion(summary.appTokens)
             webs.formUnion(summary.webTokens)
@@ -220,7 +237,7 @@ enum ShieldManager {
         var webs = Set<WebDomainToken>()
         var domains: [String] = []
 
-        for routine in routines where !routine.items.isEmpty {
+        for routine in routines where RoutineSchedule.isVisibleToday(routine) {
             let summary = blockedSummary(for: routine, modelContext: modelContext)
             apps.formUnion(summary.appTokens)
             webs.formUnion(summary.webTokens)
@@ -247,7 +264,7 @@ enum ShieldManager {
         modelContext: ModelContext
     ) -> [ApplicationToken] {
         var tokens = Set<ApplicationToken>()
-        for routine in routines where !routine.items.isEmpty {
+        for routine in routines where RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) && !routine.items.isEmpty {
             let complete = (try? routineIsFullyCompleteToday(
                 routine,
                 dayStart: dayStart,
@@ -268,7 +285,7 @@ enum ShieldManager {
         modelContext: ModelContext
     ) -> [WebDomainToken] {
         var tokens = Set<WebDomainToken>()
-        for routine in routines where !routine.items.isEmpty {
+        for routine in routines where RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) && !routine.items.isEmpty {
             let complete = (try? routineIsFullyCompleteToday(
                 routine,
                 dayStart: dayStart,
@@ -288,6 +305,9 @@ enum ShieldManager {
         calendar: Calendar,
         modelContext: ModelContext
     ) throws -> Bool {
+        if RestDayStore.isRestDay(dayStart, calendar: calendar) {
+            return true
+        }
         let rid = routine.id
         var fd = FetchDescriptor<DailyLog>(
             predicate: #Predicate { log in

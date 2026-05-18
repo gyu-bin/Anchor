@@ -6,6 +6,12 @@
 import SwiftData
 import SwiftUI
 
+private struct UndoSnapshot {
+    let item: RoutineItem
+    let routine: Routine
+    let wasCompleted: Bool
+}
+
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
@@ -17,13 +23,16 @@ struct TodayView: View {
     @State private var wasAllComplete = false
     @State private var showCompletionSheet = false
     @State private var scrollTarget: UUID?
+    @State private var pendingUndo: UndoSnapshot?
+    @State private var showUndoToast = false
+    @State private var undoTask: Task<Void, Never>?
 
     private var sortedRoutines: [Routine] {
         vm.sortedRoutines(routines)
     }
 
     private var routinesWithItems: [Routine] {
-        sortedRoutines.filter { !$0.items.isEmpty }
+        vm.routinesForToday(sortedRoutines)
     }
 
     private var todayLogs: [DailyLog] {
@@ -32,77 +41,103 @@ struct TodayView: View {
         }
     }
 
+    private var isRestToday: Bool {
+        RestDayStore.isRestToday()
+    }
+
     private var dateTitle: String {
         let df = DateFormatter()
         df.locale = Locale(identifier: "ko_KR")
-        df.setLocalizedDateFormatFromTemplate("EEEE MMMd")
+        df.setLocalizedDateFormatFromTemplate("EEEE, MMMd")
         return df.string(from: Date())
+    }
+
+    private var greeting: String {
+        if isRestToday { return AppCopy.Today.restDayActive }
+        return AppCopy.Today.greeting(hour: Calendar.current.component(.hour, from: Date()))
     }
 
     var body: some View {
         NavigationStack {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        header
+            ZStack(alignment: .bottom) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
+                            AnchorScreenHeader(title: greeting, subtitle: dateTitle)
 
-                        if routinesWithItems.isEmpty {
-                            emptyState
-                        } else {
-                            OverallProgressCard(
-                                routines: sortedRoutines,
-                                logs: todayLogs,
-                                blockSummary: ShieldManager.aggregatedDisplaySummary(
-                                    routines: sortedRoutines,
-                                    modelContext: modelContext
-                                ),
-                                isActivelyLocking: ShieldManager.isAnyActivelyLocking(
+                            if !routinesWithItems.isEmpty {
+                                restDayControl
+                            }
+
+                            if routinesWithItems.isEmpty {
+                                emptyState
+                            } else if isRestToday {
+                                restDayCard
+                            } else {
+                                OverallProgressCard(
                                     routines: routinesWithItems,
-                                    modelContext: modelContext
-                                )
-                            )
-
-                            ForEach(routinesWithItems, id: \.id) { routine in
-                                if let log = try? vm.todayLog(for: routine, context: modelContext) {
-                                    RoutineSectionCard(
-                                        routine: routine,
-                                        log: log,
-                                        blockSummary: ShieldManager.displaySummary(
-                                            for: routine,
-                                            modelContext: modelContext
-                                        ),
-                                        isActivelyLocking: ShieldManager.isActivelyLocking(
-                                            routine: routine,
-                                            modelContext: modelContext
-                                        ),
-                                        onToggle: { item in
-                                            toggle(item: item, routine: routine)
-                                        }
+                                    logs: todayLogs,
+                                    blockSummary: ShieldManager.aggregatedDisplaySummary(
+                                        routines: routinesWithItems,
+                                        modelContext: modelContext
+                                    ),
+                                    isActivelyLocking: ShieldManager.isAnyActivelyLocking(
+                                        routines: routinesWithItems,
+                                        modelContext: modelContext
                                     )
-                                    .id(routine.id)
+                                )
+
+                                ForEach(routinesWithItems, id: \.id) { routine in
+                                    if let log = try? vm.todayLog(for: routine, context: modelContext) {
+                                        RoutineSectionCard(
+                                            routine: routine,
+                                            log: log,
+                                            blockSummary: ShieldManager.displaySummary(
+                                                for: routine,
+                                                modelContext: modelContext
+                                            ),
+                                            isActivelyLocking: ShieldManager.isActivelyLocking(
+                                                routine: routine,
+                                                modelContext: modelContext
+                                            ),
+                                            onToggle: { item in
+                                                toggle(item: item, routine: routine)
+                                            }
+                                        )
+                                        .id(routine.id)
+                                    }
                                 }
                             }
                         }
+                        .padding(.horizontal, AnchorLayout.screenHorizontal)
+                        .padding(.bottom, showUndoToast ? 88 : 36)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 32)
+                    .onChange(of: scrollTarget) { _, target in
+                        guard let target else { return }
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                            proxy.scrollTo(target, anchor: .center)
+                        }
+                    }
                 }
-                .onChange(of: scrollTarget) { _, target in
-                    guard let target else { return }
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-                        proxy.scrollTo(target, anchor: .center)
-                    }
+
+                if showUndoToast {
+                    UndoToast { performUndo() }
+                        .padding(.horizontal, AnchorLayout.screenHorizontal)
+                        .padding(.bottom, 12)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .background(Color.anchorBg(scheme).ignoresSafeArea())
-            .navigationTitle("오늘")
+            .anchorScreenBackground()
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .navigationBar)
             .onAppear {
                 refreshCompletionBannerState()
+                syncWidgetAndNotifications()
                 Task { await ShieldManager.refresh(modelContext: modelContext) }
             }
             .onChange(of: routines.map(\.id)) { _, _ in
                 refreshCompletionBannerState()
+                syncWidgetAndNotifications()
                 Task { await ShieldManager.refresh(modelContext: modelContext) }
             }
             .onChange(of: routines.map(\.blockedWebs)) { _, _ in
@@ -112,37 +147,76 @@ struct TodayView: View {
                 completionSheet
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
+                    .presentationCornerRadius(28)
             }
         }
     }
 
-    private var header: some View {
-        Text(dateTitle)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(Color.anchorSub(scheme))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.top, 8)
+    private var restDayControl: some View {
+        Button {
+            if isRestToday {
+                RestDayStore.clearRestToday()
+            } else {
+                RestDayStore.setRestToday()
+            }
+            syncWidgetAndNotifications()
+            Task { await ShieldManager.refresh(modelContext: modelContext) }
+        } label: {
+            Text(isRestToday ? AppCopy.Today.restDayCancel : AppCopy.Today.restDayButton)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isRestToday ? Color.anchorSub(scheme) : Color.anchorAccent(scheme))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(isRestToday ? Color.anchorSubBg(scheme) : Color.anchorHighlight(scheme))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var restDayCard: some View {
+        AnchorCard {
+            Text(AppCopy.Today.restDayBody)
+                .font(.subheadline)
+                .lineSpacing(4)
+                .foregroundStyle(Color.anchorSub(scheme))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(AnchorLayout.cardPadding)
+        }
     }
 
     private var emptyState: some View {
-        ContentUnavailableView {
-            Label("루틴이 없어요", systemImage: "anchor")
-        } description: {
-            Text("루틴 탭에서 첫 루틴을 만들어보세요")
-        } actions: {
-            Button("루틴 만들기") {
+        VStack(spacing: 16) {
+            VStack(spacing: 8) {
+                Text(AppCopy.Today.emptyTitle)
+                    .font(.title3.bold())
+                    .foregroundStyle(Color.anchorText(scheme))
+                Text(AppCopy.Today.emptyBody)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.anchorSub(scheme))
+                    .multilineTextAlignment(.center)
+            }
+
+            Button(AppCopy.Today.emptyAction) {
                 tabRouter.selectedTab = 1
             }
             .buttonStyle(AnchorButtonStyle())
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 32)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 48)
     }
 
     private func toggle(item: RoutineItem, routine: Routine) {
+        guard !isRestToday else { return }
         withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
             do {
+                let log = try vm.todayLog(for: routine, context: modelContext)
+                let wasCompleted = log.completedItems.contains(item.id)
+
                 try vm.toggleCompletion(item: item, routine: routine, context: modelContext)
                 try modelContext.save()
+
+                presentUndo(item: item, routine: routine, wasCompleted: wasCompleted)
 
                 let gen = UINotificationFeedbackGenerator()
                 gen.notificationOccurred(.success)
@@ -158,10 +232,52 @@ struct TodayView: View {
                 }
                 wasAllComplete = allDone
 
+                syncWidgetAndNotifications()
                 Task { await ShieldManager.refresh(modelContext: modelContext) }
             } catch {
                 // no-op
             }
+        }
+    }
+
+    private func presentUndo(item: RoutineItem, routine: Routine, wasCompleted: Bool) {
+        undoTask?.cancel()
+        pendingUndo = UndoSnapshot(item: item, routine: routine, wasCompleted: wasCompleted)
+        withAnimation(.spring(response: 0.32)) {
+            showUndoToast = true
+        }
+        undoTask = Task {
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation {
+                    showUndoToast = false
+                    pendingUndo = nil
+                }
+            }
+        }
+    }
+
+    private func performUndo() {
+        guard let undo = pendingUndo else { return }
+        undoTask?.cancel()
+        do {
+            try vm.setCompletion(
+                item: undo.item,
+                routine: undo.routine,
+                completed: undo.wasCompleted,
+                context: modelContext
+            )
+            try modelContext.save()
+            wasAllComplete = (try? vm.allRoutinesFullyCompletedToday(routines: routines, context: modelContext)) ?? false
+            syncWidgetAndNotifications()
+            Task { await ShieldManager.refresh(modelContext: modelContext) }
+        } catch {
+            // no-op
+        }
+        withAnimation {
+            showUndoToast = false
+            pendingUndo = nil
         }
     }
 
@@ -170,44 +286,32 @@ struct TodayView: View {
         wasAllComplete = allDone
     }
 
+    private func syncWidgetAndNotifications() {
+        WidgetSync.refresh(modelContext: modelContext, routines: routines)
+        let fullDays = HistoryView.weekFullDaysCount(
+            logs: (try? modelContext.fetch(FetchDescriptor<DailyLog>())) ?? [],
+            routines: routines.filter { !$0.items.isEmpty },
+            now: Date(),
+            cal: .current
+        )
+        NotificationManager.updateWeeklySummaryContent(fullDays: fullDays)
+    }
+
     private var completionSheet: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 24) {
             CompletionBanner(
                 totalItems: routines.reduce(0) { $0 + $1.items.count }
             )
 
-            Button("확인") {
+            Button(AppCopy.Today.completeConfirm) {
                 showCompletionSheet = false
                 Task { await ShieldManager.refresh(modelContext: modelContext) }
             }
             .buttonStyle(AnchorButtonStyle())
             .padding(.horizontal, 24)
         }
-        .padding(.vertical, 24)
+        .padding(.vertical, 28)
         .frame(maxWidth: .infinity)
         .presentationBackground(Color.anchorBg(scheme))
-    }
-}
-
-#Preview {
-    TodayView()
-        .environmentObject(TabRouter())
-        .modelContainer(PreviewData.container)
-}
-
-enum PreviewData {
-    static var container: ModelContainer {
-        let schema = Schema([Routine.self, RoutineItem.self, DailyLog.self])
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try! ModelContainer(for: schema, configurations: [config])
-        let routine = Routine(name: "아침 루틴", startTime: Date(), order: 0)
-        let i1 = RoutineItem(name: "독서", duration: 20, icon: "book", order: 0, routine: routine)
-        let i2 = RoutineItem(name: "명상", duration: 10, icon: "brain.head.profile", order: 1, routine: routine)
-        routine.items = [i1, i2]
-        routine.blockedWebs = ["youtube.com"]
-        container.mainContext.insert(routine)
-        container.mainContext.insert(i1)
-        container.mainContext.insert(i2)
-        return container
     }
 }
