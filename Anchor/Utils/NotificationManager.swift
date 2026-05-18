@@ -206,7 +206,7 @@ enum NotificationManager {
             startContent.body = start.body
             startContent.sound = .default
             startContent.categoryIdentifier = routineCategoryId
-            startContent.userInfo = ["openToday": true]
+            startContent.userInfo = ["openToday": true, "refreshShield": true]
 
             let startReq = UNNotificationRequest(
                 identifier: "routine-start-\(routine.id.uuidString)-\(idSuffix)",

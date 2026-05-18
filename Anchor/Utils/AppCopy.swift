@@ -54,18 +54,30 @@ enum AppCopy {
     }
 
     enum Guide {
-        static let welcomeBody = "루틴을 끝낼 때까지 선택한 앱을 잠그고,\n완료하면 바로 풀어 드려요."
-        static let howTitle = "이렇게 써요"
-        static let steps = [
-            "루틴 탭에서 루틴과 할 일을 만들어요",
-            "막을 앱을 고르고 시작 시간을 정해요",
-            "오늘 탭에서 하나씩 체크해요",
-            "다 하면 잠금이 풀려요",
+        static let morningBadge = "아침"
+        static let morningTitle = "눈 뜨자마자\n인스타·유튜브 보다가\n오전을 다 날린 적, 있으시죠?"
+        static let morningBody = "의지만으로는 어려울 때가 많아요.\n그건 게으른 게 아니라, 습관이 그렇게 만든 거예요."
+
+        static let eveningBadge = "저녁"
+        static let eveningTitle = "눕자마자\n틱톡·유튜브 한 편 더 하다\n밤이 새버린 적도 있죠?"
+        static let eveningBody = "내일을 위해 쉬고 싶은데, 손이 먼저 가는 날이에요.\n저녁 루틴이 있으면 훨씬 편해져요."
+
+        static let reliefTitle = "걱정 마세요"
+        static let reliefHighlight = "할 일이 끝나지 않으면\n앱이 열리지 않아요"
+        static let reliefBody = "루틴을 다 마치면 잠금이 풀려요.\n「조금만 더」 하다 하루가 새는 일을, 시스템이 막아 줄게요."
+
+        static let howTitle = "이렇게만 하면 돼요"
+        static let howNote = "시작 시간이 되면 알림이 오고,\n그때부터 선택한 앱은 잠겨요."
+        static let steps: [(icon: String, text: String)] = [
+            ("list.bullet.rectangle", "루틴을 만들고, 잠금할 앱을 골라요"),
+            ("checkmark.circle", "오늘 탭에서 할 일을 하나씩 체크해요"),
+            ("lock.open", "다 하면 잠금이 풀려요. 그때 마음껏 쉬어도 괜찮아요"),
         ]
-        static let screenTimeTitle = "Screen Time"
-        static let screenTimeBody = "앱 잠금을 쓰려면 한 번만 허용해 주세요.\n나중에 설정에서 다시 할 수 있어요."
-        static let startTitle = "이제 시작해 볼까요"
-        static let startBody = "루틴 탭에서 첫 루틴을 만들어 주세요.\n기록은 이 기기에만 저장돼요."
+
+        static let screenTimeTitle = "잠금을 쓰려면\n한 번만 허용해 주세요"
+        static let screenTimeBody = "iPhone의 Screen Time으로만 앱을 막을 수 있어요.\n키링은 선택한 앱만 잠그고, 나머지는 그대로 두어요."
+        static let startTitle = "이제 아침을,\n내 루틴부터 시작해 볼까요?"
+        static let startBody = "루틴 탭에서 첫 루틴을 만들어 주세요.\n기록은 이 iPhone에만 저장돼요."
         static let start = "시작하기"
         static let replayDone = "확인"
         static let replay = "앱 가이드 다시 보기"
@@ -73,10 +85,15 @@ enum AppCopy {
 
     enum Settings {
         static let title = "설정"
-        static let subtitle = "알림과 잠금 화면을 정해요"
+        static let subtitle = "알림·잠금·화면을 정해요"
+        static let sectionGeneral = "일반"
+        static let sectionNotifications = "알림"
+        static let sectionLock = "잠금"
+        static let sectionAbout = "앱 정보"
         static let appearance = "화면 모드"
-        static let dataPrivacy = "기록 저장"
-        static let dataPrivacyBody = "완료 기록과 루틴은 이 iPhone에만 저장돼요. 다른 기기와 자동으로 맞춰지지 않아요."
+        static let lockTitle = "앱 잠금"
+        static let lockConnected = "연결됨"
+        static let lockNeeded = "연결 필요"
         static let notifications = "알림"
         static let notificationsMaster = "알림 받기"
         static let routineStart = "루틴 시작 알림"
@@ -89,6 +106,7 @@ enum AppCopy {
         static let screenTime = "Screen Time"
         static let about = "앱 정보"
         static let aboutBody = "루틴이 끝날 때까지 선택한 앱을 잠가 드리고, 완료하면 바로 풀어 드려요."
+        static let versionRow = "버전"
         static func version(_ label: String) -> String { "버전 \(label)" }
         static let privacyPolicy = "개인정보처리방침"
         static let contact = "문의하기"

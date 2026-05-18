@@ -97,6 +97,18 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
             }
             return
         }
+        if userInfo["refreshShield"] as? Bool == true {
+            Task { @MainActor in
+                if let ctx = AppModelContextHolder.main {
+                    await ShieldManager.refresh(modelContext: ctx)
+                } else {
+                    NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
+                }
+                completionHandler([.banner, .sound, .badge])
+            }
+            return
+        }
+
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
         }

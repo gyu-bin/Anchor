@@ -29,16 +29,188 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
+                VStack(alignment: .leading, spacing: 24) {
                     AnchorScreenHeader(title: AppCopy.Settings.title, subtitle: AppCopy.Settings.subtitle)
 
                     premiumSection
-                    appearanceSection
-                    guideSection
-                    dataPrivacySection
-                    notificationsSection
-                    screenTimeSection
-                    aboutSection
+
+                    settingsGroup(AppCopy.Settings.sectionGeneral) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text(AppCopy.Settings.appearance)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(Color.anchorText(scheme))
+                            Picker(AppCopy.Settings.appearance, selection: $appearanceModeRaw) {
+                                ForEach(AppearanceMode.allCases) { mode in
+                                    Text(mode.title).tag(mode.rawValue)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .labelsHidden()
+                        }
+                        .padding(AnchorLayout.cardPadding)
+
+                        SettingsInsetDivider()
+
+                        guideRow
+                    }
+
+                    settingsGroup(AppCopy.Settings.sectionNotifications) {
+                        VStack(spacing: 0) {
+                            Toggle(AppCopy.Settings.notificationsMaster, isOn: $notificationsEnabled)
+                                .padding(.horizontal, AnchorLayout.cardPadding)
+                                .padding(.vertical, 14)
+
+                            if notificationsEnabled {
+                                SettingsInsetDivider()
+
+                                VStack(spacing: 0) {
+                                    Toggle(AppCopy.Settings.routineStart, isOn: $routineStartEnabled)
+                                        .padding(.horizontal, AnchorLayout.cardPadding)
+                                        .padding(.vertical, 12)
+
+                                    SettingsInsetDivider()
+
+                                    Toggle(AppCopy.Settings.reminder, isOn: $reminderEnabled)
+                                        .padding(.horizontal, AnchorLayout.cardPadding)
+                                        .padding(.vertical, 12)
+
+                                    if reminderEnabled {
+                                        SettingsInsetDivider()
+                                        Picker(AppCopy.Settings.reminderDelay, selection: $reminderOffsetMinutes) {
+                                            ForEach(NotificationPreferences.reminderOffsetChoices, id: \.minutes) { choice in
+                                                Text(choice.label).tag(choice.minutes)
+                                            }
+                                        }
+                                        .padding(.horizontal, AnchorLayout.cardPadding)
+                                        .padding(.vertical, 10)
+                                    }
+
+                                    SettingsInsetDivider()
+                                    weeklySummaryRow
+                                        .padding(.horizontal, AnchorLayout.cardPadding)
+                                        .padding(.vertical, 12)
+                                }
+                            }
+
+                            SettingsInsetDivider()
+
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text(notificationStatusText)
+                                    .font(.caption)
+                                    .foregroundStyle(Color.anchorSub(scheme))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                                if notificationStatus == .denied {
+                                    Button(AppCopy.Settings.openSystemSettings) {
+                                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                                            UIApplication.shared.open(url)
+                                        }
+                                    }
+                                    .buttonStyle(AnchorSecondaryButtonStyle())
+                                } else if notificationStatus != .authorized
+                                    && notificationStatus != .provisional
+                                    && notificationStatus != .ephemeral {
+                                    Button(AppCopy.Settings.requestNotification) {
+                                        Task { await requestNotifications() }
+                                    }
+                                    .buttonStyle(AnchorSecondaryButtonStyle())
+                                }
+                            }
+                            .padding(AnchorLayout.cardPadding)
+                        }
+                    }
+
+                    settingsGroup(AppCopy.Settings.sectionLock) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "lock.shield.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(Color.anchorAccent(scheme))
+                                    .frame(width: 32)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(AppCopy.Settings.lockTitle)
+                                        .font(.body.weight(.semibold))
+                                        .foregroundStyle(Color.anchorText(scheme))
+                                    Text(screenTimeStatus == .approved
+                                         ? AppCopy.Onboarding.screenTimeLinked
+                                         : AppCopy.Onboarding.screenTimeNeeded)
+                                        .font(.caption)
+                                        .foregroundStyle(Color.anchorSub(scheme))
+                                }
+
+                                Spacer(minLength: 8)
+
+                                Text(screenTimeStatus == .approved
+                                     ? AppCopy.Settings.lockConnected
+                                     : AppCopy.Settings.lockNeeded)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(
+                                        screenTimeStatus == .approved
+                                            ? Color.anchorSuccess(scheme)
+                                            : Color.anchorWarning(scheme)
+                                    )
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(
+                                        (screenTimeStatus == .approved
+                                         ? Color.anchorSuccess(scheme)
+                                         : Color.anchorWarning(scheme)).opacity(0.12)
+                                    )
+                                    .clipShape(Capsule())
+                            }
+
+                            if screenTimeStatus != .approved {
+                                Button(AppCopy.Onboarding.screenTimeAllow) {
+                                    Task {
+                                        try? await ShieldManager.requestAuthorization()
+                                        screenTimeStatus = ShieldManager.authorizationStatus()
+                                        await ShieldManager.refresh(modelContext: modelContext)
+                                    }
+                                }
+                                .buttonStyle(AnchorSecondaryButtonStyle())
+                            }
+                        }
+                        .padding(AnchorLayout.cardPadding)
+                    }
+
+                    settingsGroup(AppCopy.Settings.sectionAbout) {
+                        VStack(spacing: 0) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(AppBrand.displayName)
+                                    .font(.headline)
+                                    .foregroundStyle(Color.anchorText(scheme))
+                                Text(AppCopy.Settings.aboutBody)
+                                    .font(.caption)
+                                    .lineSpacing(3)
+                                    .foregroundStyle(Color.anchorSub(scheme))
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(AnchorLayout.cardPadding)
+
+                            SettingsInsetDivider()
+
+                            SettingsValueRow(
+                                title: AppCopy.Settings.versionRow,
+                                value: AppInfo.versionLabel
+                            )
+
+                            SettingsInsetDivider()
+
+                            Link(destination: AppInfo.privacyPolicyURL) {
+                                SettingsChevronRow(title: AppCopy.Settings.privacyPolicy)
+                            }
+                            .buttonStyle(.plain)
+
+                            if let url = URL(string: "mailto:support@keyring.app") {
+                                SettingsInsetDivider()
+                                Link(destination: url) {
+                                    SettingsChevronRow(title: AppCopy.Settings.contact)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
                 }
                 .padding(.horizontal, AnchorLayout.screenHorizontal)
                 .padding(.bottom, 36)
@@ -71,15 +243,26 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Sections
+
     private var premiumSection: some View {
         AnchorCard {
             VStack(alignment: .leading, spacing: 12) {
-                AnchorSectionHeader(title: AppCopy.Premium.settingsTitle)
+                HStack {
+                    Text(AppCopy.Premium.settingsTitle)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color.anchorText(scheme))
+                    Spacer()
+                    if premium.isPremium {
+                        Image(systemName: "checkmark.seal.fill")
+                            .foregroundStyle(Color.anchorSuccess(scheme))
+                    }
+                }
 
                 if premium.isPremium {
-                    Label(AppCopy.Premium.settingsUnlocked, systemImage: "checkmark.seal.fill")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(Color.anchorSuccess(scheme))
+                    Text(AppCopy.Premium.settingsUnlocked)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.anchorSub(scheme))
                 } else {
                     Text(AppCopy.Premium.settingsLocked)
                         .font(.subheadline)
@@ -95,174 +278,83 @@ struct SettingsView: View {
                     }
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.anchorAccent(scheme))
+                    .frame(maxWidth: .infinity)
                 }
             }
             .padding(AnchorLayout.cardPadding)
         }
     }
 
-    private var appearanceSection: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 12) {
-                AnchorSectionHeader(title: AppCopy.Settings.appearance)
-                Picker(AppCopy.Settings.appearance, selection: $appearanceModeRaw) {
-                    ForEach(AppearanceMode.allCases) { mode in
-                        Text(mode.title).tag(mode.rawValue)
-                    }
-                }
-                .pickerStyle(.segmented)
+    private var guideRow: some View {
+        Button {
+            showGuide = true
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "book.pages.fill")
+                    .font(.body)
+                    .foregroundStyle(Color.anchorAccent(scheme))
+                    .frame(width: 28)
+
+                Text(AppCopy.Guide.replay)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color.anchorText(scheme))
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.anchorSub(scheme).opacity(0.7))
             }
             .padding(AnchorLayout.cardPadding)
+            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(SettingsRowButtonStyle())
     }
 
-    private var guideSection: some View {
-        AnchorCard {
-            Button {
-                showGuide = true
-            } label: {
-                HStack {
-                    Text(AppCopy.Guide.replay)
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(Color.anchorText(scheme))
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.anchorSub(scheme))
-                }
-            }
-            .buttonStyle(.plain)
-            .padding(AnchorLayout.cardPadding)
-        }
-    }
-
-    private var dataPrivacySection: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 8) {
-                AnchorSectionHeader(title: AppCopy.Settings.dataPrivacy)
-                Text(AppCopy.Settings.dataPrivacyBody)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.anchorSub(scheme))
-            }
-            .padding(AnchorLayout.cardPadding)
-        }
-    }
-
-    private var notificationsSection: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 14) {
-                AnchorSectionHeader(title: AppCopy.Settings.notifications)
-
-                Toggle(AppCopy.Settings.notificationsMaster, isOn: $notificationsEnabled)
-
-                if notificationsEnabled {
-                    Toggle(AppCopy.Settings.routineStart, isOn: $routineStartEnabled)
-                    Toggle(AppCopy.Settings.reminder, isOn: $reminderEnabled)
-                    if reminderEnabled {
-                        Picker(AppCopy.Settings.reminderDelay, selection: $reminderOffsetMinutes) {
-                            ForEach(NotificationPreferences.reminderOffsetChoices, id: \.minutes) { choice in
-                                Text(choice.label).tag(choice.minutes)
-                            }
-                        }
-                    }
-                    weeklySummaryToggle
-                }
-
-                Text(notificationStatusText)
-                    .font(.caption)
-                    .foregroundStyle(Color.anchorSub(scheme))
-
-                if notificationStatus == .denied {
-                    Button(AppCopy.Settings.openSystemSettings) {
-                        if let url = URL(string: UIApplication.openSettingsURLString) {
-                            UIApplication.shared.open(url)
-                        }
-                    }
-                    .buttonStyle(AnchorSecondaryButtonStyle())
-                }
-
-                Button(AppCopy.Settings.requestNotification) {
-                    Task { await requestNotifications() }
-                }
-                .buttonStyle(AnchorSecondaryButtonStyle())
-            }
-            .padding(AnchorLayout.cardPadding)
-        }
-    }
-
-    private var screenTimeSection: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 12) {
-                AnchorSectionHeader(title: AppCopy.Settings.screenTime)
-
-                HStack {
-                    Text(screenTimeStatus == .approved ? AppCopy.Onboarding.screenTimeLinked : AppCopy.Onboarding.screenTimeNeeded)
-                        .foregroundStyle(Color.anchorText(scheme))
-                    Spacer()
-                    Image(systemName: screenTimeStatus == .approved ? "checkmark.circle.fill" : "exclamationmark.circle")
-                        .foregroundStyle(screenTimeStatus == .approved ? Color.anchorSuccess(scheme) : Color.anchorSub(scheme))
-                }
-
-                if screenTimeStatus != .approved {
-                    Button(AppCopy.Onboarding.screenTimeAllow) {
-                        Task {
-                            try? await ShieldManager.requestAuthorization()
-                            screenTimeStatus = ShieldManager.authorizationStatus()
-                            await ShieldManager.refresh(modelContext: modelContext)
-                        }
-                    }
-                    .buttonStyle(AnchorSecondaryButtonStyle())
-                }
-            }
-            .padding(AnchorLayout.cardPadding)
-        }
-    }
-
-    private var weeklySummaryToggle: some View {
+    private var weeklySummaryRow: some View {
         Group {
             if premium.isPremium {
                 Toggle(AppCopy.Settings.weeklySummary, isOn: $weeklySummaryEnabled)
             } else {
-                HStack {
+                HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(AppCopy.Settings.weeklySummary)
+                            .font(.body)
+                            .foregroundStyle(Color.anchorText(scheme))
                         Text(AppCopy.Premium.weeklyLocked)
                             .font(.caption)
                             .foregroundStyle(Color.anchorSub(scheme))
                     }
-                    Spacer()
+                    Spacer(minLength: 8)
                     Button(AppCopy.Premium.settingsOpen) {
                         paywallReason = .weeklyNotification
                     }
                     .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.anchorAccent(scheme))
                 }
             }
         }
     }
 
-    private var aboutSection: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 10) {
-                AnchorSectionHeader(title: AppCopy.Settings.about)
-                Text(AppBrand.displayName)
-                    .font(.headline)
-                    .foregroundStyle(Color.anchorText(scheme))
-                Text(AppCopy.Settings.aboutBody)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.anchorSub(scheme))
-                Text(AppCopy.Settings.version(AppInfo.versionLabel))
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(Color.anchorSub(scheme))
-                Link(AppCopy.Settings.privacyPolicy, destination: AppInfo.privacyPolicyURL)
-                    .font(.subheadline.weight(.semibold))
-                if let url = URL(string: "mailto:support@keyring.app") {
-                    Link(AppCopy.Settings.contact, destination: url)
-                        .font(.subheadline.weight(.semibold))
-                }
+    @ViewBuilder
+    private func settingsGroup<Content: View>(
+        _ title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.anchorSub(scheme))
+                .padding(.leading, 4)
+
+            AnchorCard {
+                content()
             }
-            .padding(AnchorLayout.cardPadding)
         }
     }
+
+    // MARK: - Helpers
 
     private var notificationStatusText: String {
         switch notificationStatus {
@@ -303,6 +395,61 @@ struct SettingsView: View {
         }
         refreshNotificationStatus()
         applyNotificationPrefs()
+    }
+}
+
+// MARK: - Settings rows
+
+private struct SettingsInsetDivider: View {
+    @Environment(\.colorScheme) private var scheme
+
+    var body: some View {
+        Divider()
+            .overlay(Color.anchorBorder(scheme).opacity(0.55))
+            .padding(.leading, AnchorLayout.cardPadding)
+    }
+}
+
+private struct SettingsValueRow: View {
+    @Environment(\.colorScheme) private var scheme
+
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.body)
+                .foregroundStyle(Color.anchorText(scheme))
+            Spacer()
+            Text(value)
+                .font(.subheadline)
+                .foregroundStyle(Color.anchorSub(scheme))
+        }
+        .padding(.horizontal, AnchorLayout.cardPadding)
+        .padding(.vertical, 14)
+    }
+}
+
+private struct SettingsChevronRow: View {
+    @Environment(\.colorScheme) private var scheme
+
+    let title: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.body)
+                .foregroundStyle(Color.anchorAccent(scheme))
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.anchorSub(scheme).opacity(0.7))
+        }
+        .padding(.horizontal, AnchorLayout.cardPadding)
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 }
 

@@ -104,6 +104,66 @@ enum ShieldManager {
 
         SharedShieldStore.saveBlockedWebDomainStrings(webDomainStrings)
 
+        applyShieldSettings(apps: apps, webTokens: webTokens, webDomainStrings: webDomainStrings)
+
+        await DeviceActivityScheduleManager.sync(modelContext: modelContext)
+
+        // 모니터 재등록 직후 확장이 잠금을 비울 수 있어, 동기화 뒤 한 번 더 반영합니다.
+        applyShieldSettings(
+            apps: activeBlockedApplicationTokens(
+                routines: routines,
+                dayStart: dayStart,
+                calendar: calendar,
+                modelContext: modelContext
+            ),
+            webTokens: activeBlockedWebDomainTokens(
+                routines: routines,
+                dayStart: dayStart,
+                calendar: calendar,
+                modelContext: modelContext
+            ),
+            webDomainStrings: activeBlockedWebDomainStrings(
+                routines: routines,
+                dayStart: dayStart,
+                calendar: calendar,
+                modelContext: modelContext
+            )
+        )
+
+        ShieldScheduleWatcher.reschedule(modelContext: modelContext)
+        ShieldScheduleWatcher.syncLockState(modelContext: modelContext)
+    }
+
+    /// 지금 잠금이 걸려야 하는지 (UI·폴링용).
+    static func shouldApplyShieldsNow(modelContext: ModelContext) -> Bool {
+        let calendar = Calendar.current
+        let dayStart = calendar.startOfDay(for: Date())
+        guard let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) else { return false }
+        return !activeBlockedApplicationTokens(
+            routines: routines,
+            dayStart: dayStart,
+            calendar: calendar,
+            modelContext: modelContext
+        ).isEmpty
+        || !activeBlockedWebDomainTokens(
+            routines: routines,
+            dayStart: dayStart,
+            calendar: calendar,
+            modelContext: modelContext
+        ).isEmpty
+        || !activeBlockedWebDomainStrings(
+            routines: routines,
+            dayStart: dayStart,
+            calendar: calendar,
+            modelContext: modelContext
+        ).isEmpty
+    }
+
+    private static func applyShieldSettings(
+        apps: [ApplicationToken],
+        webTokens: [WebDomainToken],
+        webDomainStrings: [String]
+    ) {
         if apps.isEmpty && webTokens.isEmpty && webDomainStrings.isEmpty {
             settings.clearAllSettings()
         } else {
@@ -114,8 +174,6 @@ enum ShieldManager {
                 domainStrings: webDomainStrings
             )
         }
-
-        await DeviceActivityScheduleManager.sync(modelContext: modelContext)
     }
 
     private static func syncWidgetLockStatus(modelContext: ModelContext) {
@@ -357,6 +415,7 @@ enum ShieldManager {
                 modelContext: modelContext
             )) ?? false
             if complete { continue }
+            guard hasRoutineStartedToday(routine, calendar: calendar) else { continue }
             guard RoutineDeadline.shouldKeepShield(
                 routine: routine,
                 isComplete: complete,
@@ -383,6 +442,7 @@ enum ShieldManager {
                 modelContext: modelContext
             )) ?? false
             if complete { continue }
+            guard hasRoutineStartedToday(routine, calendar: calendar) else { continue }
             guard RoutineDeadline.shouldKeepShield(
                 routine: routine,
                 isComplete: complete,
@@ -409,6 +469,7 @@ enum ShieldManager {
                 modelContext: modelContext
             )) ?? false
             if complete { continue }
+            guard hasRoutineStartedToday(routine, calendar: calendar) else { continue }
             guard RoutineDeadline.shouldKeepShield(
                 routine: routine,
                 isComplete: complete,

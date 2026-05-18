@@ -45,9 +45,17 @@ struct ContentView: View {
             completeNextFromIntent()
         }
         .onChange(of: scenePhase) { _, phase in
-            guard hasSeenAppGuide, !showGuide, phase == .active else { return }
-            consumeIntentFlags()
-            Task { await ShieldManager.refresh(modelContext: modelContext) }
+            guard hasSeenAppGuide, !showGuide else { return }
+            switch phase {
+            case .active:
+                ShieldScheduleWatcher.startPolling(modelContext: modelContext)
+                consumeIntentFlags()
+                Task { await ShieldManager.refresh(modelContext: modelContext) }
+            case .background, .inactive:
+                ShieldScheduleWatcher.stopPolling()
+            @unknown default:
+                break
+            }
         }
         .onAppear {
             AppModelContextHolder.main = modelContext
@@ -56,6 +64,7 @@ struct ContentView: View {
             if !hasSeenAppGuide {
                 showGuide = true
             } else {
+                ShieldScheduleWatcher.startPolling(modelContext: modelContext)
                 consumeIntentFlags()
             }
         }

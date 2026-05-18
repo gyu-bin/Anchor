@@ -83,6 +83,7 @@ enum DeviceActivityScheduleManager {
             if complete { continue }
 
             if !complete,
+               ShieldManager.hasRoutineStartedToday(routine, calendar: calendar),
                RoutineDeadline.shouldKeepShield(
                    routine: routine,
                    isComplete: false,
