@@ -104,7 +104,7 @@ struct RoutineView: View {
     }
 
     private func collapseRoutine(_ id: UUID) {
-        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+        _ = withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             expandedRoutineIDs.remove(id)
         }
     }

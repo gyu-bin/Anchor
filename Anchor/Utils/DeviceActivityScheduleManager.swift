@@ -53,7 +53,7 @@ enum DeviceActivityScheduleManager {
             )
 
             if complete {
-                try? center.stopMonitoring([activityName])
+                center.stopMonitoring([activityName])
                 continue
             }
 
@@ -68,7 +68,7 @@ enum DeviceActivityScheduleManager {
                 repeats: true
             )
 
-            try? center.stopMonitoring([activityName])
+            center.stopMonitoring([activityName])
             do {
                 try center.startMonitoring(activityName, during: schedule)
             } catch {
