@@ -152,7 +152,12 @@ enum RoutineSchedule {
         if itemCount == 0 {
             return "\(schedulePart) · \(startTimeText)"
         }
-        return "\(schedulePart) · \(itemCount)개 항목 · \(startTimeText)"
+        var parts = [schedulePart, "\(itemCount)개 항목"]
+        if let duration = RoutineDuration.formattedTotal(items: routine.items) {
+            parts.append(duration)
+        }
+        parts.append(startTimeText)
+        return parts.joined(separator: " · ")
     }
 }
 

@@ -11,8 +11,8 @@ struct OverallProgressCard: View {
 
     let routines: [Routine]
     let logs: [DailyLog]
+    /// 지금 실제로 잠금 중인 앱·웹만 포함 (시작 전 루틴의 예정 차단은 제외).
     let blockSummary: BlockedShieldSummary
-    let isActivelyLocking: Bool
 
     private var routinesWithItems: [Routine] {
         routines.filter { !$0.items.isEmpty }
@@ -52,9 +52,9 @@ struct OverallProgressCard: View {
                         .foregroundStyle(Color.anchorSub(scheme))
 
                     if completedRoutines < totalRoutines, blockSummary.hasAnyBlock {
-                        Text(isActivelyLocking ? AppCopy.Today.lockActive : AppCopy.Today.lockScheduled)
+                        Text(AppCopy.Today.lockActive)
                             .font(.caption.weight(.medium))
-                            .foregroundStyle(isActivelyLocking ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
+                            .foregroundStyle(Color.anchorWarning(scheme))
 
                         BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6)
                     }

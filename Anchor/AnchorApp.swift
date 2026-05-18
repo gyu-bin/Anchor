@@ -12,24 +12,16 @@ struct AnchorApp: App {
     @StateObject private var tabRouter = TabRouter()
     @StateObject private var premiumStore = PremiumStore()
 
-    private var sharedModelContainer: ModelContainer = {
-        AppModelContainer.make()
-    }()
-
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRootView()
                 .environmentObject(tabRouter)
                 .environmentObject(premiumStore)
-                .modelContainer(sharedModelContainer)
-                .task {
-                    await premiumStore.bootstrap()
-                }
         }
     }
 }
 
-private enum AppModelContainer {
+enum AppModelContainer {
     private static let appGroupID = "group.com.rbqls6651.anchor"
 
     static func make() -> ModelContainer {

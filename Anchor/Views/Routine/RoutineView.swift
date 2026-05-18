@@ -18,6 +18,7 @@ struct RoutineView: View {
     @State private var expandedRoutineIDs: Set<UUID> = []
     @State private var focusNameRoutineID: UUID?
     @State private var paywallReason: PaywallReason?
+    @State private var isReorderingRoutines = false
 
     private var orderedRoutines: [Routine] {
         vm.sortedRoutines(routines)
@@ -45,6 +46,7 @@ struct RoutineView: View {
                                 RoutineCardView(
                                     routine: routine,
                                     vm: vm,
+                                    allRoutines: routines,
                                     editPayload: $editPayload,
                                     paywallReason: $paywallReason,
                                     isExpanded: Binding(
@@ -62,6 +64,11 @@ struct RoutineView: View {
                                         if focusNameRoutineID == routine.id {
                                             focusNameRoutineID = nil
                                         }
+                                    },
+                                    onDuplicated: { copy in
+                                        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                                            expandedRoutineIDs = [copy.id]
+                                        }
                                     }
                                 )
                                 .listRowInsets(EdgeInsets(
@@ -73,11 +80,20 @@ struct RoutineView: View {
                                 .listRowSeparator(.hidden)
                                 .listRowBackground(Color.clear)
                             }
+                            .onMove { source, destination in
+                                vm.moveRoutine(
+                                    from: source,
+                                    to: destination,
+                                    routines: routines,
+                                    context: modelContext
+                                )
+                            }
                         }
                     }
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
                     .contentMargins(.bottom, 36, for: .scrollContent)
+                    .environment(\.editMode, .constant(isReorderingRoutines ? .active : .inactive))
                 }
             }
             .anchorScreenBackground()
@@ -112,6 +128,17 @@ struct RoutineView: View {
             )
 
             Spacer(minLength: 12)
+
+            if !orderedRoutines.isEmpty {
+                Button {
+                    withAnimation { isReorderingRoutines.toggle() }
+                } label: {
+                    Text(isReorderingRoutines ? AppCopy.Common.save : AppCopy.Routine.reorderRoutines)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.anchorAccent(scheme))
+                }
+                .padding(.top, 10)
+            }
 
             Button {
                 addNewRoutine()

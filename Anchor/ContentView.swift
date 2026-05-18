@@ -13,7 +13,6 @@ struct ContentView: View {
 
     @AppStorage(AppGuideStorage.hasSeenGuideKey) private var hasSeenAppGuide = false
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
-    @State private var showFocusSplash = true
     @State private var showGuide = false
 
     private var appearanceMode: AppearanceMode {
@@ -22,14 +21,7 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if showFocusSplash {
-                PremiumFocusSplash {
-                    showFocusSplash = false
-                    if !hasSeenAppGuide {
-                        showGuide = true
-                    }
-                }
-            } else if showGuide {
+            if showGuide {
                 AppGuideView {
                     showGuide = false
                     bootstrapAfterGuide()
@@ -46,22 +38,26 @@ struct ContentView: View {
             tabRouter.openHistory()
         }
         .onReceive(NotificationCenter.default.publisher(for: .anchorRefreshShield)) { _ in
-            guard hasSeenAppGuide, !showFocusSplash, !showGuide else { return }
+            guard hasSeenAppGuide, !showGuide else { return }
             Task { await ShieldManager.refresh(modelContext: modelContext) }
         }
         .onReceive(NotificationCenter.default.publisher(for: .anchorCompleteNextItem)) { _ in
             completeNextFromIntent()
         }
         .onChange(of: scenePhase) { _, phase in
-            guard hasSeenAppGuide, !showFocusSplash, !showGuide, phase == .active else { return }
+            guard hasSeenAppGuide, !showGuide, phase == .active else { return }
             consumeIntentFlags()
             Task { await ShieldManager.refresh(modelContext: modelContext) }
         }
         .onAppear {
+            AppModelContextHolder.main = modelContext
             migrateLegacyOnboardingFlag()
             RoutineSchedule.repairLegacyRoutines(in: modelContext)
-            guard hasSeenAppGuide, !showFocusSplash, !showGuide else { return }
-            consumeIntentFlags()
+            if !hasSeenAppGuide {
+                showGuide = true
+            } else {
+                consumeIntentFlags()
+            }
         }
     }
 

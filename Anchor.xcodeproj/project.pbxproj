@@ -60,13 +60,13 @@
 /* Begin PBXFileReference section */
 		1D1FC0B62FBA9D1500375B72 /* AnchorShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = AnchorShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D1FD3C62FBAE04B00375B72 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text.storekit; path = Products.storekit; sourceTree = "<group>"; };
-		VRSN00012FBAE00100D55358 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
-		1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "키링: Keyring.app"; path = Keyring.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DD00AAF2FB55D3C00D55358 /* Keyring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Keyring.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00ABC2FB55D3E00D55358 /* AnchorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00AC62FB55D3E00D55358 /* AnchorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000202FB55D3E00D55358 /* AnchorShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AnchorShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2DAM0022FBAE00100D55358 /* AnchorDeviceActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AnchorDeviceActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1WGT0022FBAE00100D55358 /* AnchorWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AnchorWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		VRSN00012FBAE00100D55358 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -198,7 +198,7 @@
 		1DD00AB02FB55D3C00D55358 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */,
+				1DD00AAF2FB55D3C00D55358 /* Keyring.app */,
 				A10000202FB55D3E00D55358 /* AnchorShieldConfiguration.appex */,
 				1DD00ABC2FB55D3E00D55358 /* AnchorTests.xctest */,
 				1DD00AC62FB55D3E00D55358 /* AnchorUITests.xctest */,
@@ -256,7 +256,7 @@
 			packageProductDependencies = (
 			);
 			productName = Anchor;
-			productReference = 1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */;
+			productReference = 1DD00AAF2FB55D3C00D55358 /* Keyring.app */;
 			productType = "com.apple.product-type.application";
 		};
 		1DD00ABB2FB55D3E00D55358 /* AnchorTests */ = {
@@ -754,6 +754,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_BackgroundColor = LaunchScreenBackground;
+				INFOPLIST_KEY_UILaunchScreen_ImageName = SplashIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
@@ -790,6 +792,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_BackgroundColor = LaunchScreenBackground;
+				INFOPLIST_KEY_UILaunchScreen_ImageName = SplashIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;

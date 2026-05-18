@@ -26,18 +26,44 @@ struct CalendarMonthView: View {
     @Environment(\.colorScheme) private var scheme
 
     let monthTitle: String
+    let referenceMonth: Date
     let daysInMonth: Int
     let firstWeekdayIndex: Int
     let dayStatuses: [Int: WeekdayCompletion]
+    var canGoBackward: Bool = true
+    let canGoForward: Bool
+    let onPreviousMonth: () -> Void
+    let onNextMonth: () -> Void
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
     private let weekdaySymbols: [String] = ["일", "월", "화", "수", "목", "금", "토"]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(monthTitle)
-                .font(AnchorTypography.cardTitle(scheme))
-                .foregroundStyle(Color.anchorText(scheme))
+            HStack {
+                Button(action: onPreviousMonth) {
+                    Image(systemName: "chevron.left")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(canGoBackward ? Color.anchorText(scheme) : Color.anchorSub(scheme).opacity(0.35))
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.plain)
+                .disabled(!canGoBackward)
+
+                Text(monthTitle)
+                    .font(AnchorTypography.cardTitle(scheme))
+                    .foregroundStyle(Color.anchorText(scheme))
+                    .frame(maxWidth: .infinity)
+
+                Button(action: onNextMonth) {
+                    Image(systemName: "chevron.right")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(canGoForward ? Color.anchorText(scheme) : Color.anchorSub(scheme).opacity(0.35))
+                        .frame(width: 36, height: 36)
+                }
+                .buttonStyle(.plain)
+                .disabled(!canGoForward)
+            }
 
             LazyVGrid(columns: columns, spacing: 6) {
                 ForEach(gridCells) { cell in
@@ -75,10 +101,9 @@ struct CalendarMonthView: View {
 
     private func dayDate(_ day: Int) -> Date {
         let cal = Calendar.current
-        let now = Date()
-        var comps = cal.dateComponents([.year, .month], from: now)
+        var comps = cal.dateComponents([.year, .month], from: referenceMonth)
         comps.day = day
-        return cal.date(from: comps) ?? now
+        return cal.date(from: comps) ?? referenceMonth
     }
 
     private func dayTextColor(status: WeekdayCompletion, isToday: Bool) -> Color {

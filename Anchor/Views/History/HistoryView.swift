@@ -16,6 +16,7 @@ struct HistoryView: View {
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
 
     @State private var paywallReason: PaywallReason?
+    @State private var displayedMonth: Date = Date()
 
     private var routinesWithItems: [Routine] {
         routines.filter { !$0.items.isEmpty }
@@ -142,13 +143,26 @@ struct HistoryView: View {
     }
 
     private var metricsGrid: some View {
-        let streak = Self.streak(logs: effectiveLogs, routines: routinesWithItems, cal: .current)
-        let rate = Self.monthCompletionRate(logs: effectiveLogs, routines: routinesWithItems, now: Date(), cal: .current)
+        let cal = Calendar.current
+        let streak = Self.streak(logs: effectiveLogs, routines: routinesWithItems, cal: cal)
+        let best = Self.bestStreak(logs: effectiveLogs, routines: routinesWithItems, cal: cal)
+        let rate = Self.monthCompletionRate(logs: effectiveLogs, routines: routinesWithItems, now: Date(), cal: cal)
 
-        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            metricTile(title: AppCopy.History.streak, value: "\(streak)", unit: "일", icon: "flame.fill")
+        return VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                metricTile(title: AppCopy.History.streak, value: "\(streak)", unit: "일", icon: "flame.fill")
+                metricTile(title: AppCopy.History.bestStreak, value: "\(best)", unit: "일", icon: "trophy.fill")
+            }
             metricTile(title: AppCopy.History.monthRate, value: "\(rate)", unit: "%", icon: "chart.pie.fill")
         }
+    }
+
+    /// `effectiveLogs` 기준 가장 오래된 달의 1일 (없으면 nil)
+    private var earliestHistoryMonthStart: Date? {
+        guard let oldest = effectiveLogs.map(\.date).min() else { return nil }
+        let cal = Calendar.current
+        let comps = cal.dateComponents([.year, .month], from: oldest)
+        return cal.date(from: comps)
     }
 
     private func metricTile(title: String, value: String, unit: String, icon: String) -> some View {
@@ -235,9 +249,8 @@ struct HistoryView: View {
 
     private var calendarCard: some View {
         let cal = Calendar.current
-        let now = Date()
-        let comps = cal.dateComponents([.year, .month], from: now)
-        let monthStart = cal.date(from: comps) ?? now
+        let comps = cal.dateComponents([.year, .month], from: displayedMonth)
+        let monthStart = cal.date(from: comps) ?? displayedMonth
         let range = cal.range(of: .day, in: .month, for: monthStart) ?? 1..<32
         let daysInMonth = range.count
         let firstWeekday = cal.component(.weekday, from: monthStart)
@@ -248,6 +261,23 @@ struct HistoryView: View {
         df.setLocalizedDateFormatFromTemplate("yyyyMMMM")
         let title = df.string(from: monthStart)
 
+        let nowComps = cal.dateComponents([.year, .month], from: Date())
+        let canGoForward: Bool = {
+            guard let y = comps.year, let m = comps.month,
+                  let ny = nowComps.year, let nm = nowComps.month else { return false }
+            return y < ny || (y == ny && m < nm)
+        }()
+
+        let canGoBackward: Bool = {
+            guard let earliest = earliestHistoryMonthStart,
+                  let prev = cal.date(byAdding: .month, value: -1, to: monthStart) else { return false }
+            let prevComps = cal.dateComponents([.year, .month], from: prev)
+            let earliestComps = cal.dateComponents([.year, .month], from: earliest)
+            guard let py = prevComps.year, let pm = prevComps.month,
+                  let ey = earliestComps.year, let em = earliestComps.month else { return false }
+            return py > ey || (py == ey && pm >= em)
+        }()
+
         var statuses: [Int: WeekdayCompletion] = [:]
         for day in 1...daysInMonth {
             guard let d = cal.date(byAdding: .day, value: day - 1, to: monthStart) else { continue }
@@ -257,9 +287,22 @@ struct HistoryView: View {
         return AnchorCard {
             CalendarMonthView(
                 monthTitle: title,
+                referenceMonth: monthStart,
                 daysInMonth: daysInMonth,
                 firstWeekdayIndex: leading,
-                dayStatuses: statuses
+                dayStatuses: statuses,
+                canGoBackward: canGoBackward,
+                canGoForward: canGoForward,
+                onPreviousMonth: {
+                    guard canGoBackward,
+                          let prev = cal.date(byAdding: .month, value: -1, to: monthStart) else { return }
+                    displayedMonth = prev
+                },
+                onNextMonth: {
+                    guard canGoForward,
+                          let next = cal.date(byAdding: .month, value: 1, to: monthStart) else { return }
+                    displayedMonth = next
+                }
             )
             .padding(AnchorLayout.cardPadding)
         }
@@ -328,6 +371,39 @@ extension HistoryView {
             }
             return WeekdayBar(label: labels[idx], value: value, status: status)
         }
+    }
+
+    static func bestStreak(logs: [DailyLog], routines: [Routine], cal: Calendar) -> Int {
+        guard !routines.isEmpty else { return 0 }
+
+        let today = cal.startOfDay(for: Date())
+        var earliest = today
+        for log in logs {
+            let d = cal.startOfDay(for: log.date)
+            if d < earliest { earliest = d }
+        }
+
+        var best = 0
+        var current = 0
+        var day = earliest
+        while day <= today {
+            let scheduled = RoutineSchedule.scheduledRoutines(routines, on: day, calendar: cal)
+            let countsAsSuccess: Bool
+            if scheduled.isEmpty {
+                countsAsSuccess = true
+            } else {
+                countsAsSuccess = dayStatus(logs: logs, routines: routines, day: day, cal: cal) == .full
+            }
+            if countsAsSuccess {
+                current += 1
+                best = max(best, current)
+            } else {
+                current = 0
+            }
+            guard let next = cal.date(byAdding: .day, value: 1, to: day) else { break }
+            day = next
+        }
+        return best
     }
 
     static func streak(logs: [DailyLog], routines: [Routine], cal: Calendar) -> Int {

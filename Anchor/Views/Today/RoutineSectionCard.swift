@@ -34,6 +34,14 @@ struct RoutineSectionCard: View {
         sortedItems.first { !log.completedItems.contains($0.id) }?.id
     }
 
+    private var progressSubtitle: String {
+        var text = AppCopy.Routine.sectionProgress(done: completedCount, total: totalCount)
+        if let duration = RoutineDuration.formattedTotal(items: routine.items) {
+            text += " · \(duration)"
+        }
+        return text
+    }
+
     var body: some View {
         AnchorCard {
             VStack(alignment: .leading, spacing: 0) {
@@ -42,7 +50,7 @@ struct RoutineSectionCard: View {
                         Text(routine.name)
                             .font(AnchorTypography.cardTitle(scheme))
                             .foregroundStyle(Color.anchorText(scheme))
-                        Text(AppCopy.Routine.sectionProgress(done: completedCount, total: totalCount))
+                        Text(progressSubtitle)
                             .font(.subheadline)
                             .foregroundStyle(Color.anchorSub(scheme))
                     }
@@ -88,5 +96,6 @@ struct RoutineSectionCard: View {
                     lineWidth: 1.5
                 )
         )
+        .opacity(isFullyDone ? 0.72 : 1)
     }
 }

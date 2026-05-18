@@ -22,11 +22,13 @@ struct RoutineItemEditSheet: View {
 
     @State private var name: String
     @State private var icon: String
+    @State private var durationMinutes: Int
 
     init(payload: RoutineItemEditPayload) {
         self.payload = payload
         _name = State(initialValue: payload.item?.name ?? "")
         _icon = State(initialValue: payload.item?.icon ?? "book")
+        _durationMinutes = State(initialValue: payload.item?.duration ?? 0)
     }
 
     var body: some View {
@@ -34,6 +36,20 @@ struct RoutineItemEditSheet: View {
             Form {
                 Section("이름") {
                     TextField("루틴 항목 이름", text: $name)
+                }
+
+                Section("예상 시간") {
+                    Picker("예상 시간", selection: $durationMinutes) {
+                        Text("없음").tag(0)
+                        Text("5분").tag(5)
+                        Text("10분").tag(10)
+                        Text("15분").tag(15)
+                        Text("20분").tag(20)
+                        Text("30분").tag(30)
+                        Text("45분").tag(45)
+                        Text("60분").tag(60)
+                    }
+                    .pickerStyle(.menu)
                 }
 
                 Section("아이콘") {
@@ -83,9 +99,21 @@ struct RoutineItemEditSheet: View {
     private func save() {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if let item = payload.item {
-            vm.updateItem(item, name: trimmed, icon: icon, context: modelContext)
+            vm.updateItem(
+                item,
+                name: trimmed,
+                icon: icon,
+                duration: durationMinutes,
+                context: modelContext
+            )
         } else {
-            vm.addItem(to: payload.routine, name: trimmed, icon: icon, context: modelContext)
+            vm.addItem(
+                to: payload.routine,
+                name: trimmed,
+                icon: icon,
+                duration: durationMinutes,
+                context: modelContext
+            )
         }
         dismiss()
     }

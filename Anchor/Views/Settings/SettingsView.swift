@@ -6,6 +6,7 @@
 import FamilyControls
 import SwiftData
 import SwiftUI
+import UIKit
 import UserNotifications
 
 struct SettingsView: View {
@@ -17,6 +18,7 @@ struct SettingsView: View {
     @AppStorage(NotificationPreferencesKey.routineStart) private var routineStartEnabled = true
     @AppStorage(NotificationPreferencesKey.reminder) private var reminderEnabled = true
     @AppStorage(NotificationPreferencesKey.weeklySummary) private var weeklySummaryEnabled = true
+    @AppStorage(NotificationPreferencesKey.reminderOffset) private var reminderOffsetMinutes = 30
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
 
     @State private var showGuide = false
@@ -57,6 +59,7 @@ struct SettingsView: View {
             .onChange(of: routineStartEnabled) { _, _ in applyNotificationPrefs() }
             .onChange(of: reminderEnabled) { _, _ in applyNotificationPrefs() }
             .onChange(of: weeklySummaryEnabled) { _, _ in applyNotificationPrefs() }
+            .onChange(of: reminderOffsetMinutes) { _, _ in applyNotificationPrefs() }
             .fullScreenCover(isPresented: $showGuide) {
                 AppGuideView(isReplay: true) {
                     showGuide = false
@@ -155,12 +158,28 @@ struct SettingsView: View {
                 if notificationsEnabled {
                     Toggle(AppCopy.Settings.routineStart, isOn: $routineStartEnabled)
                     Toggle(AppCopy.Settings.reminder, isOn: $reminderEnabled)
+                    if reminderEnabled {
+                        Picker(AppCopy.Settings.reminderDelay, selection: $reminderOffsetMinutes) {
+                            ForEach(NotificationPreferences.reminderOffsetChoices, id: \.minutes) { choice in
+                                Text(choice.label).tag(choice.minutes)
+                            }
+                        }
+                    }
                     weeklySummaryToggle
                 }
 
                 Text(notificationStatusText)
                     .font(.caption)
                     .foregroundStyle(Color.anchorSub(scheme))
+
+                if notificationStatus == .denied {
+                    Button(AppCopy.Settings.openSystemSettings) {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    .buttonStyle(AnchorSecondaryButtonStyle())
+                }
 
                 Button(AppCopy.Settings.requestNotification) {
                     Task { await requestNotifications() }
@@ -231,6 +250,11 @@ struct SettingsView: View {
                 Text(AppCopy.Settings.aboutBody)
                     .font(.subheadline)
                     .foregroundStyle(Color.anchorSub(scheme))
+                Text(AppCopy.Settings.version(AppInfo.versionLabel))
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.anchorSub(scheme))
+                Link(AppCopy.Settings.privacyPolicy, destination: AppInfo.privacyPolicyURL)
+                    .font(.subheadline.weight(.semibold))
                 if let url = URL(string: "mailto:support@keyring.app") {
                     Link(AppCopy.Settings.contact, destination: url)
                         .font(.subheadline.weight(.semibold))
@@ -256,6 +280,7 @@ struct SettingsView: View {
         NotificationPreferences.routineStartEnabled = routineStartEnabled
         NotificationPreferences.reminderEnabled = reminderEnabled
         NotificationPreferences.weeklySummaryEnabled = weeklySummaryEnabled
+        NotificationPreferences.reminderOffsetMinutes = reminderOffsetMinutes
     }
 
     private func applyNotificationPrefs() {
@@ -286,4 +311,5 @@ enum NotificationPreferencesKey {
     static let routineStart = "notifications.routineStart"
     static let reminder = "notifications.reminder"
     static let weeklySummary = "notifications.weeklySummary"
+    static let reminderOffset = "notifications.reminderOffsetMinutes"
 }

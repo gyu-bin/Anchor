@@ -59,20 +59,67 @@ final class RoutineViewModel: ObservableObject {
         try? NotificationManager.rescheduleAll(modelContext: context)
     }
 
-    func addItem(to routine: Routine, name: String, icon: String, context: ModelContext) {
+    func addItem(
+        to routine: Routine,
+        name: String,
+        icon: String,
+        duration: Int = 0,
+        context: ModelContext
+    ) {
         let next = (routine.items.map(\.order).max() ?? -1) + 1
-        let item = RoutineItem(name: name, duration: 0, icon: icon, order: next, routine: routine)
+        let item = RoutineItem(name: name, duration: max(0, duration), icon: icon, order: next, routine: routine)
         context.insert(item)
         routine.items.append(item)
         try? context.save()
         try? NotificationManager.rescheduleAll(modelContext: context)
     }
 
-    func updateItem(_ item: RoutineItem, name: String, icon: String, context: ModelContext) {
+    func updateItem(
+        _ item: RoutineItem,
+        name: String,
+        icon: String,
+        duration: Int,
+        context: ModelContext
+    ) {
         item.name = name
         item.icon = icon
+        item.duration = max(0, duration)
         try? context.save()
         try? NotificationManager.rescheduleAll(modelContext: context)
+    }
+
+    @discardableResult
+    func duplicateRoutine(
+        _ source: Routine,
+        context: ModelContext,
+        routines: [Routine]
+    ) -> Routine {
+        let copy = Routine(
+            name: "\(source.name) 복사",
+            startTime: source.startTime,
+            order: nextOrder(in: routines),
+            blockedApps: source.blockedApps,
+            blockedWebs: source.blockedWebs,
+            shieldSelectionData: source.shieldSelectionData,
+            scheduleKindRaw: source.scheduleKindRaw,
+            activeWeekdays: source.activeWeekdays,
+            oneTimeDate: source.oneTimeDate
+        )
+        context.insert(copy)
+        for item in source.items.sorted(by: { $0.order < $1.order }) {
+            let newItem = RoutineItem(
+                name: item.name,
+                duration: item.duration,
+                icon: item.icon,
+                order: item.order,
+                routine: copy
+            )
+            context.insert(newItem)
+            copy.items.append(newItem)
+        }
+        try? context.save()
+        try? NotificationManager.rescheduleAll(modelContext: context)
+        return copy
     }
 
     func deleteItem(_ item: RoutineItem, context: ModelContext) {

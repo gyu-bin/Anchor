@@ -192,10 +192,11 @@ enum NotificationManager {
         }
 
         if NotificationPreferences.reminderEnabled {
+            let offset = NotificationPreferences.reminderOffsetMinutes
             let anchor = calendar.date(from: startComponents)
                 ?? calendar.date(bySettingHour: startComponents.hour ?? 0, minute: startComponents.minute ?? 0, second: 0, of: Date())
                 ?? routine.startTime
-            let reminderDate = calendar.date(byAdding: .minute, value: 30, to: anchor) ?? anchor
+            let reminderDate = calendar.date(byAdding: .minute, value: offset, to: anchor) ?? anchor
             var reminderComps = startComponents
             reminderComps.hour = calendar.component(.hour, from: reminderDate)
             reminderComps.minute = calendar.component(.minute, from: reminderDate)
@@ -207,7 +208,11 @@ enum NotificationManager {
             reminderContent.body = reminder.body
             reminderContent.sound = .default
             reminderContent.categoryIdentifier = reminderCategoryId
-            reminderContent.userInfo = ["openToday": true]
+            reminderContent.userInfo = [
+                "openToday": true,
+                "routineId": routine.id.uuidString,
+                "isReminder": true,
+            ]
 
             let reminderReq = UNNotificationRequest(
                 identifier: "routine-reminder-\(routine.id.uuidString)-\(idSuffix)",
@@ -216,6 +221,59 @@ enum NotificationManager {
             )
             UNUserNotificationCenter.current().add(reminderReq)
         }
+    }
+
+    /// 오늘 해당 루틴을 이미 완료했으면 리마인더를 보내지 않습니다.
+    static func shouldDeliverReminder(
+        routineId: UUID,
+        modelContext: ModelContext
+    ) -> Bool {
+        guard let routines = try? modelContext.fetch(FetchDescriptor<Routine>()),
+              let routine = routines.first(where: { $0.id == routineId }) else {
+            return true
+        }
+        let calendar = Calendar.current
+        let dayStart = calendar.startOfDay(for: Date())
+        guard RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) else { return false }
+        let complete = (try? routineIsFullyCompleteToday(
+            routine,
+            dayStart: dayStart,
+            calendar: calendar,
+            modelContext: modelContext
+        )) ?? false
+        return !complete
+    }
+
+    static func cancelReminders(for routine: Routine) {
+        let prefix = "routine-reminder-\(routine.id.uuidString)-"
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            let ids = requests.filter { $0.identifier.hasPrefix(prefix) }.map(\.identifier)
+            guard !ids.isEmpty else { return }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
+        }
+    }
+
+    private static func routineIsFullyCompleteToday(
+        _ routine: Routine,
+        dayStart: Date,
+        calendar: Calendar,
+        modelContext: ModelContext
+    ) throws -> Bool {
+        if RestDayStore.isRestDay(dayStart, calendar: calendar) {
+            return true
+        }
+        let rid = routine.id
+        var fd = FetchDescriptor<DailyLog>(
+            predicate: #Predicate { log in
+                log.routineId == rid
+            }
+        )
+        fd.fetchLimit = 200
+        let logs = try modelContext.fetch(fd)
+        guard let log = logs.first(where: { calendar.isDate($0.date, inSameDayAs: dayStart) }) else {
+            return false
+        }
+        return log.isFullyCompleted
     }
 
     /// 매주 일요일 오전 9시 주간 요약

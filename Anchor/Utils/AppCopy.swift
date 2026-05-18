@@ -89,7 +89,11 @@ enum AppCopy {
         static let screenTime = "Screen Time"
         static let about = "앱 정보"
         static let aboutBody = "루틴이 끝날 때까지 선택한 앱을 잠가 드리고, 완료하면 바로 풀어 드려요."
+        static func version(_ label: String) -> String { "버전 \(label)" }
+        static let privacyPolicy = "개인정보처리방침"
         static let contact = "문의하기"
+        static let openSystemSettings = "설정 앱 열기"
+        static let reminderDelay = "리마인더 시점"
     }
 
     enum Routine {
@@ -116,6 +120,17 @@ enum AppCopy {
         static let onceDateLabel = "날짜"
         static let onceToday = "오늘로 맞추기"
         static let weekdayRequired = "요일을 하나 이상 골라 주세요"
+        static let deleteConfirmTitle = "루틴을 삭제할까요?"
+        static let deleteConfirmMessage = "항목과 차단 설정도 함께 사라져요. 되돌릴 수 없어요."
+        static let deleteConfirmAction = "삭제"
+        static let duplicate = "루틴 복제"
+        static let reorderItems = "항목 순서"
+        static let reorderRoutines = "순서 변경"
+        static func durationMinutes(_ minutes: Int) -> String { "약 \(minutes)분" }
+        static func durationHours(_ hours: Int) -> String { "약 \(hours)시간" }
+        static func durationHoursMinutes(hours: Int, minutes: Int) -> String {
+            "약 \(hours)시간 \(minutes)분"
+        }
 
         enum ScheduleKind {
             static let daily = "매일"
@@ -134,6 +149,7 @@ enum AppCopy {
         static let emptyBody = "오늘 탭에서 루틴을 마치면\n여기에 차곡차곡 쌓여요"
         static let emptyAction = "루틴 만들기"
         static let streak = "연속 완료"
+        static let bestStreak = "최고 기록"
         static let monthRate = "이번 달"
         static let thisWeek = "이번 주"
         static let byItem = "항목별"

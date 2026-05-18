@@ -13,15 +13,19 @@ struct RoutineCardView: View {
 
     @Bindable var routine: Routine
     @ObservedObject var vm: RoutineViewModel
+    let allRoutines: [Routine]
     @Binding var editPayload: RoutineItemEditPayload?
     @Binding var paywallReason: PaywallReason?
     @Binding var isExpanded: Bool
     var focusNameOnAppear: Bool = false
     var onFinishEditing: (() -> Void)? = nil
+    var onDuplicated: ((Routine) -> Void)? = nil
 
     @State private var editingName: String = ""
     @State private var scheduleDraft = RoutineScheduleDraft()
     @State private var weekdayAlert = false
+    @State private var showDeleteConfirm = false
+    @State private var isReorderingItems = false
     @FocusState private var nameFieldFocused: Bool
 
     private var itemCount: Int { routine.items.count }
@@ -46,6 +50,18 @@ struct RoutineCardView: View {
                         .padding(.top, 4)
                 }
             }
+        }
+        .confirmationDialog(
+            AppCopy.Routine.deleteConfirmTitle,
+            isPresented: $showDeleteConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(AppCopy.Routine.deleteConfirmAction, role: .destructive) {
+                vm.deleteRoutine(routine, context: modelContext)
+            }
+            Button(AppCopy.Common.cancel, role: .cancel) {}
+        } message: {
+            Text(AppCopy.Routine.deleteConfirmMessage)
         }
     }
 
@@ -94,7 +110,7 @@ struct RoutineCardView: View {
             }
 
             Button(role: .destructive) {
-                vm.deleteRoutine(routine, context: modelContext)
+                showDeleteConfirm = true
             } label: {
                 Image(systemName: "trash")
                     .font(.body)
@@ -152,19 +168,70 @@ struct RoutineCardView: View {
                     Task { await ShieldManager.refresh(modelContext: modelContext) }
                 }
 
-            VStack(alignment: .leading, spacing: 8) {
+            Button {
+                guard PremiumLimits.canAddRoutine(
+                    currentCount: allRoutines.count,
+                    isPremium: premium.isPremium
+                ) else {
+                    paywallReason = .routineLimit
+                    return
+                }
+                let copy = vm.duplicateRoutine(routine, context: modelContext, routines: allRoutines)
+                onDuplicated?(copy)
+            } label: {
+                Label(AppCopy.Routine.duplicate, systemImage: "doc.on.doc")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .tint(Color.anchorAccent(scheme))
+
+            itemsSection
+
+            BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
+            BlockedWebSection(routine: routine, paywallReason: $paywallReason)
+        }
+        .alert(AppCopy.Routine.weekdayRequired, isPresented: $weekdayAlert) {
+            Button("확인", role: .cancel) {}
+        }
+    }
+
+    @ViewBuilder
+    private var itemsSection: some View {
+        let sorted = routine.items.sorted { $0.order < $1.order }
+
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
                 Text("항목")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.anchorSub(scheme))
+                Spacer()
+                if sorted.count > 1 {
+                    Button(isReorderingItems ? AppCopy.Common.save : AppCopy.Routine.reorderItems) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            isReorderingItems.toggle()
+                        }
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.anchorAccent(scheme))
+                }
+            }
 
-                let sorted = routine.items.sorted { $0.order < $1.order }
-                if sorted.isEmpty {
-                    Text(AppCopy.Routine.noItems)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.anchorSub(scheme))
-                } else {
-                    VStack(spacing: 0) {
-                        ForEach(sorted, id: \.id) { item in
+            if sorted.isEmpty {
+                Text(AppCopy.Routine.noItems)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.anchorSub(scheme))
+            } else {
+                List {
+                    ForEach(sorted, id: \.id) { item in
+                        if isReorderingItems {
+                            HStack(spacing: 12) {
+                                Image(systemName: item.icon)
+                                    .foregroundStyle(Color.anchorAccent(scheme))
+                                    .frame(width: 28)
+                                Text(item.name)
+                                    .foregroundStyle(Color.anchorText(scheme))
+                            }
+                            .padding(.vertical, 4)
+                        } else {
                             Button {
                                 editPayload = RoutineItemEditPayload(routine: routine, item: item)
                             } label: {
@@ -172,48 +239,52 @@ struct RoutineCardView: View {
                                     Image(systemName: item.icon)
                                         .foregroundStyle(Color.anchorAccent(scheme))
                                         .frame(width: 28)
-                                    Text(item.name)
-                                        .foregroundStyle(Color.anchorText(scheme))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(item.name)
+                                            .foregroundStyle(Color.anchorText(scheme))
+                                        if item.duration > 0 {
+                                            Text(AppCopy.Routine.durationMinutes(item.duration))
+                                                .font(.caption2)
+                                                .foregroundStyle(Color.anchorSub(scheme))
+                                        }
+                                    }
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(Color.anchorSub(scheme))
                                 }
-                                .padding(.vertical, 12)
-                                .padding(.horizontal, 4)
+                                .padding(.vertical, 8)
                             }
                             .buttonStyle(.plain)
-
-                            if item.id != sorted.last?.id {
-                                Divider()
-                            }
                         }
                     }
-                    .background(Color.anchorSubBg(scheme))
-                    .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
-                }
-
-                Button {
-                    guard PremiumLimits.canAddItem(
-                        currentCount: routine.items.count,
-                        isPremium: premium.isPremium
-                    ) else {
-                        paywallReason = .itemLimit
-                        return
+                    .onMove { source, destination in
+                        vm.moveItem(from: source, to: destination, in: routine, context: modelContext)
                     }
-                    editPayload = RoutineItemEditPayload(routine: routine, item: nil)
-                } label: {
-                    Label(AppCopy.Routine.addItem, systemImage: "plus.circle.fill")
-                        .font(.subheadline.weight(.semibold))
                 }
-                .tint(Color.anchorAccent(scheme))
+                .listStyle(.plain)
+                .scrollDisabled(true)
+                .scrollContentBackground(.hidden)
+                .frame(height: CGFloat(sorted.count) * (isReorderingItems ? 44 : 52))
+                .environment(\.editMode, .constant(isReorderingItems ? .active : .inactive))
+                .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
+                .background(Color.anchorSubBg(scheme))
             }
 
-            BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
-            BlockedWebSection(routine: routine, paywallReason: $paywallReason)
-        }
-        .alert(AppCopy.Routine.weekdayRequired, isPresented: $weekdayAlert) {
-            Button("확인", role: .cancel) {}
+            Button {
+                guard PremiumLimits.canAddItem(
+                    currentCount: routine.items.count,
+                    isPremium: premium.isPremium
+                ) else {
+                    paywallReason = .itemLimit
+                    return
+                }
+                editPayload = RoutineItemEditPayload(routine: routine, item: nil)
+            } label: {
+                Label(AppCopy.Routine.addItem, systemImage: "plus.circle.fill")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .tint(Color.anchorAccent(scheme))
         }
     }
 
@@ -228,6 +299,7 @@ struct RoutineCardView: View {
     private func finishEditing() {
         nameFieldFocused = false
         commitRoutineName()
+        isReorderingItems = false
         onFinishEditing?()
         withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             isExpanded = false

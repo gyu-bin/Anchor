@@ -26,6 +26,7 @@ struct TodayView: View {
     @State private var pendingUndo: UndoSnapshot?
     @State private var showUndoToast = false
     @State private var undoTask: Task<Void, Never>?
+    @State private var isRestToday = RestDayStore.isRestToday()
 
     private var sortedRoutines: [Routine] {
         vm.sortedRoutines(routines)
@@ -44,10 +45,6 @@ struct TodayView: View {
         actionableRoutinesToday.compactMap { routine in
             try? vm.todayLog(for: routine, context: modelContext)
         }
-    }
-
-    private var isRestToday: Bool {
-        RestDayStore.isRestToday()
     }
 
     private var dateTitle: String {
@@ -85,11 +82,7 @@ struct TodayView: View {
                                     OverallProgressCard(
                                         routines: actionableRoutinesToday,
                                         logs: todayLogs,
-                                        blockSummary: ShieldManager.aggregatedDisplaySummary(
-                                            routines: actionableRoutinesToday,
-                                            modelContext: modelContext
-                                        ),
-                                        isActivelyLocking: ShieldManager.isAnyActivelyLocking(
+                                        blockSummary: ShieldManager.aggregatedBlockedSummary(
                                             routines: actionableRoutinesToday,
                                             modelContext: modelContext
                                         )
@@ -145,6 +138,7 @@ struct TodayView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
             .onAppear {
+                isRestToday = RestDayStore.isRestToday()
                 refreshCompletionBannerState()
                 Task {
                     await ShieldManager.refresh(modelContext: modelContext)
@@ -170,10 +164,13 @@ struct TodayView: View {
 
     private var restDayControl: some View {
         Button {
-            if isRestToday {
-                RestDayStore.clearRestToday()
-            } else {
-                RestDayStore.setRestToday()
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                if isRestToday {
+                    RestDayStore.clearRestToday()
+                } else {
+                    RestDayStore.setRestToday()
+                }
+                isRestToday = RestDayStore.isRestToday()
             }
             syncWidgetAndNotifications()
             Task { await ShieldManager.refresh(modelContext: modelContext) }
@@ -249,6 +246,12 @@ struct TodayView: View {
                 try vm.toggleCompletion(item: item, routine: routine, context: modelContext)
                 try modelContext.save()
 
+                if let updatedLog = try? vm.todayLog(for: routine, context: modelContext),
+                   updatedLog.isFullyCompleted {
+                    NotificationManager.cancelReminders(for: routine)
+                    AppReviewManager.recordRoutineFullyCompleted()
+                }
+
                 presentUndo(item: item, routine: routine, wasCompleted: wasCompleted)
 
                 let gen = UINotificationFeedbackGenerator()
@@ -306,6 +309,7 @@ struct TodayView: View {
             )
             try modelContext.save()
             wasAllComplete = (try? vm.allRoutinesFullyCompletedToday(routines: routines, context: modelContext)) ?? false
+            try? NotificationManager.rescheduleAll(modelContext: modelContext)
             syncWidgetAndNotifications()
             Task { await ShieldManager.refresh(modelContext: modelContext) }
         } catch {

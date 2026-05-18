@@ -3,6 +3,7 @@
 //  Anchor
 //
 
+import SwiftData
 import UIKit
 import UserNotifications
 
@@ -55,6 +56,21 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
+        let userInfo = notification.request.content.userInfo
+        if userInfo["isReminder"] as? Bool == true,
+           let idString = userInfo["routineId"] as? String,
+           let routineId = UUID(uuidString: idString) {
+            Task { @MainActor in
+                if let ctx = AppModelContextHolder.main,
+                   !NotificationManager.shouldDeliverReminder(routineId: routineId, modelContext: ctx) {
+                    completionHandler([])
+                    return
+                }
+                NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
+                completionHandler([.banner, .sound, .badge])
+            }
+            return
+        }
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
         }
