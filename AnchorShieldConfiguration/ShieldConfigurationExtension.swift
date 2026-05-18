@@ -11,7 +11,7 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     override func configuration(shielding application: Application) -> ShieldConfiguration {
         makeConfig(
             title: "루틴을 먼저 완료해보세요",
-            subtitle: "Anchor에서 루틴을 완료하면 바로 열려요"
+            subtitle: "키링에서 루틴을 완료하면 바로 열려요"
         )
     }
 
@@ -26,7 +26,7 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
         ShieldConfiguration(
             backgroundBlurStyle: .systemUltraThinMaterial,
             backgroundColor: UIColor(red: 245 / 255, green: 240 / 255, blue: 232 / 255, alpha: 1),
-            icon: UIImage(systemName: "anchor"),
+            icon: UIImage(systemName: "key.fill"),
             title: ShieldConfiguration.Label(
                 text: title,
                 color: UIColor(red: 26 / 255, green: 26 / 255, blue: 26 / 255, alpha: 1)
@@ -36,7 +36,7 @@ final class ShieldConfigurationExtension: ShieldConfigurationDataSource {
                 color: .secondaryLabel
             ),
             primaryButtonLabel: ShieldConfiguration.Label(
-                text: "Anchor 열기",
+                text: "키링 열기",
                 color: .white
             ),
             primaryButtonBackgroundColor: UIColor(red: 74 / 255, green: 103 / 255, blue: 65 / 255, alpha: 1),

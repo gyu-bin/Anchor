@@ -53,10 +53,10 @@ struct OnboardingView: View {
     private var introPage: some View {
         VStack(spacing: 18) {
             Spacer()
-            Image(systemName: "anchor.circle.fill")
+            Image(systemName: "key.fill")
                 .font(.system(size: 72))
                 .foregroundStyle(Color.anchorAccent(scheme))
-            Text("Anchor")
+            Text(AppBrand.displayName)
                 .font(.largeTitle.bold())
                 .foregroundStyle(Color.anchorText(scheme))
             Text("루틴을 끝내기 전까지 방해 요소를 소프트 잠금하고,\n완료의 순간에 바로 해제해요.")

@@ -50,7 +50,7 @@
 
 /* Begin PBXFileReference section */
 		1D1FC0B62FBA9D1500375B72 /* AnchorShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = AnchorShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		1DD00AAF2FB55D3C00D55358 /* Anchor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Anchor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "키링: Keyring.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00ABC2FB55D3E00D55358 /* AnchorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DD00AC62FB55D3E00D55358 /* AnchorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnchorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000202FB55D3E00D55358 /* AnchorShieldConfiguration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AnchorShieldConfiguration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -171,7 +171,7 @@
 		1DD00AB02FB55D3C00D55358 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1DD00AAF2FB55D3C00D55358 /* Anchor.app */,
+				1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */,
 				A10000202FB55D3E00D55358 /* AnchorShieldConfiguration.appex */,
 				1DD00ABC2FB55D3E00D55358 /* AnchorTests.xctest */,
 				1DD00AC62FB55D3E00D55358 /* AnchorUITests.xctest */,
@@ -227,7 +227,7 @@
 			packageProductDependencies = (
 			);
 			productName = Anchor;
-			productReference = 1DD00AAF2FB55D3C00D55358 /* Anchor.app */;
+			productReference = 1DD00AAF2FB55D3C00D55358 /* 키링: Keyring.app */;
 			productType = "com.apple.product-type.application";
 		};
 		1DD00ABB2FB55D3E00D55358 /* AnchorTests */ = {
@@ -681,6 +681,7 @@
 				DEVELOPMENT_TEAM = 6YASPU77L7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "키링:Keyring";
 				INFOPLIST_KEY_NSFamilyControlsUsageDescription = "루틴이 끝나기 전까지 선택한 앱(예: Safari) 사용을 제한하기 위해 Screen Time 연동이 필요합니다.";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "루틴 시작 알림과 미완료 리마인더를 보내기 위해 알림 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -694,7 +695,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rbqls6651.anchor;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "키링:Keyring";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -716,6 +717,7 @@
 				DEVELOPMENT_TEAM = 6YASPU77L7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "키링:Keyring";
 				INFOPLIST_KEY_NSFamilyControlsUsageDescription = "루틴이 끝나기 전까지 선택한 앱(예: Safari) 사용을 제한하기 위해 Screen Time 연동이 필요합니다.";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "루틴 시작 알림과 미완료 리마인더를 보내기 위해 알림 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -729,7 +731,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.rbqls6651.anchor;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "키링:Keyring";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
