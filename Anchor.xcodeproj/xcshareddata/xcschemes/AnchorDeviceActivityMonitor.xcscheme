@@ -30,7 +30,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1DD00AAE2FB55D3C00D55358"
-               BuildableName = "&#x110f;&#x1175;&#x1105;&#x1175;&#x11bc;:Keyring.app"
+               BuildableName = "Keyring.app"
                BlueprintName = "Anchor"
                ReferencedContainer = "container:Anchor.xcodeproj">
             </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1DD00AAE2FB55D3C00D55358"
-            BuildableName = "&#x110f;&#x1175;&#x1105;&#x1175;&#x11bc;:Keyring.app"
+            BuildableName = "Keyring.app"
             BlueprintName = "Anchor"
             ReferencedContainer = "container:Anchor.xcodeproj">
          </BuildableReference>
@@ -81,7 +81,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1DD00AAE2FB55D3C00D55358"
-            BuildableName = "&#x110f;&#x1175;&#x1105;&#x1175;&#x11bc;:Keyring.app"
+            BuildableName = "Keyring.app"
             BlueprintName = "Anchor"
             ReferencedContainer = "container:Anchor.xcodeproj">
          </BuildableReference>
