@@ -59,42 +59,64 @@ enum DeviceActivityScheduleManager {
             let start = calendar.dateComponents([.hour, .minute], from: routine.startTime)
 
             if !complete {
+                var unlockHour: Int?
+                var unlockMinute: Int?
+                if routine.endTime != nil,
+                   let unlock = RoutineDeadline.unlockTimeToday(for: routine, calendar: calendar) {
+                    let unlockComps = calendar.dateComponents([.hour, .minute], from: unlock)
+                    unlockHour = unlockComps.hour
+                    unlockMinute = unlockComps.minute
+                }
                 scheduleItems.append(
                     ScheduledRoutineShield(
                         routineId: routine.id,
                         startHour: start.hour ?? 0,
                         startMinute: start.minute ?? 0,
                         isComplete: false,
-                        selectionData: selectionData
+                        selectionData: selectionData,
+                        unlockHour: unlockHour,
+                        unlockMinute: unlockMinute
                     )
                 )
             }
 
             if complete { continue }
 
-            if ShieldManager.hasRoutineStartedToday(routine, calendar: calendar) {
+            if !complete,
+               RoutineDeadline.shouldKeepShield(
+                   routine: routine,
+                   isComplete: false,
+                   now: Date(),
+                   calendar: calendar
+               ) {
                 pendingMerge.applicationTokens.formUnion(selection.applicationTokens)
                 pendingMerge.webDomainTokens.formUnion(selection.webDomainTokens)
             }
 
+            let intervalEnd = intervalEndComponents(for: routine, calendar: calendar)
+
             switch routine.scheduleKind {
             case .daily, .once:
+                var end = intervalEnd
+                end.weekday = nil
                 let schedule = DeviceActivitySchedule(
                     intervalStart: DateComponents(hour: start.hour, minute: start.minute),
-                    intervalEnd: DateComponents(hour: 23, minute: 59),
+                    intervalEnd: end,
                     repeats: routine.scheduleKind == .daily
                 )
                 startMonitoring(center: center, name: names[0], schedule: schedule)
             case .weekdays:
                 let weekdays = RoutineSchedule.activeWeekdays(for: routine)
                 for (index, weekday) in weekdays.enumerated() {
+                    var end = intervalEnd
+                    end.weekday = weekday
                     let schedule = DeviceActivitySchedule(
                         intervalStart: DateComponents(
                             hour: start.hour,
                             minute: start.minute,
                             weekday: weekday
                         ),
-                        intervalEnd: DateComponents(hour: 23, minute: 59, weekday: weekday),
+                        intervalEnd: end,
                         repeats: true
                     )
                     guard index < names.count else { continue }
@@ -112,6 +134,15 @@ enum DeviceActivityScheduleManager {
         let center = DeviceActivityCenter()
         let names = routines.flatMap { activityNames(for: $0) }
         center.stopMonitoring(names)
+    }
+
+    private static func intervalEndComponents(for routine: Routine, calendar: Calendar) -> DateComponents {
+        if routine.endTime != nil,
+           let unlock = RoutineDeadline.unlockTimeToday(for: routine, calendar: calendar) {
+            let comps = calendar.dateComponents([.hour, .minute], from: unlock)
+            return DateComponents(hour: comps.hour, minute: comps.minute)
+        }
+        return DateComponents(hour: 23, minute: 59)
     }
 
     private static func startMonitoring(

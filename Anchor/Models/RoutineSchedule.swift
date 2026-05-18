@@ -27,6 +27,8 @@ struct RoutineScheduleDraft: Equatable {
     var activeWeekdays: Set<Int> = [2, 3, 4, 5, 6]
     var oneTimeDate: Date = Date()
     var startTime: Date = Calendar.current.date(bySettingHour: 7, minute: 30, second: 0, of: Date()) ?? Date()
+    var hasEndTime: Bool = false
+    var endTime: Date = Calendar.current.date(bySettingHour: 9, minute: 0, second: 0, of: Date()) ?? Date()
 }
 
 enum RoutineSchedule {
@@ -41,6 +43,7 @@ enum RoutineSchedule {
     static func apply(_ draft: RoutineScheduleDraft, to routine: Routine, calendar: Calendar = .current) {
         routine.scheduleKindRaw = draft.kind.rawValue
         routine.startTime = draft.startTime
+        routine.endTime = draft.hasEndTime ? draft.endTime : nil
         switch draft.kind {
         case .daily:
             routine.activeWeekdays = Array(allWeekdays).sorted()
@@ -60,6 +63,8 @@ enum RoutineSchedule {
         draft.activeWeekdays = Set(activeWeekdays(for: routine))
         draft.oneTimeDate = routine.oneTimeDate ?? Date()
         draft.startTime = routine.startTime
+        draft.hasEndTime = routine.endTime != nil
+        draft.endTime = routine.endTime ?? (calendar.date(bySettingHour: 9, minute: 0, second: 0, of: routine.startTime) ?? routine.startTime)
         return draft
     }
 
@@ -90,6 +95,12 @@ enum RoutineSchedule {
             }
             if routine.activeWeekdays == nil {
                 routine.activeWeekdays = activeWeekdays(for: routine)
+                changed = true
+            }
+            if routine.createdAt == nil {
+                let fd = FetchDescriptor<DailyLog>()
+                let logs = (try? context.fetch(fd)) ?? []
+                routine.createdAt = effectiveCreatedDay(for: routine, logs: logs)
                 changed = true
             }
         }
@@ -126,6 +137,36 @@ enum RoutineSchedule {
         routines.filter { !$0.items.isEmpty && isActive($0, on: day, calendar: calendar) }
     }
 
+    /// 그날 일정이 있고, 루틴이 이미 만들어진 뒤인 날만 (생성일 이전은 제외).
+    static func scheduledRoutinesExisting(
+        _ routines: [Routine],
+        logs: [DailyLog],
+        on day: Date,
+        calendar: Calendar = .current
+    ) -> [Routine] {
+        let dayStart = day.startOfDay(in: calendar)
+        return scheduledRoutines(routines, on: day, calendar: calendar).filter { routine in
+            effectiveCreatedDay(for: routine, logs: logs, calendar: calendar) <= dayStart
+        }
+    }
+
+    static func effectiveCreatedDay(
+        for routine: Routine,
+        logs: [DailyLog],
+        calendar: Calendar = .current
+    ) -> Date {
+        if let created = routine.createdAt {
+            return calendar.startOfDay(for: created)
+        }
+        if let earliest = logs
+            .filter({ $0.routineId == routine.id })
+            .map({ calendar.startOfDay(for: $0.date) })
+            .min() {
+            return earliest
+        }
+        return calendar.startOfDay(for: Date())
+    }
+
     static func weekdaySummary(_ weekdays: [Int]) -> String {
         let set = Set(weekdays)
         if set == allWeekdays { return AppCopy.Routine.repeatsDaily }
@@ -136,6 +177,16 @@ enum RoutineSchedule {
     }
 
     static func cardSubtitle(for routine: Routine, itemCount: Int, startTimeText: String) -> String {
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "ko_KR")
+        df.dateFormat = "a h:mm"
+        let timePart: String
+        if let end = routine.endTime {
+            timePart = "\(startTimeText) ~ \(df.string(from: end))"
+        } else {
+            timePart = startTimeText
+        }
+
         let schedulePart: String
         switch routine.scheduleKind {
         case .daily:
@@ -143,20 +194,18 @@ enum RoutineSchedule {
         case .weekdays:
             schedulePart = weekdaySummary(activeWeekdays(for: routine))
         case .once:
-            let df = DateFormatter()
-            df.locale = Locale(identifier: "ko_KR")
             df.setLocalizedDateFormatFromTemplate("MMMd")
             let date = routine.oneTimeDate ?? Date()
             schedulePart = "\(AppCopy.Routine.ScheduleKind.onceShort) \(df.string(from: date))"
         }
         if itemCount == 0 {
-            return "\(schedulePart) · \(startTimeText)"
+            return "\(schedulePart) · \(timePart)"
         }
         var parts = [schedulePart, "\(itemCount)개 항목"]
         if let duration = RoutineDuration.formattedTotal(items: routine.items) {
             parts.append(duration)
         }
-        parts.append(startTimeText)
+        parts.append(timePart)
         return parts.joined(separator: " · ")
     }
 }

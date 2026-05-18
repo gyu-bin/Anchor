@@ -108,8 +108,10 @@ enum AppCopy {
         static let namePlaceholder = "예: 아침 루틴"
         static let noItems = "항목을 하나만 추가해 주세요"
         static let addItem = "항목 추가"
-        static let lockActive = "지금 앱 잠금 중"
-        static let lockScheduled = "시작 후 잠겨요"
+        static let lockActive = "앱 잠금 중"
+        static let lockScheduled = "시작 후 잠김"
+        static func lockUnlocksAt(_ time: String) -> String { "잠금 \(time)에 해제" }
+        static let lockReleasedAfterDeadline = "마감 지남 · 미완료"
         static func sectionProgress(done: Int, total: Int) -> String {
             "\(done)개 / \(total)개 했어요"
         }
@@ -156,6 +158,26 @@ enum AppCopy {
         static let noLogs = "조금만 더 하면 기록이 생겨요"
         static func weeklySummary(fullDays: Int) -> String {
             "이번 주 \(fullDays)일 루틴을 채웠어요. 정말 대단해요"
+        }
+        static let statusTitle = "하루 상태"
+        static let legendFull = "완료"
+        static let legendMissed = "마감 미완료"
+        static let legendNone = "기록 없음"
+        static func monthMissedDays(_ count: Int) -> String {
+            "이번 달 마감 미완료 \(count)일"
+        }
+        static let monthMissedNone = "이번 달 마감 미완료 없음"
+        static let dayDetailRoutines = "루틴"
+        static let dayDetailRest = "쉬는 날이에요"
+        static let dayDetailFuture = "아직 오지 않은 날이에요"
+        static let dayDetailNoSchedule = "예정된 루틴이 없어요"
+        static let routineCompleted = "완료"
+        static let routineInProgress = "진행 중"
+        static let routineMissed = "마감 미완료"
+        static let routineWaiting = "대기 중"
+        static let routineUpcoming = "예정"
+        static func routineProgress(completed: Int, total: Int) -> String {
+            "\(completed)/\(total) 완료"
         }
     }
 
@@ -241,6 +263,13 @@ enum AppCopy {
         }
         static func reminder(name: String) -> (title: String, body: String) {
             ("아직 \(name)이 남아 있어요", "조금만 더 해볼까요?")
+        }
+        static let incompleteDayTitle = "오늘 루틴, 아직 남았어요"
+        static let incompleteDayBody = "하루가 끝나기 전에 조금만 더 해볼까요?"
+        static let dayCelebrationTitle = "오늘도 고생 많으셨어요"
+        static let dayCelebrationBody = "루틴을 모두 마치셨네요. 편히 쉬세요"
+        static func deadlineReminder(name: String) -> (title: String, body: String) {
+            ("\(name) 마감 30분 전이에요", "아직 완료 전이라면 지금 시작해 보세요!")
         }
         static let openToday = "오늘 보기"
         static let weeklyTitle = "이번 주도 수고 많으셨어요"

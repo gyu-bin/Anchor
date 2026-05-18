@@ -57,7 +57,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
         let userInfo = notification.request.content.userInfo
-        if userInfo["isReminder"] as? Bool == true,
+        let isRoutineReminder = userInfo["isReminder"] as? Bool == true
+            || userInfo["isDeadlineReminder"] as? Bool == true
+        if isRoutineReminder,
            let idString = userInfo["routineId"] as? String,
            let routineId = UUID(uuidString: idString) {
             Task { @MainActor in
@@ -68,6 +70,30 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
                 }
                 NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
                 completionHandler([.banner, .sound, .badge])
+            }
+            return
+        }
+
+        if userInfo["isIncompleteDayNudge"] as? Bool == true {
+            Task { @MainActor in
+                if let ctx = AppModelContextHolder.main,
+                   !NotificationManager.shouldDeliverIncompleteDayNudge(modelContext: ctx) {
+                    completionHandler([])
+                    return
+                }
+                completionHandler([.banner, .sound, .badge])
+            }
+            return
+        }
+
+        if userInfo["isDayCelebration"] as? Bool == true {
+            Task { @MainActor in
+                if let ctx = AppModelContextHolder.main,
+                   !NotificationManager.shouldDeliverDayCelebration(modelContext: ctx) {
+                    completionHandler([])
+                    return
+                }
+                completionHandler([.banner, .sound])
             }
             return
         }

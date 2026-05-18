@@ -3,10 +3,12 @@
 //  Anchor
 //
 
+import SwiftData
 import SwiftUI
 
 struct RoutineSectionCard: View {
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.modelContext) private var modelContext
 
     let routine: Routine
     let log: DailyLog
@@ -64,16 +66,21 @@ struct RoutineSectionCard: View {
                 }
                 .padding(AnchorLayout.cardPadding)
 
-                if !isFullyDone, blockSummary.hasAnyBlock {
-                    Text(isActivelyLocking ? AppCopy.Routine.lockActive : AppCopy.Routine.lockScheduled)
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(isActivelyLocking ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
-                        .padding(.horizontal, AnchorLayout.cardPadding)
-                        .padding(.bottom, 4)
+                if !isFullyDone {
+                    let lockMessage = ShieldManager.routineLockMessage(routine: routine, modelContext: modelContext)
+                    if blockSummary.hasAnyBlock || lockMessage != AppCopy.Routine.lockScheduled {
+                        Text(lockMessage)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(isActivelyLocking ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
+                            .padding(.horizontal, AnchorLayout.cardPadding)
+                            .padding(.bottom, blockSummary.hasAnyBlock ? 4 : 10)
 
-                    BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6, iconSize: 26)
-                        .padding(.horizontal, AnchorLayout.cardPadding)
-                        .padding(.bottom, 10)
+                        if blockSummary.hasAnyBlock {
+                            BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6, iconSize: 26)
+                                .padding(.horizontal, AnchorLayout.cardPadding)
+                                .padding(.bottom, 10)
+                        }
+                    }
                 }
 
                 VStack(spacing: 4) {

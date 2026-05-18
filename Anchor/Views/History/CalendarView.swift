@@ -34,6 +34,7 @@ struct CalendarMonthView: View {
     let canGoForward: Bool
     let onPreviousMonth: () -> Void
     let onNextMonth: () -> Void
+    var onSelectDay: ((Int) -> Void)?
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
     private let weekdaySymbols: [String] = ["일", "월", "화", "수", "목", "금", "토"]
@@ -88,15 +89,22 @@ struct CalendarMonthView: View {
         let status = dayStatuses[day] ?? .none
         let isToday = Calendar.current.isDateInToday(dayDate(day))
 
-        VStack(spacing: 4) {
-            Text("\(day)")
-                .font(.system(size: 13, weight: isToday ? .bold : .medium))
-                .foregroundStyle(dayTextColor(status: status, isToday: isToday))
+        Button {
+            onSelectDay?(day)
+        } label: {
+            VStack(spacing: 4) {
+                Text("\(day)")
+                    .font(.system(size: 13, weight: isToday ? .bold : .medium))
+                    .foregroundStyle(dayTextColor(status: status, isToday: isToday))
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 36)
+            .background(dayBackground(status: status, isToday: isToday))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 36)
-        .background(dayBackground(status: status, isToday: isToday))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(day)일")
+        .accessibilityHint("루틴 현황 보기")
     }
 
     private func dayDate(_ day: Int) -> Date {
@@ -109,7 +117,7 @@ struct CalendarMonthView: View {
     private func dayTextColor(status: WeekdayCompletion, isToday: Bool) -> Color {
         if isToday { return Color.anchorAccent(scheme) }
         switch status {
-        case .full, .partial:
+        case .full, .missedDeadline:
             return Color.anchorText(scheme)
         case .none:
             return Color.anchorSub(scheme)
@@ -123,8 +131,8 @@ struct CalendarMonthView: View {
         switch status {
         case .full:
             return Color.anchorSuccess(scheme).opacity(0.18)
-        case .partial:
-            return Color.anchorAccent(scheme).opacity(0.12)
+        case .missedDeadline:
+            return Color.anchorWarning(scheme).opacity(0.2)
         case .none:
             return Color.clear
         }

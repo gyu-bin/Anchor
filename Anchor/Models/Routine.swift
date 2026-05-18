@@ -25,6 +25,10 @@ final class Routine {
     var activeWeekdays: [Int]?
     /// `once` 일정의 당일 0시
     var oneTimeDate: Date?
+    /// 루틴 종료 시간 (nil = 설정 안함)
+    var endTime: Date?
+    /// 루틴을 만든 날(기록·달력에서 이전 날짜는 미완료로 치지 않음)
+    var createdAt: Date?
 
     init(
         id: UUID = UUID(),
@@ -50,5 +54,6 @@ final class Routine {
         self.scheduleKindRaw = scheduleKindRaw
         self.activeWeekdays = activeWeekdays
         self.oneTimeDate = oneTimeDate
+        self.createdAt = Date()
     }
 }

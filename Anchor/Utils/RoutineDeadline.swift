@@ -1,0 +1,127 @@
+//
+//  RoutineDeadline.swift
+//  Anchor
+//
+
+import Foundation
+
+enum RoutineDeadline {
+  /// 마감 시각(오늘). `endTime` 미설정이면 nil.
+  static func endTimeToday(
+    for routine: Routine,
+    now: Date = Date(),
+    calendar: Calendar = .current
+  ) -> Date? {
+    guard let end = routine.endTime else { return nil }
+    let comps = calendar.dateComponents([.hour, .minute], from: end)
+    guard let hour = comps.hour, let minute = comps.minute else { return nil }
+    return calendar.date(
+      bySettingHour: hour,
+      minute: minute,
+      second: 0,
+      of: calendar.startOfDay(for: now)
+    )
+  }
+
+  /// 미완료 시 잠금이 풀리는 시각. `endTime` 없으면 nil(완료할 때까지 유지).
+  static func unlockTimeToday(
+    for routine: Routine,
+    graceMissCount: Int = DeadlineGraceStore.missCount,
+    now: Date = Date(),
+    calendar: Calendar = .current
+  ) -> Date? {
+    guard let end = endTimeToday(for: routine, now: now, calendar: calendar) else { return nil }
+    if graceMissCount < DeadlineGraceStore.maxImmediateUnlockMisses {
+      return end
+    }
+    return calendar.date(
+      byAdding: .minute,
+      value: DeadlineGraceStore.delayedUnlockMinutes,
+      to: end
+    )
+  }
+
+  /// 시작 후 · 미완료 · (마감 전이거나 아직 unlock 시각 전)이면 잠금 유지.
+  static func shouldKeepShield(
+    routine: Routine,
+    isComplete: Bool,
+    now: Date = Date(),
+    calendar: Calendar = .current,
+    graceMissCount: Int = DeadlineGraceStore.missCount
+  ) -> Bool {
+    if isComplete || routine.items.isEmpty { return false }
+    guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else { return false }
+    guard let unlock = unlockTimeToday(
+      for: routine,
+      graceMissCount: graceMissCount,
+      now: now,
+      calendar: calendar
+    ) else {
+      return true
+    }
+    return now < unlock
+  }
+
+  static func remainingGraceUnlocks(graceMissCount: Int = DeadlineGraceStore.missCount) -> Int {
+    max(0, DeadlineGraceStore.maxImmediateUnlockMisses - graceMissCount)
+  }
+
+  static func isFutureDay(_ day: Date, calendar: Calendar = .current, now: Date = Date()) -> Bool {
+    calendar.startOfDay(for: day) > calendar.startOfDay(for: now)
+  }
+
+  /// 미완료 판정 가능한 시점인지 (과거 날짜, 또는 오늘 마감이 지난 뒤).
+  static func isReadyToJudgeIncomplete(
+    scheduled: [Routine],
+    logs: [DailyLog],
+    day: Date,
+    calendar: Calendar = .current,
+    now: Date = Date()
+  ) -> Bool {
+    guard !isFutureDay(day, calendar: calendar, now: now) else { return false }
+    guard !scheduled.isEmpty else { return false }
+
+    let dayStart = calendar.startOfDay(for: day)
+    let todayStart = calendar.startOfDay(for: now)
+    if dayStart < todayStart { return true }
+
+    let dayLogs = logs.filter { calendar.isDate($0.date, inSameDayAs: dayStart) }
+    let map = Dictionary(uniqueKeysWithValues: dayLogs.map { ($0.routineId, $0) })
+
+    for routine in scheduled {
+      if map[routine.id]?.isFullyCompleted == true { continue }
+      if let end = endTimeToday(for: routine, now: day, calendar: calendar) {
+        if now >= end { return true }
+      }
+    }
+    return false
+  }
+
+  static func isFullyComplete(
+    _ routine: Routine,
+    logs: [DailyLog],
+    day: Date,
+    calendar: Calendar
+  ) -> Bool {
+    let dayStart = calendar.startOfDay(for: day)
+    let dayLogs = logs.filter { calendar.isDate($0.date, inSameDayAs: dayStart) }
+    guard let log = dayLogs.first(where: { $0.routineId == routine.id }) else { return false }
+    return log.isFullyCompleted
+  }
+
+  private static func hasRoutineStartedToday(
+    _ routine: Routine,
+    now: Date,
+    calendar: Calendar
+  ) -> Bool {
+    let comps = calendar.dateComponents([.hour, .minute], from: routine.startTime)
+    guard let hour = comps.hour, let minute = comps.minute else { return true }
+    guard let startToday = calendar.date(
+      bySettingHour: hour,
+      minute: minute,
+      second: 0,
+      of: calendar.startOfDay(for: now)
+    ) else { return true }
+    return now >= startToday
+  }
+}

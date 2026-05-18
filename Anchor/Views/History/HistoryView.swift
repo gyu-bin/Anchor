@@ -17,6 +17,7 @@ struct HistoryView: View {
 
     @State private var paywallReason: PaywallReason?
     @State private var displayedMonth: Date = Date()
+    @State private var selectedDay: HistoryDaySelection?
 
     private var routinesWithItems: [Routine] {
         routines.filter { !$0.items.isEmpty }
@@ -49,6 +50,15 @@ struct HistoryView: View {
             .onAppear { refreshWeeklyNotification() }
             .sheet(item: $paywallReason) { reason in
                 PaywallSheet(reason: reason)
+            }
+            .sheet(item: $selectedDay) { selection in
+                HistoryDayDetailSheet(
+                    snapshot: HistoryDaySnapshot.build(
+                        date: selection.date,
+                        logs: effectiveLogs,
+                        routines: routinesWithItems
+                    )
+                )
             }
         }
     }
@@ -115,6 +125,7 @@ struct HistoryView: View {
                 weeklyCard
                 itemTotalsCard
                 calendarCard
+                historyStatusCard
             }
             .padding(.horizontal, AnchorLayout.screenHorizontal)
             .padding(.bottom, 36)
@@ -247,6 +258,35 @@ struct HistoryView: View {
         }
     }
 
+    private var historyStatusCard: some View {
+        let cal = Calendar.current
+        let comps = cal.dateComponents([.year, .month], from: displayedMonth)
+        let monthStart = cal.date(from: comps) ?? displayedMonth
+        let missedCount = Self.missedDeadlineDaysInMonth(
+            logs: effectiveLogs,
+            routines: routinesWithItems,
+            monthStart: monthStart,
+            cal: cal
+        )
+
+        return AnchorCard {
+            VStack(alignment: .leading, spacing: 14) {
+                AnchorSectionHeader(title: AppCopy.History.statusTitle)
+
+                HStack(spacing: 16) {
+                    HistoryStatusLegendItem(color: Color.anchorSuccess(scheme).opacity(0.35), label: AppCopy.History.legendFull)
+                    HistoryStatusLegendItem(color: Color.anchorWarning(scheme).opacity(0.35), label: AppCopy.History.legendMissed)
+                    HistoryStatusLegendItem(color: Color.anchorSubBg(scheme), label: AppCopy.History.legendNone)
+                }
+
+                Text(missedCount > 0 ? AppCopy.History.monthMissedDays(missedCount) : AppCopy.History.monthMissedNone)
+                    .font(.subheadline)
+                    .foregroundStyle(missedCount > 0 ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
+            }
+            .padding(AnchorLayout.cardPadding)
+        }
+    }
+
     private var calendarCard: some View {
         let cal = Calendar.current
         let comps = cal.dateComponents([.year, .month], from: displayedMonth)
@@ -302,6 +342,14 @@ struct HistoryView: View {
                     guard canGoForward,
                           let next = cal.date(byAdding: .month, value: 1, to: monthStart) else { return }
                     displayedMonth = next
+                },
+                onSelectDay: { day in
+                    guard let date = cal.date(byAdding: .day, value: day - 1, to: monthStart) else { return }
+                    if !PremiumLimits.includesHistoryDate(date, isPremium: premium.isPremium, calendar: cal) {
+                        paywallReason = .history
+                        return
+                    }
+                    selectedDay = HistoryDaySelection(date: date, calendar: cal)
                 }
             )
             .padding(AnchorLayout.cardPadding)
@@ -322,27 +370,50 @@ struct ItemTotalRow: Identifiable {
 
 extension HistoryView {
     static func dayStatus(logs: [DailyLog], routines: [Routine], day: Date, cal: Calendar) -> WeekdayCompletion {
-        let scheduled = RoutineSchedule.scheduledRoutines(routines, on: day, calendar: cal)
+        if RoutineDeadline.isFutureDay(day, calendar: cal) { return .none }
+
+        let scheduled = RoutineSchedule.scheduledRoutinesExisting(
+            routines,
+            logs: logs,
+            on: day,
+            calendar: cal
+        )
         guard !scheduled.isEmpty else { return .none }
         if RestDayStore.isRestDay(day, calendar: cal) { return .full }
-        let start = day.startOfDay(in: cal)
-        let dayLogs = logs.filter { cal.isDate($0.date, inSameDayAs: start) }
-        let map = Dictionary(uniqueKeysWithValues: dayLogs.map { ($0.routineId, $0) })
 
-        var anyProgress = false
-        var allFull = true
-        for r in scheduled {
-            guard let log = map[r.id] else {
-                allFull = false
-                continue
-            }
-            if !log.completedItems.isEmpty { anyProgress = true }
-            if !log.isFullyCompleted { allFull = false }
+        let allFull = !scheduled.contains {
+            !RoutineDeadline.isFullyComplete($0, logs: logs, day: day, calendar: cal)
         }
-
         if allFull { return .full }
-        if anyProgress { return .partial }
+
+        if RoutineDeadline.isReadyToJudgeIncomplete(
+            scheduled: scheduled,
+            logs: logs,
+            day: day,
+            calendar: cal
+        ) {
+            return .missedDeadline
+        }
         return .none
+    }
+
+    static func missedDeadlineDaysInMonth(
+        logs: [DailyLog],
+        routines: [Routine],
+        monthStart: Date,
+        cal: Calendar
+    ) -> Int {
+        guard let range = cal.range(of: .day, in: .month, for: monthStart) else { return 0 }
+        var count = 0
+        let todayStart = cal.startOfDay(for: Date())
+        for day in range {
+            guard let d = cal.date(byAdding: .day, value: day - 1, to: monthStart) else { continue }
+            guard cal.startOfDay(for: d) <= todayStart else { continue }
+            if dayStatus(logs: logs, routines: routines, day: d, cal: cal) == .missedDeadline {
+                count += 1
+            }
+        }
+        return count
     }
 
     static func weekFullDaysCount(logs: [DailyLog], routines: [Routine], now: Date, cal: Calendar) -> Int {
@@ -364,8 +435,8 @@ extension HistoryView {
             switch status {
             case .full:
                 value = 3
-            case .partial:
-                value = 2
+            case .missedDeadline:
+                value = 1.2
             case .none:
                 value = 0.6
             }

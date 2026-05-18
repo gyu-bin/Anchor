@@ -67,10 +67,6 @@ struct TodayView: View {
                         VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
                             AnchorScreenHeader(title: greeting, subtitle: dateTitle)
 
-                            if !scheduledRoutinesToday.isEmpty {
-                                restDayControl
-                            }
-
                             if routines.isEmpty {
                                 emptyState
                             } else if scheduledRoutinesToday.isEmpty {
@@ -155,46 +151,46 @@ struct TodayView: View {
             }
             .sheet(isPresented: $showCompletionSheet) {
                 completionSheet
-                    .presentationDetents([.medium])
+                    .presentationDetents([.height(300)])
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(28)
             }
         }
     }
 
-    private var restDayControl: some View {
-        Button {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                if isRestToday {
-                    RestDayStore.clearRestToday()
-                } else {
-                    RestDayStore.setRestToday()
-                }
-                isRestToday = RestDayStore.isRestToday()
-            }
-            syncWidgetAndNotifications()
-            Task { await ShieldManager.refresh(modelContext: modelContext) }
-        } label: {
-            Text(isRestToday ? AppCopy.Today.restDayCancel : AppCopy.Today.restDayButton)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(isRestToday ? Color.anchorSub(scheme) : Color.anchorAccent(scheme))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(isRestToday ? Color.anchorSubBg(scheme) : Color.anchorHighlight(scheme))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        }
-        .buttonStyle(.plain)
-    }
-
     private var restDayCard: some View {
         AnchorCard {
-            Text(AppCopy.Today.restDayBody)
-                .font(.subheadline)
-                .lineSpacing(4)
-                .foregroundStyle(Color.anchorSub(scheme))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(AnchorLayout.cardPadding)
+            VStack(alignment: .leading, spacing: 14) {
+                Text(AppCopy.Today.restDayBody)
+                    .font(.subheadline)
+                    .lineSpacing(4)
+                    .foregroundStyle(Color.anchorSub(scheme))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Button {
+                    clearRestToday()
+                } label: {
+                    Text(AppCopy.Today.restDayCancel)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.anchorAccent(scheme))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.anchorHighlight(scheme))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(AnchorLayout.cardPadding)
         }
+    }
+
+    private func clearRestToday() {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+            RestDayStore.clearRestToday()
+            isRestToday = false
+        }
+        syncWidgetAndNotifications()
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
     }
 
     private var noScheduleTodayState: some View {
@@ -250,6 +246,7 @@ struct TodayView: View {
                    updatedLog.isFullyCompleted {
                     NotificationManager.cancelReminders(for: routine)
                     AppReviewManager.recordRoutineFullyCompleted()
+                    DeadlineGraceStore.resetMissCount()
                 }
 
                 presentUndo(item: item, routine: routine, wasCompleted: wasCompleted)
@@ -335,6 +332,7 @@ struct TodayView: View {
             cal: .current
         )
         NotificationManager.updateWeeklySummaryContent(fullDays: fullDays)
+        NotificationManager.refreshDailyClosureNotifications(modelContext: modelContext)
     }
 
     private var completionSheet: some View {

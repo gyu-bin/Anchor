@@ -14,6 +14,13 @@ enum NotificationPreferences {
         static let reminderOffsetMinutes = "notifications.reminderOffsetMinutes"
     }
 
+    /// 미완료 시 저녁 알림 (21:00)
+    static let incompleteDayNudgeHour = 21
+    static let incompleteDayNudgeMinute = 0
+    /// 전부 완료 시 격려 알림 (23:30)
+    static let dayCelebrationHour = 23
+    static let dayCelebrationMinute = 30
+
     /// 리마인더: 루틴 시작 후 몇 분 뒤 (15 / 30 / 60)
     static var reminderOffsetMinutes: Int {
         get {

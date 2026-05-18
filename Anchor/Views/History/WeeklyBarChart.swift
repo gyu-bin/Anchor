@@ -8,7 +8,7 @@ import SwiftUI
 
 enum WeekdayCompletion: String, CaseIterable {
     case full
-    case partial
+    case missedDeadline
     case none
 }
 
@@ -54,8 +54,8 @@ struct WeeklyBarChart: View {
         switch status {
         case .full:
             return Color.anchorSuccess(scheme)
-        case .partial:
-            return Color.anchorAccent(scheme).opacity(0.65)
+        case .missedDeadline:
+            return Color.anchorWarning(scheme).opacity(0.75)
         case .none:
             return Color.anchorSubBg(scheme)
         }

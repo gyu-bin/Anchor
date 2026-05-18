@@ -76,6 +76,13 @@ enum ShieldManager {
             return
         }
 
+        processDeadlineGrace(
+            routines: routines,
+            dayStart: dayStart,
+            calendar: calendar,
+            modelContext: modelContext
+        )
+
         let apps = activeBlockedApplicationTokens(
             routines: routines,
             dayStart: dayStart,
@@ -133,21 +140,74 @@ enum ShieldManager {
         routines.contains { isActivelyLocking(routine: $0, modelContext: modelContext) }
     }
 
-    /// 지금 실제로 잠금이 걸려야 하는지(시작 후 + 미완료).
+    /// 지금 실제로 잠금이 걸려야 하는지(시작 후 + 미완료 + 마감 유예 전).
     static func isActivelyLocking(routine: Routine, modelContext: ModelContext) -> Bool {
+        let summary = blockedSummary(for: routine, modelContext: modelContext)
+        return summary.hasAnyBlock
+    }
+
+    static func routineLockMessage(routine: Routine, modelContext: ModelContext) -> String {
+        if isActivelyLocking(routine: routine, modelContext: modelContext) {
+            return AppCopy.Routine.lockActive
+        }
+        guard routine.endTime != nil else { return AppCopy.Routine.lockScheduled }
+
         let calendar = Calendar.current
-        guard RoutineSchedule.isActive(routine, on: Date(), calendar: calendar) else { return false }
-        let dayStart = calendar.startOfDay(for: Date())
+        let now = Date()
+        let dayStart = calendar.startOfDay(for: now)
         let complete = (try? routineIsFullyCompleteToday(
             routine,
             dayStart: dayStart,
             calendar: calendar,
             modelContext: modelContext
         )) ?? false
-        if complete || routine.items.isEmpty { return false }
-        guard hasRoutineStartedToday(routine, calendar: calendar) else { return false }
-        let summary = blockedSummary(for: routine, modelContext: modelContext)
-        return summary.hasAnyBlock
+        if complete || routine.items.isEmpty { return AppCopy.Routine.lockScheduled }
+        guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else {
+            return AppCopy.Routine.lockScheduled
+        }
+        guard let end = RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar),
+              let unlock = RoutineDeadline.unlockTimeToday(for: routine, now: now, calendar: calendar),
+              now >= end else {
+            return AppCopy.Routine.lockScheduled
+        }
+        if now >= unlock {
+            return AppCopy.Routine.lockReleasedAfterDeadline
+        }
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "ko_KR")
+        df.dateFormat = "a h:mm"
+        return AppCopy.Routine.lockUnlocksAt(df.string(from: unlock))
+    }
+
+    private static func processDeadlineGrace(
+        routines: [Routine],
+        dayStart: Date,
+        calendar: Calendar,
+        modelContext: ModelContext,
+        now: Date = Date()
+    ) {
+        let dayKey = DeadlineGraceStore.dayKey(for: now, calendar: calendar)
+        var missedDeadlineToday = false
+
+        for routine in routines where RoutineSchedule.isActive(routine, on: now, calendar: calendar) && !routine.items.isEmpty {
+            guard routine.endTime != nil else { continue }
+            let complete = (try? routineIsFullyCompleteToday(
+                routine,
+                dayStart: dayStart,
+                calendar: calendar,
+                modelContext: modelContext
+            )) ?? false
+            if complete { continue }
+            guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else { continue }
+            guard let end = RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar),
+                  now >= end else { continue }
+            missedDeadlineToday = true
+            break
+        }
+
+        if missedDeadlineToday {
+            DeadlineGraceStore.recordMissForTodayIfNeeded(dayKey: dayKey)
+        }
     }
 
     static func activeBlockedApplicationTokens(modelContext: ModelContext) -> [ApplicationToken] {
@@ -193,13 +253,19 @@ enum ShieldManager {
 
         let selection = decodeSelection(routine.shieldSelectionData)
         let started = hasRoutineStartedToday(routine, calendar: calendar)
-        let apps = started ? selection.applicationTokens : []
-        let webs = started ? selection.webDomainTokens : []
+        let keepShield = RoutineDeadline.shouldKeepShield(
+            routine: routine,
+            isComplete: complete,
+            now: Date(),
+            calendar: calendar
+        )
+        let apps = started && keepShield ? selection.applicationTokens : []
+        let webs = started && keepShield ? selection.webDomainTokens : []
 
         return BlockedShieldSummary(
             appTokens: Array(apps).sorted { String(describing: $0) < String(describing: $1) },
             webTokens: Array(webs).sorted { String(describing: $0) < String(describing: $1) },
-            webDomains: started ? routine.blockedWebs : []
+            webDomains: started && keepShield ? routine.blockedWebs : []
         )
     }
 
@@ -291,7 +357,12 @@ enum ShieldManager {
                 modelContext: modelContext
             )) ?? false
             if complete { continue }
-            guard hasRoutineStartedToday(routine, calendar: calendar) else { continue }
+            guard RoutineDeadline.shouldKeepShield(
+                routine: routine,
+                isComplete: complete,
+                now: Date(),
+                calendar: calendar
+            ) else { continue }
             tokens.formUnion(decodeSelection(routine.shieldSelectionData).applicationTokens)
         }
         return tokens.sorted { String(describing: $0) < String(describing: $1) }
@@ -312,7 +383,12 @@ enum ShieldManager {
                 modelContext: modelContext
             )) ?? false
             if complete { continue }
-            guard hasRoutineStartedToday(routine, calendar: calendar) else { continue }
+            guard RoutineDeadline.shouldKeepShield(
+                routine: routine,
+                isComplete: complete,
+                now: Date(),
+                calendar: calendar
+            ) else { continue }
             tokens.formUnion(decodeSelection(routine.shieldSelectionData).webDomainTokens)
         }
         return tokens.sorted { String(describing: $0) < String(describing: $1) }
@@ -333,7 +409,12 @@ enum ShieldManager {
                 modelContext: modelContext
             )) ?? false
             if complete { continue }
-            guard hasRoutineStartedToday(routine, calendar: calendar) else { continue }
+            guard RoutineDeadline.shouldKeepShield(
+                routine: routine,
+                isComplete: complete,
+                now: Date(),
+                calendar: calendar
+            ) else { continue }
             for domain in routine.blockedWebs where !domains.contains(domain) {
                 domains.append(domain)
             }

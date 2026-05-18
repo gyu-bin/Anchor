@@ -18,6 +18,7 @@ final class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
+        applyActiveShieldsFromAppGroup()
     }
 
     private func applyActiveShieldsFromAppGroup() {
@@ -73,6 +74,23 @@ struct ScheduledRoutineShield: Codable {
     let startMinute: Int
     let isComplete: Bool
     let selectionData: Data
+    let unlockHour: Int?
+    let unlockMinute: Int?
+
+    private enum CodingKeys: String, CodingKey {
+        case routineId, startHour, startMinute, isComplete, selectionData, unlockHour, unlockMinute
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        routineId = try c.decode(UUID.self, forKey: .routineId)
+        startHour = try c.decode(Int.self, forKey: .startHour)
+        startMinute = try c.decode(Int.self, forKey: .startMinute)
+        isComplete = try c.decode(Bool.self, forKey: .isComplete)
+        selectionData = try c.decode(Data.self, forKey: .selectionData)
+        unlockHour = try c.decodeIfPresent(Int.self, forKey: .unlockHour)
+        unlockMinute = try c.decodeIfPresent(Int.self, forKey: .unlockMinute)
+    }
 }
 
 enum SharedShieldStoreAppGroup {
@@ -91,6 +109,7 @@ enum SharedShieldStoreAppGroup {
 
         for item in items where !item.isComplete {
             guard hasStarted(item: item, now: now, calendar: calendar) else { continue }
+            if isPastUnlock(item: item, now: now, calendar: calendar) { continue }
             let selection = (try? PropertyListDecoder().decode(
                 FamilyActivitySelection.self,
                 from: item.selectionData
@@ -100,6 +119,17 @@ enum SharedShieldStoreAppGroup {
         }
 
         return merge
+    }
+
+    private static func isPastUnlock(item: ScheduledRoutineShield, now: Date, calendar: Calendar) -> Bool {
+        guard let hour = item.unlockHour, let minute = item.unlockMinute else { return false }
+        guard let unlockToday = calendar.date(
+            bySettingHour: hour,
+            minute: minute,
+            second: 0,
+            of: calendar.startOfDay(for: now)
+        ) else { return false }
+        return now >= unlockToday
     }
 
     private static func hasStarted(item: ScheduledRoutineShield, now: Date, calendar: Calendar) -> Bool {
