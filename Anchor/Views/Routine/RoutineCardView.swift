@@ -154,7 +154,7 @@ struct RoutineCardView: View {
                         scheduleDraft = RoutineSchedule.draft(from: routine)
                     }
                     .onChange(of: scheduleDraft) { _, newValue in
-                        if newValue.kind == .weekdays && newValue.activeWeekdays.isEmpty { return }
+                        guard RoutineSchedule.isDraftValid(newValue) else { return }
                         vm.updateSchedule(routine, draft: newValue, context: modelContext)
                         RoutineSync.afterMutation(modelContext: modelContext)
                     }

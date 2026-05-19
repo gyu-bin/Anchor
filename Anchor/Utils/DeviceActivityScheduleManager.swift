@@ -15,8 +15,11 @@ enum DeviceActivityScheduleManager {
         switch routine.scheduleKind {
         case .daily, .once:
             return [DeviceActivityName(routine.id.uuidString)]
-        case .weekdays:
+        case .weekdays, .period:
             let weekdays = RoutineSchedule.activeWeekdays(for: routine)
+            if weekdays.isEmpty, routine.scheduleKind == .period {
+                return [DeviceActivityName(routine.id.uuidString)]
+            }
             return weekdays.map { DeviceActivityName("\(routine.id.uuidString)-\($0)") }
         }
     }
@@ -106,6 +109,33 @@ enum DeviceActivityScheduleManager {
                     repeats: routine.scheduleKind == .daily
                 )
                 startMonitoring(center: center, name: names[0], schedule: schedule)
+            case .period:
+                let weekdays = RoutineSchedule.activeWeekdays(for: routine)
+                if weekdays.isEmpty {
+                    var end = intervalEnd
+                    end.weekday = nil
+                    let schedule = DeviceActivitySchedule(
+                        intervalStart: DateComponents(hour: start.hour, minute: start.minute),
+                        intervalEnd: end,
+                        repeats: false
+                    )
+                    startMonitoring(center: center, name: names[0], schedule: schedule)
+                } else {
+                    for (index, weekday) in weekdays.enumerated() {
+                        var end = intervalEnd
+                        end.weekday = weekday
+                        let schedule = DeviceActivitySchedule(
+                            intervalStart: DateComponents(
+                                hour: start.hour,
+                                minute: start.minute,
+                                weekday: weekday
+                            ),
+                            intervalEnd: end,
+                            repeats: false
+                        )
+                        startMonitoring(center: center, name: names[index], schedule: schedule)
+                    }
+                }
             case .weekdays:
                 let weekdays = RoutineSchedule.activeWeekdays(for: routine)
                 for (index, weekday) in weekdays.enumerated() {

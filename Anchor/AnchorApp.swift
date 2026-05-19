@@ -33,6 +33,8 @@ enum AppModelContainer {
             Routine.self,
             RoutineItem.self,
             DailyLog.self,
+            RoutineTemplate.self,
+            RoutineTemplateItem.self,
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: false)
 

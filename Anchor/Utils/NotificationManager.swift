@@ -96,6 +96,8 @@ enum NotificationManager {
     static func scheduleRoutineNotifications(for routine: Routine) {
         guard !routine.items.isEmpty else { return }
         guard !RestDayStore.isRestToday() else { return }
+        guard !RoutineSchedule.isArchived(routine) else { return }
+        guard !RoutineSchedule.isExpired(routine) else { return }
 
         let cal = Calendar.current
         let comps = cal.dateComponents([.hour, .minute], from: routine.startTime)
@@ -131,6 +133,26 @@ enum NotificationManager {
                 minute: minute,
                 calendar: cal
             )
+        case .period:
+            let weekdays = RoutineSchedule.activeWeekdays(for: routine)
+            if weekdays.isEmpty {
+                scheduleDailyPair(
+                    routine: routine,
+                    hour: hour,
+                    minute: minute,
+                    calendar: cal
+                )
+            } else {
+                for weekday in weekdays {
+                    scheduleWeekdayPair(
+                        routine: routine,
+                        weekday: weekday,
+                        hour: hour,
+                        minute: minute,
+                        calendar: cal
+                    )
+                }
+            }
         }
     }
 

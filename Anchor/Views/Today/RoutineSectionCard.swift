@@ -14,6 +14,9 @@ struct RoutineSectionCard: View {
     let log: DailyLog
     let blockSummary: BlockedShieldSummary
     let isActivelyLocking: Bool
+    var unlockSecondsLeft: Int = 0
+    var onUnlock: (() -> Void)? = nil
+    var onRelockNow: (() -> Void)? = nil
     let onToggle: (RoutineItem) -> Void
 
     private var sortedItems: [RoutineItem] {
@@ -30,6 +33,12 @@ struct RoutineSectionCard: View {
 
     private var isFullyDone: Bool {
         log.isFullyCompleted
+    }
+
+    private func formatCountdown(_ seconds: Int) -> String {
+        let m = seconds / 60
+        let s = seconds % 60
+        return m > 0 ? "\(m)분 \(s)초" : "\(s)초"
     }
 
     private var firstIncompleteId: UUID? {
@@ -92,18 +101,60 @@ struct RoutineSectionCard: View {
                 .padding(AnchorLayout.cardPadding)
 
                 if !isFullyDone {
-                    let lockMessage = ShieldManager.routineLockMessage(routine: routine, modelContext: modelContext)
-                    if blockSummary.hasAnyBlock || lockMessage != AppCopy.Routine.lockScheduled {
-                        Text(lockMessage)
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(isActivelyLocking ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
-                            .padding(.horizontal, AnchorLayout.cardPadding)
-                            .padding(.bottom, blockSummary.hasAnyBlock ? 4 : 10)
+                    if unlockSecondsLeft > 0 {
+                        HStack(spacing: 8) {
+                            Image(systemName: "lock.open")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(Color.anchorAccent(scheme))
+                            Text("\(formatCountdown(unlockSecondsLeft)) 후 잠금")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(Color.anchorSub(scheme))
+                            Spacer()
+                            Button("지금 잠금") { onRelockNow?() }
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.anchorAccent(scheme))
+                        }
+                        .padding(.horizontal, AnchorLayout.cardPadding)
+                        .padding(.bottom, blockSummary.hasAnyBlock ? 4 : 10)
 
                         if blockSummary.hasAnyBlock {
                             BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6, iconSize: 26)
                                 .padding(.horizontal, AnchorLayout.cardPadding)
                                 .padding(.bottom, 10)
+                                .opacity(0.4)
+                        }
+                    } else {
+                        let lockMessage = ShieldManager.routineLockMessage(routine: routine, modelContext: modelContext)
+                        if blockSummary.hasAnyBlock || lockMessage != AppCopy.Routine.lockScheduled {
+                            if blockSummary.hasAnyBlock && isActivelyLocking {
+                                HStack(spacing: 8) {
+                                    Text(lockMessage)
+                                        .font(.caption.weight(.medium))
+                                        .foregroundStyle(Color.anchorWarning(scheme))
+                                    Spacer()
+                                    Button("10분 해제") { onUnlock?() }
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(Color.anchorAccent(scheme))
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 5)
+                                        .background(Color.anchorAccent(scheme).opacity(0.1))
+                                        .clipShape(Capsule())
+                                }
+                                .padding(.horizontal, AnchorLayout.cardPadding)
+                                .padding(.bottom, 4)
+                            } else {
+                                Text(lockMessage)
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(isActivelyLocking ? Color.anchorWarning(scheme) : Color.anchorSub(scheme))
+                                    .padding(.horizontal, AnchorLayout.cardPadding)
+                                    .padding(.bottom, blockSummary.hasAnyBlock ? 4 : 10)
+                            }
+
+                            if blockSummary.hasAnyBlock {
+                                BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6, iconSize: 26)
+                                    .padding(.horizontal, AnchorLayout.cardPadding)
+                                    .padding(.bottom, 10)
+                            }
                         }
                     }
                 }

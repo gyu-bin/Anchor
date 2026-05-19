@@ -34,7 +34,13 @@ enum TestFixtures {
 
     @MainActor
     static func makeInMemoryContext() throws -> (ModelContainer, ModelContext) {
-        let schema = Schema([Routine.self, RoutineItem.self, DailyLog.self])
+        let schema = Schema([
+            Routine.self,
+            RoutineItem.self,
+            DailyLog.self,
+            RoutineTemplate.self,
+            RoutineTemplateItem.self,
+        ])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [config])
         return (container, container.mainContext)

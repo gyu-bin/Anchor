@@ -48,7 +48,7 @@ final class RoutineViewModel {
     }
 
     func updateSchedule(_ routine: Routine, draft: RoutineScheduleDraft, context: ModelContext) {
-        guard draft.kind != .weekdays || !draft.activeWeekdays.isEmpty else { return }
+        guard RoutineSchedule.isDraftValid(draft) else { return }
         RoutineSchedule.apply(draft, to: routine)
         try? context.save()
         RoutineSync.afterMutation(modelContext: context)
@@ -90,6 +90,23 @@ final class RoutineViewModel {
     }
 
     @discardableResult
+    func createRoutine(
+        from template: RoutineTemplate,
+        context: ModelContext,
+        routines: [Routine]
+    ) -> Routine {
+        let routine = RoutineTemplateStore.createRoutine(
+            from: template,
+            context: context,
+            routines: routines,
+            order: nextOrder(in: routines)
+        )
+        try? context.save()
+        RoutineSync.afterMutation(modelContext: context)
+        return routine
+    }
+
+    @discardableResult
     func duplicateRoutine(
         _ source: Routine,
         context: ModelContext,
@@ -104,8 +121,13 @@ final class RoutineViewModel {
             shieldSelectionData: source.shieldSelectionData,
             scheduleKindRaw: source.scheduleKindRaw,
             activeWeekdays: source.activeWeekdays,
-            oneTimeDate: source.oneTimeDate
+            oneTimeDate: source.oneTimeDate,
+            scheduleStartDate: source.scheduleStartDate,
+            scheduleEndDate: source.scheduleEndDate,
+            expiryActionRaw: source.expiryActionRaw,
+            isArchived: false
         )
+        copy.endTime = source.endTime
         context.insert(copy)
         for item in source.items.sorted(by: { $0.order < $1.order }) {
             let newItem = RoutineItem(

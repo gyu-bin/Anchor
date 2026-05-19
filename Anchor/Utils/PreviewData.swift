@@ -8,7 +8,13 @@ import SwiftData
 
 enum PreviewData {
     static var container: ModelContainer {
-        let schema = Schema([Routine.self, RoutineItem.self, DailyLog.self])
+        let schema = Schema([
+            Routine.self,
+            RoutineItem.self,
+            DailyLog.self,
+            RoutineTemplate.self,
+            RoutineTemplateItem.self,
+        ])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: schema, configurations: [config])
         let routine = Routine(name: "아침 루틴", startTime: Date(), order: 0)

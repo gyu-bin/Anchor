@@ -62,6 +62,12 @@ enum ShieldManager {
         let calendar = Calendar.current
         let dayStart = calendar.startOfDay(for: Date())
 
+        if TempUnlockStore.isActive {
+            settings.clearAllSettings()
+            SharedShieldStore.clearMergedSelection()
+            return
+        }
+
         if RestDayStore.isRestToday(calendar: calendar) {
             settings.clearAllSettings()
             if let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) {
@@ -200,6 +206,7 @@ enum ShieldManager {
 
     /// 지금 실제로 잠금이 걸려야 하는지(시작 후 + 미완료 + 마감 유예 전).
     static func isActivelyLocking(routine: Routine, modelContext: ModelContext) -> Bool {
+        if TempUnlockStore.isActive { return false }
         let summary = blockedSummary(for: routine, modelContext: modelContext)
         return summary.hasAnyBlock
     }

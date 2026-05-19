@@ -29,6 +29,8 @@ struct TodayView: View {
     @State private var showErrorToast = false
     @State private var errorToastTask: Task<Void, Never>?
     @State private var isRestToday = RestDayStore.isRestToday()
+    @State private var unlockSecondsLeft: Int = 0
+    @State private var unlockTimerTask: Task<Void, Never>? = nil
 
     private var sortedRoutines: [Routine] {
         vm.sortedRoutines(routines)
@@ -105,6 +107,9 @@ struct TodayView: View {
                                                 routine: routine,
                                                 modelContext: modelContext
                                             ),
+                                            unlockSecondsLeft: unlockSecondsLeft,
+                                            onUnlock: { handleTempUnlock() },
+                                            onRelockNow: { handleRelockNow() },
                                             onToggle: { item in
                                                 toggle(item: item, routine: routine)
                                             }
@@ -145,6 +150,18 @@ struct TodayView: View {
                 isRestToday = RestDayStore.isRestToday()
                 refreshCompletionBannerState()
                 syncAfterTodayChange()
+                let remaining = TempUnlockStore.remainingSeconds
+                if remaining > 0 {
+                    unlockSecondsLeft = remaining
+                    startUnlockCountdown()
+                } else if TempUnlockStore.expiresAt != nil {
+                    TempUnlockStore.deactivate()
+                    Task { await ShieldManager.refresh(modelContext: modelContext) }
+                }
+            }
+            .onDisappear {
+                unlockTimerTask?.cancel()
+                unlockTimerTask = nil
             }
             .onChange(of: routines.map(\.id)) { _, _ in
                 applyRoutineListChange()
@@ -328,6 +345,38 @@ struct TodayView: View {
         }
         wasAllComplete = allDone
         syncAfterTodayChange()
+    }
+
+    private func handleTempUnlock() {
+        TempUnlockStore.activate(minutes: 10)
+        unlockSecondsLeft = TempUnlockStore.remainingSeconds
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
+        startUnlockCountdown()
+    }
+
+    private func handleRelockNow() {
+        unlockTimerTask?.cancel()
+        unlockTimerTask = nil
+        TempUnlockStore.deactivate()
+        unlockSecondsLeft = 0
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
+    }
+
+    private func startUnlockCountdown() {
+        unlockTimerTask?.cancel()
+        unlockTimerTask = Task { @MainActor in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled else { break }
+                let remaining = TempUnlockStore.remainingSeconds
+                unlockSecondsLeft = remaining
+                if remaining == 0 {
+                    TempUnlockStore.deactivate()
+                    await ShieldManager.refresh(modelContext: modelContext)
+                    break
+                }
+            }
+        }
     }
 
     private func syncAfterTodayChange() {

@@ -13,6 +13,7 @@ enum RoutineSync {
         modelContext: ModelContext,
         refreshShield: Bool = true
     ) {
+        RoutineScheduleMaintenance.run(modelContext: modelContext)
         let descriptor = FetchDescriptor<Routine>(sortBy: [SortDescriptor(\.order)])
         let routines = (try? modelContext.fetch(descriptor)) ?? []
         let todayVM = TodayViewModel()

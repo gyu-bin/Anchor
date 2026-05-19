@@ -50,6 +50,7 @@ struct ContentView: View {
             guard hasSeenAppGuide, !showGuide else { return }
             switch phase {
             case .active:
+                RoutineScheduleMaintenance.run(modelContext: modelContext)
                 ShieldScheduleWatcher.startPolling(modelContext: modelContext)
                 consumeIntentFlags()
                 Task { await ShieldManager.refresh(modelContext: modelContext) }
@@ -63,6 +64,7 @@ struct ContentView: View {
             AppModelContextHolder.main = modelContext
             migrateLegacyOnboardingFlag()
             RoutineSchedule.repairLegacyRoutines(in: modelContext)
+            RoutineScheduleMaintenance.run(modelContext: modelContext)
             if !hasSeenAppGuide {
                 showGuide = true
             } else {

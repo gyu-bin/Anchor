@@ -15,11 +15,14 @@ struct RoutineView: View {
     @Environment(\.appStoreScreenshotExpandedRoutines) private var screenshotExpandedRoutines
 
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
+    @Query(sort: [SortDescriptor(\RoutineTemplate.savedAt, order: .reverse)]) private var templates: [RoutineTemplate]
 
     @State private var editPayload: RoutineItemEditPayload?
     @State private var expandedRoutineIDs: Set<UUID> = []
     @State private var focusNameRoutineID: UUID?
     @State private var paywallReason: PaywallReason?
+    @State private var showTemplatePicker = false
+    @State private var showAddMenu = false
 
     private var orderedRoutines: [Routine] {
         routineVM.sortedRoutines(routines)
@@ -34,9 +37,11 @@ struct RoutineView: View {
                     if orderedRoutines.isEmpty {
                         emptyState
                     } else {
-                        ForEach(orderedRoutines, id: \.id) { routine in
-                            routineCard(for: routine)
-                                .padding(.horizontal, AnchorLayout.screenHorizontal)
+                        VStack(spacing: 10) {
+                            ForEach(orderedRoutines, id: \.id) { routine in
+                                routineCard(for: routine)
+                                    .padding(.horizontal, AnchorLayout.screenHorizontal)
+                            }
                         }
                     }
                 }
@@ -53,26 +58,42 @@ struct RoutineView: View {
             .sheet(item: $paywallReason) { reason in
                 PaywallSheet(reason: reason)
             }
+            .sheet(isPresented: $showTemplatePicker) {
+                RoutineTemplatePickerSheet(
+                    routines: routines,
+                    routineVM: routineVM,
+                    onCreated: { routine in
+                        focusNameRoutineID = routine.id
+                        withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
+                            expandedRoutineIDs = [routine.id]
+                        }
+                    }
+                )
+            }
+            .confirmationDialog(AppCopy.Routine.addRoutinePrompt, isPresented: $showAddMenu, titleVisibility: .visible) {
+                Button(AppCopy.Routine.addNewRoutine) {
+                    addNewRoutine()
+                }
+                Button(AppCopy.Routine.loadTemplate) {
+                    showTemplatePicker = true
+                }
+                Button(AppCopy.Common.cancel, role: .cancel) {}
+            }
             .onAppear {
                 if let ids = screenshotExpandedRoutines, !ids.isEmpty, expandedRoutineIDs.isEmpty {
                     expandedRoutineIDs = ids
                 }
+                RoutineScheduleMaintenance.run(modelContext: modelContext)
                 fulfillPendingCreateRoutine()
             }
             .onChange(of: tabRouter.selectedTab) { _, tab in
                 if tab == 1 {
+                    RoutineScheduleMaintenance.run(modelContext: modelContext)
                     fulfillPendingCreateRoutine()
                 }
             }
-            .onChange(of: routines.map(\.id)) { _, _ in
-                expandedRoutineIDs = expandedRoutineIDs.filter { id in
-                    routines.contains { $0.id == id }
-                }
-                if let focusID = focusNameRoutineID,
-                   !routines.contains(where: { $0.id == focusID }) {
-                    focusNameRoutineID = nil
-                }
-                RoutineSync.afterMutation(modelContext: modelContext, refreshShield: false)
+            .onChange(of: routines.count) { _, _ in
+                syncRoutineListState()
             }
         }
     }
@@ -141,7 +162,11 @@ struct RoutineView: View {
             Spacer(minLength: 12)
 
             Button {
-                addNewRoutine()
+                if templates.isEmpty {
+                    addNewRoutine()
+                } else {
+                    showAddMenu = true
+                }
             } label: {
                 Image(systemName: "plus")
                     .font(.body.weight(.semibold))
@@ -158,14 +183,32 @@ struct RoutineView: View {
     }
 
     private var emptyState: some View {
-        AnchorEmptyState(
-            icon: "list.bullet.rectangle",
-            title: AppCopy.Routine.emptyTitle,
-            message: AppCopy.Routine.emptyBody,
-            actionTitle: AppCopy.Routine.emptyAction,
-            action: addNewRoutine
-        )
+        VStack(spacing: 12) {
+            AnchorEmptyState(
+                icon: "list.bullet.rectangle",
+                title: AppCopy.Routine.emptyTitle,
+                message: AppCopy.Routine.emptyBody,
+                actionTitle: AppCopy.Routine.emptyAction,
+                action: { templates.isEmpty ? addNewRoutine() : (showAddMenu = true) }
+            )
+            if !templates.isEmpty {
+                Button(AppCopy.Routine.loadTemplate) {
+                    showTemplatePicker = true
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.anchorAccent(scheme))
+            }
+        }
         .padding(.horizontal, AnchorLayout.screenHorizontal)
+    }
+
+    private func syncRoutineListState() {
+        let ids = Set(routines.map(\.id))
+        expandedRoutineIDs = expandedRoutineIDs.filter { ids.contains($0) }
+        if let focusID = focusNameRoutineID, !ids.contains(focusID) {
+            focusNameRoutineID = nil
+        }
+        RoutineSync.afterMutation(modelContext: modelContext, refreshShield: false)
     }
 
     private func fulfillPendingCreateRoutine() {
