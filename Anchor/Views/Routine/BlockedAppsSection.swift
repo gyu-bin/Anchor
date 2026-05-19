@@ -30,15 +30,16 @@ struct BlockedAppsSection: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("앱 차단")
-                .font(.headline)
-                .foregroundStyle(Color.anchorText(scheme))
-
-            if !premium.isPremium {
-                Text(AppCopy.Premium.appLimitHint)
-                    .font(.caption)
-                    .foregroundStyle(Color.anchorSub(scheme))
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("앱 차단")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.anchorText(scheme))
+                if !premium.isPremium {
+                    Text(AppCopy.Premium.appLimitHint)
+                        .font(.caption)
+                        .foregroundStyle(Color.anchorSub(scheme))
+                }
             }
 
             HStack(spacing: 10) {
@@ -47,6 +48,7 @@ struct BlockedAppsSection: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(authStatus == .approved)
+                .accessibilityLabel("Screen Time 권한 요청")
 
                 Button(savedTokens.isEmpty ? "앱 선택" : "앱 수정") {
                     guard authStatus == .approved else { return }
@@ -56,43 +58,30 @@ struct BlockedAppsSection: View {
                 .buttonStyle(.borderedProminent)
                 .tint(Color.anchorAccent(scheme))
                 .disabled(authStatus != .approved)
+                .accessibilityLabel(savedTokens.isEmpty ? "차단할 앱 선택" : "차단 앱 수정")
             }
 
             if !savedTokens.isEmpty {
                 BlockedAppIconsRow(tokens: savedTokens, maxVisible: 10, iconSize: 32)
+                    .padding(.top, 2)
             }
 
             if let authError {
-                Text(authError)
-                    .font(.caption2)
-                    .foregroundStyle(.red)
+                BlockedInlineError(message: authError)
             }
         }
-        .padding(.vertical, 6)
         .onAppear {
             authStatus = ShieldManager.authorizationStatus()
             syncSelectionFromRoutine()
         }
         .sheet(isPresented: $showPicker) {
-            NavigationStack {
-                FamilyActivityPicker(selection: $selection)
-                    .navigationTitle("차단할 앱")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("취소") {
-                                syncSelectionFromRoutine()
-                                showPicker = false
-                            }
-                        }
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("적용") {
-                                applyAppSelection()
-                                showPicker = false
-                            }
-                        }
-                    }
-            }
+            FamilyActivityPickerSheet(
+                selection: $selection,
+                isPresented: $showPicker,
+                title: "차단할 앱",
+                onApply: applyAppSelection,
+                onCancelSync: syncSelectionFromRoutine
+            )
         }
     }
 
@@ -111,9 +100,9 @@ struct BlockedAppsSection: View {
             merged.applicationTokens = selection.applicationTokens
             try ShieldManager.saveSelection(merged, for: routine, modelContext: modelContext)
             authError = nil
-            Task { await ShieldManager.refresh(modelContext: modelContext) }
+            RoutineSync.afterMutation(modelContext: modelContext)
         } catch {
-            authError = "저장에 실패했습니다."
+            authError = AppCopy.Error.saveFailed
         }
     }
 
@@ -122,9 +111,9 @@ struct BlockedAppsSection: View {
             try await ShieldManager.requestAuthorization()
             authStatus = ShieldManager.authorizationStatus()
             authError = nil
-            await ShieldManager.refresh(modelContext: modelContext)
+            RoutineSync.afterMutation(modelContext: modelContext)
         } catch {
-            authError = "권한 요청에 실패했습니다."
+            authError = AppCopy.Error.permissionFailed
             authStatus = ShieldManager.authorizationStatus()
         }
     }

@@ -57,7 +57,7 @@ struct HistoryDaySnapshot {
 
         let isFuture = RoutineDeadline.isFutureDay(day, calendar: calendar, now: now)
         let isRest = RestDayStore.isRestDay(day, calendar: calendar)
-        let overall = HistoryView.dayStatus(logs: logs, routines: routines, day: day, cal: calendar)
+        let overall = HistoryAnalytics.dayStatus(logs: logs, routines: routines, day: day, cal: calendar)
 
         if isRest {
             return HistoryDaySnapshot(

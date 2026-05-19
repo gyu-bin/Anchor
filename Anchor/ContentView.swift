@@ -10,6 +10,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var tabRouter: TabRouter
+    @State private var routineViewModel = RoutineViewModel()
 
     @AppStorage(AppGuideStorage.hasSeenGuideKey) private var hasSeenAppGuide = false
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
@@ -30,6 +31,7 @@ struct ContentView: View {
                 mainTabs
             }
         }
+        .environment(routineViewModel)
         .preferredColorScheme(appearanceMode.colorScheme)
         .onReceive(NotificationCenter.default.publisher(for: .anchorOpenTodayTab)) { _ in
             tabRouter.openToday()
@@ -75,18 +77,22 @@ struct ContentView: View {
             TodayView()
                 .tabItem { Label("오늘", systemImage: "sun.max.fill") }
                 .tag(0)
+                .accessibilityLabel("오늘")
 
             RoutineView()
                 .tabItem { Label("루틴", systemImage: "list.bullet.rectangle.fill") }
                 .tag(1)
+                .accessibilityLabel("루틴")
 
             HistoryView()
                 .tabItem { Label("기록", systemImage: "chart.bar.fill") }
                 .tag(2)
+                .accessibilityLabel("기록")
 
             SettingsView()
                 .tabItem { Label("설정", systemImage: "gearshape.fill") }
                 .tag(3)
+                .accessibilityLabel("설정")
         }
         .tint(Color("AnchorAccent"))
         .toolbarBackground(.ultraThinMaterial, for: .tabBar)
@@ -103,10 +109,7 @@ struct ContentView: View {
     private func bootstrapAfterGuide() {
         Task { @MainActor in
             _ = await NotificationManager.requestAuthorization()
-            try? NotificationManager.rescheduleAll(modelContext: modelContext)
-            await ShieldManager.refresh(modelContext: modelContext)
-            let routines = (try? modelContext.fetch(FetchDescriptor<Routine>())) ?? []
-            WidgetSync.refresh(modelContext: modelContext, routines: routines)
+            RoutineSync.afterMutation(modelContext: modelContext)
         }
     }
 
@@ -126,16 +129,14 @@ struct ContentView: View {
         let routines = (try? modelContext.fetch(FetchDescriptor<Routine>())) ?? []
         _ = try? vm.completeNextItem(routines: routines, context: modelContext)
         try? modelContext.save()
-        Task {
-            await ShieldManager.refresh(modelContext: modelContext)
-            WidgetSync.refresh(modelContext: modelContext, routines: routines)
-        }
+        RoutineSync.afterMutation(modelContext: modelContext)
     }
 }
 
 #Preview {
     ContentView()
         .environmentObject(TabRouter())
+        .environment(RoutineViewModel())
         .environmentObject(PremiumStore())
         .modelContainer(PreviewData.container)
 }

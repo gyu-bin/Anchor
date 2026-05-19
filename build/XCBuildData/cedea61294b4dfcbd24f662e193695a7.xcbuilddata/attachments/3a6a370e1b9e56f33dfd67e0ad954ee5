@@ -1,0 +1,26 @@
+{
+  "" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary.dia",
+    "emit-module-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary-emit-module.dia",
+    "pch" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/AnchorWidgetBundle.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetBundle.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetBundle.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetBundle.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/LockStatusWidget.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/LockStatusWidget.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/LockStatusWidget.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/LockStatusWidget.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/TodayProgressWidget.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/TodayProgressWidget.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/TodayProgressWidget.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/TodayProgressWidget.o"
+  }
+}

@@ -39,13 +39,15 @@ extension Color {
     }
 
     static func anchorSuccess(_ scheme: ColorScheme) -> Color {
-        _ = scheme
-        return Color(hex: "3D8B5A")
+        scheme == .dark ? Color(hex: "5CB87A") : Color(hex: "3D8B5A")
     }
 
     static func anchorWarning(_ scheme: ColorScheme) -> Color {
-        _ = scheme
-        return Color(hex: "D4843A")
+        scheme == .dark ? Color(hex: "E8A55C") : Color(hex: "D4843A")
+    }
+
+    static func anchorDanger(_ scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color(hex: "F07171") : Color(hex: "D64545")
     }
 
     static func anchorHighlight(_ scheme: ColorScheme) -> Color {
@@ -53,5 +55,4 @@ extension Color {
         return Color.anchorAccent(scheme).opacity(0.1)
     }
 
-    static let anchorDanger = Color(hex: "D64545")
 }

@@ -12,7 +12,7 @@ struct RoutineCardView: View {
     @EnvironmentObject private var premium: PremiumStore
 
     @Bindable var routine: Routine
-    @ObservedObject var vm: RoutineViewModel
+    var vm: RoutineViewModel
     let allRoutines: [Routine]
     @Binding var editPayload: RoutineItemEditPayload?
     @Binding var paywallReason: PaywallReason?
@@ -44,7 +44,7 @@ struct RoutineCardView: View {
 
                     expandedContent
                         .padding(AnchorLayout.cardPadding)
-                        .padding(.top, 4)
+                        .padding(.top, 8)
                 }
             }
         }
@@ -65,7 +65,7 @@ struct RoutineCardView: View {
     private var header: some View {
         HStack(alignment: .center, spacing: 12) {
             Button {
-                withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
                     if isExpanded {
                         finishEditing()
                     } else {
@@ -96,14 +96,18 @@ struct RoutineCardView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(routine.name)
+            .accessibilityHint(isExpanded ? "탭하여 접기" : "탭하여 펼치기")
 
             Button(role: .destructive) {
                 showDeleteConfirm = true
             } label: {
                 Image(systemName: "trash")
                     .font(.body)
+                    .foregroundStyle(Color.anchorSub(scheme))
             }
             .buttonStyle(.borderless)
+            .accessibilityLabel("루틴 삭제")
         }
         .padding(16)
     }
@@ -114,12 +118,9 @@ struct RoutineCardView: View {
 
     @ViewBuilder
     private var expandedContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("루틴 이름")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.anchorSub(scheme))
-                TextField("루틴 이름", text: $editingName)
+        VStack(alignment: .leading, spacing: 14) {
+            RoutineEditSection(title: AppCopy.Routine.routineNameLabel, systemImage: "pencil") {
+                TextField(AppCopy.Routine.namePlaceholder, text: $editingName)
                     .font(.body)
                     .foregroundStyle(Color.anchorText(scheme))
                     .submitLabel(.done)
@@ -142,99 +143,142 @@ struct RoutineCardView: View {
                     }
             }
 
-            RoutineScheduleEditor(draft: $scheduleDraft)
-                .onAppear {
-                    scheduleDraft = RoutineSchedule.draft(from: routine)
-                }
-                .onChange(of: scheduleDraft) { _, newValue in
-                    if newValue.kind == .weekdays && newValue.activeWeekdays.isEmpty { return }
-                    vm.updateSchedule(routine, draft: newValue, context: modelContext)
-                    Task { await ShieldManager.refresh(modelContext: modelContext) }
-                }
+            RoutineEditSection(
+                title: AppCopy.Routine.scheduleTimeSection,
+                systemImage: "calendar"
+            ) {
+                RoutineScheduleEditor(draft: $scheduleDraft)
+                    .onAppear {
+                        scheduleDraft = RoutineSchedule.draft(from: routine)
+                    }
+                    .onChange(of: scheduleDraft) { _, newValue in
+                        if newValue.kind == .weekdays && newValue.activeWeekdays.isEmpty { return }
+                        vm.updateSchedule(routine, draft: newValue, context: modelContext)
+                        RoutineSync.afterMutation(modelContext: modelContext)
+                    }
+            }
 
-            itemsSection
+            todosSection
 
-            BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
-            BlockedWebSection(routine: routine, paywallReason: $paywallReason)
+            RoutineEditSection(
+                title: AppCopy.Routine.blockSection,
+                subtitle: AppCopy.Routine.blockSectionHint,
+                systemImage: "lock.shield"
+            ) {
+                VStack(alignment: .leading, spacing: 16) {
+                    BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
+                    Divider()
+                        .overlay(Color.anchorBorder(scheme).opacity(0.45))
+                    BlockedWebSection(routine: routine, paywallReason: $paywallReason)
+                }
+            }
         }
     }
 
     @ViewBuilder
-    private var itemsSection: some View {
+    private var todosSection: some View {
         let sorted = routine.items.sorted { $0.order < $1.order }
 
-        VStack(alignment: .leading, spacing: 8) {
-            Text("항목")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.anchorSub(scheme))
-
-            if sorted.isEmpty {
-                Text(AppCopy.Routine.noItems)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.anchorSub(scheme))
-            } else {
-                VStack(spacing: 0) {
-                    ForEach(Array(sorted.enumerated()), id: \.element.id) { index, item in
-                        HStack(spacing: 0) {
-                            Button {
-                                editPayload = RoutineItemEditPayload(routine: routine, item: item)
-                            } label: {
-                                HStack(spacing: 12) {
-                                    Image(systemName: item.icon)
-                                        .foregroundStyle(Color.anchorAccent(scheme))
-                                        .frame(width: 24, height: 24, alignment: .center)
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(item.name)
-                                            .foregroundStyle(Color.anchorText(scheme))
-                                        if item.duration > 0 {
-                                            Text(AppCopy.Routine.durationMinutes(item.duration))
-                                                .font(.caption2)
-                                                .foregroundStyle(Color.anchorSub(scheme))
-                                        }
-                                    }
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(Color.anchorSub(scheme))
-                                }
-                                .padding(.leading, 12)
-                                .padding(.trailing, 8)
-                                .padding(.vertical, 10)
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-
-                            Button(role: .destructive) {
-                                vm.deleteItem(item, context: modelContext)
-                            } label: {
-                                Image(systemName: "trash")
-                                    .font(.caption)
-                                    .foregroundStyle(.red.opacity(0.7))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 10)
-                            }
-                            .buttonStyle(.borderless)
-                        }
-
-                        if index < sorted.count - 1 {
-                            Divider()
-                                .padding(.leading, 48)
+        RoutineEditSection(
+            title: AppCopy.Routine.todosSection,
+            subtitle: sorted.isEmpty ? AppCopy.Routine.noItems : nil,
+            systemImage: "checklist"
+        ) {
+            VStack(alignment: .leading, spacing: 12) {
+                if sorted.isEmpty {
+                    emptyTodosPlaceholder
+                } else {
+                    VStack(spacing: 8) {
+                        ForEach(sorted, id: \.id) { item in
+                            todoRow(item)
                         }
                     }
                 }
-                .background(Color.anchorSubBg(scheme))
-                .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
-            }
 
-            Button {
-                editPayload = RoutineItemEditPayload(routine: routine, item: nil)
-            } label: {
-                Label(AppCopy.Routine.addItem, systemImage: "plus.circle.fill")
-                    .font(.subheadline.weight(.semibold))
+                Button {
+                    editPayload = RoutineItemEditPayload(routine: routine, item: nil)
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.body)
+                        Text(AppCopy.Routine.addTodo)
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 13)
+                }
+                .buttonStyle(AnchorTextButtonStyle())
             }
-            .tint(Color.anchorAccent(scheme))
-            .padding(.top, 4)
         }
+    }
+
+    private var emptyTodosPlaceholder: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "square.and.pencil")
+                .font(.title3)
+                .foregroundStyle(Color.anchorSub(scheme).opacity(0.7))
+            Text(AppCopy.Routine.noItems)
+                .font(.subheadline)
+                .foregroundStyle(Color.anchorSub(scheme))
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func todoRow(_ item: RoutineItem) -> some View {
+        HStack(spacing: 0) {
+            Button {
+                editPayload = RoutineItemEditPayload(routine: routine, item: item)
+            } label: {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color.anchorHighlight(scheme))
+                            .frame(width: 40, height: 40)
+                        Image(systemName: item.icon)
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundStyle(Color.anchorAccent(scheme))
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(item.name)
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(Color.anchorText(scheme))
+                            .multilineTextAlignment(.leading)
+                        if item.duration > 0 {
+                            Text(AppCopy.Routine.durationMinutes(item.duration))
+                                .font(.caption)
+                                .foregroundStyle(Color.anchorSub(scheme))
+                        }
+                    }
+
+                    Spacer(minLength: 8)
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.anchorSub(scheme).opacity(0.6))
+                }
+                .padding(.leading, 12)
+                .padding(.trailing, 4)
+                .padding(.vertical, 10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(item.name) 편집")
+
+            Button(role: .destructive) {
+                vm.deleteItem(item, context: modelContext)
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(Color.anchorSub(scheme).opacity(0.45))
+                    .padding(.horizontal, 12)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(item.name) 삭제")
+        }
+        .background(Color.anchorSubBg(scheme))
+        .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
     }
 
     private func commitRoutineName() {
@@ -242,14 +286,14 @@ struct RoutineCardView: View {
         routine.name = trimmed.isEmpty ? "새 루틴" : trimmed
         editingName = routine.name
         try? modelContext.save()
-        try? NotificationManager.rescheduleAll(modelContext: modelContext)
+        RoutineSync.afterMutation(modelContext: modelContext)
     }
 
     private func finishEditing() {
         nameFieldFocused = false
         commitRoutineName()
         onFinishEditing?()
-        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+        withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
             isExpanded = false
         }
     }

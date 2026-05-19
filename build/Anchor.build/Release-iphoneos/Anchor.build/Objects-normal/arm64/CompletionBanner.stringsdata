@@ -1,0 +1,16 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Components/CompletionBanner.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%@ %lld개",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 32
+        }
+      }
+    ]
+  },
+  "version": 1
+}

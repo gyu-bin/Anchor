@@ -4,10 +4,12 @@
 //
 
 import Foundation
+import Observation
 import SwiftData
 import SwiftUI
 
 @MainActor
+@Observable
 final class TodayViewModel {
     func sortedRoutines(_ routines: [Routine]) -> [Routine] {
         routines.sorted { $0.order < $1.order }

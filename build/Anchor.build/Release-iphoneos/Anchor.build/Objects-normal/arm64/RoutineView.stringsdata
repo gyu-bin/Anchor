@@ -1,0 +1,24 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "순서 변경",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "새 루틴 추가",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 149
+        }
+      }
+    ]
+  },
+  "version": 1
+}

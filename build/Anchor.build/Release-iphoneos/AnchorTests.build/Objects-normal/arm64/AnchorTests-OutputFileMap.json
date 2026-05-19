@@ -1,0 +1,36 @@
+{
+  "" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary.dia",
+    "emit-module-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary-emit-module.dia",
+    "pch" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorTests/AnchorTests.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorTests/HistoryAnalyticsTests.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/HistoryAnalyticsTests.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/HistoryAnalyticsTests.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/HistoryAnalyticsTests.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorTests/PremiumAndScheduleTests.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/PremiumAndScheduleTests.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/PremiumAndScheduleTests.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/PremiumAndScheduleTests.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorTests/ShieldAndTodayTests.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/ShieldAndTodayTests.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/ShieldAndTodayTests.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/ShieldAndTodayTests.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorTests/TestFixtures.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/TestFixtures.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/TestFixtures.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/TestFixtures.o"
+  }
+}

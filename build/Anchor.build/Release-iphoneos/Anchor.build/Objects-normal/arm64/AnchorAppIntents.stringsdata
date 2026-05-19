@@ -1,0 +1,56 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Intents/AnchorAppIntents.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "오늘 루틴 열기",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 16
+        }
+      },
+      {
+        "comment": "",
+        "key": "오늘 탭을 엽니다.",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 17
+        }
+      },
+      {
+        "comment": "",
+        "key": "다음 항목 완료",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "아직 끝내지 않은 첫 항목을 완료 처리합니다.",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 29
+        }
+      },
+      {
+        "comment": "",
+        "key": "오늘",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "다음 항목",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 58
+        }
+      }
+    ]
+  },
+  "version": 1
+}

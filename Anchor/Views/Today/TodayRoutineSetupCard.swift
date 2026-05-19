@@ -23,8 +23,7 @@ struct TodayRoutineSetupCard: View {
                     .foregroundStyle(Color.anchorSub(scheme))
 
                 Button(AppCopy.Today.setupItemsAction, action: onOpenRoutineTab)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.anchorAccent(scheme))
+                    .buttonStyle(AnchorTextButtonStyle())
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(AnchorLayout.cardPadding)

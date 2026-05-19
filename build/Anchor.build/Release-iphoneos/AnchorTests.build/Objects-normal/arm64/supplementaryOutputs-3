@@ -1,0 +1,12 @@
+{
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorTests/AnchorTests.swift" : {
+    "abi-baseline-json" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests.abi.json",
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-primary.dia",
+    "objc-header" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests-Swift.h",
+    "swiftdoc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests.swiftdoc",
+    "swiftmodule" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests.swiftmodule",
+    "swiftsourceinfo" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorTests.build/Objects-normal/arm64/AnchorTests.swiftsourceinfo"
+  }
+}

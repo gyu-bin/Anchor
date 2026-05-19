@@ -26,6 +26,8 @@ struct TodayView: View {
     @State private var pendingUndo: UndoSnapshot?
     @State private var showUndoToast = false
     @State private var undoTask: Task<Void, Never>?
+    @State private var showErrorToast = false
+    @State private var errorToastTask: Task<Void, Never>?
     @State private var isRestToday = RestDayStore.isRestToday()
 
     private var sortedRoutines: [Routine] {
@@ -113,22 +115,28 @@ struct TodayView: View {
                             }
                         }
                         .padding(.horizontal, AnchorLayout.screenHorizontal)
-                        .padding(.bottom, showUndoToast ? 88 : 36)
+                        .padding(.bottom, bottomScrollInset)
                     }
                     .onChange(of: scrollTarget) { _, target in
                         guard let target else { return }
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                        withAnimation(AnchorMotion.spring(response: 0.35, dampingFraction: 0.7)) {
                             proxy.scrollTo(target, anchor: .center)
                         }
                     }
                 }
 
-                if showUndoToast {
-                    UndoToast { performUndo() }
-                        .padding(.horizontal, AnchorLayout.screenHorizontal)
-                        .padding(.bottom, 12)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                VStack(spacing: 8) {
+                    if showErrorToast {
+                        AnchorBriefToast(message: AppCopy.Today.toggleFailed)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    if showUndoToast {
+                        UndoToast { performUndo() }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                 }
+                .padding(.horizontal, AnchorLayout.screenHorizontal)
+                .padding(.bottom, 12)
             }
             .anchorScreenBackground()
             .navigationBarTitleDisplayMode(.inline)
@@ -136,18 +144,11 @@ struct TodayView: View {
             .onAppear {
                 isRestToday = RestDayStore.isRestToday()
                 refreshCompletionBannerState()
-                Task {
-                    await ShieldManager.refresh(modelContext: modelContext)
-                    syncWidgetAndNotifications()
-                }
+                syncAfterTodayChange()
             }
             .onChange(of: routines.map(\.id)) { _, _ in
                 refreshCompletionBannerState()
-                syncWidgetAndNotifications()
-                Task { await ShieldManager.refresh(modelContext: modelContext) }
-            }
-            .onChange(of: routines.map(\.blockedWebs)) { _, _ in
-                Task { await ShieldManager.refresh(modelContext: modelContext) }
+                syncAfterTodayChange()
             }
             .sheet(isPresented: $showCompletionSheet) {
                 completionSheet
@@ -167,74 +168,51 @@ struct TodayView: View {
                     .foregroundStyle(Color.anchorSub(scheme))
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                Button {
+                Button(AppCopy.Today.restDayCancel) {
                     clearRestToday()
-                } label: {
-                    Text(AppCopy.Today.restDayCancel)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.anchorAccent(scheme))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.anchorHighlight(scheme))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(AnchorTextButtonStyle())
             }
             .padding(AnchorLayout.cardPadding)
         }
     }
 
     private func clearRestToday() {
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+        withAnimation(AnchorMotion.spring(response: 0.35, dampingFraction: 0.8)) {
             RestDayStore.clearRestToday()
             isRestToday = false
         }
-        syncWidgetAndNotifications()
-        Task { await ShieldManager.refresh(modelContext: modelContext) }
+        syncAfterTodayChange()
     }
 
     private var noScheduleTodayState: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(AppCopy.Today.noScheduleTitle)
-                    .font(.headline)
-                    .foregroundStyle(Color.anchorText(scheme))
-                Text(AppCopy.Today.noScheduleBody)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.anchorSub(scheme))
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(AnchorLayout.cardPadding)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
+        AnchorEmptyState(
+            icon: "calendar",
+            title: AppCopy.Today.noScheduleTitle,
+            message: AppCopy.Today.noScheduleBody
+        )
+    }
+
+    private var bottomScrollInset: CGFloat {
+        if showUndoToast { return 88 }
+        if showErrorToast { return 72 }
+        return 36
     }
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            VStack(spacing: 8) {
-                Text(AppCopy.Today.emptyTitle)
-                    .font(.title3.bold())
-                    .foregroundStyle(Color.anchorText(scheme))
-                Text(AppCopy.Today.emptyBody)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.anchorSub(scheme))
-                    .multilineTextAlignment(.center)
-            }
-
-            Button(AppCopy.Today.emptyAction) {
-                tabRouter.selectedTab = 1
-            }
-            .buttonStyle(AnchorButtonStyle())
-            .padding(.horizontal, 32)
+        AnchorEmptyState(
+            icon: "sun.max",
+            title: AppCopy.Today.emptyTitle,
+            message: AppCopy.Today.emptyBody,
+            actionTitle: AppCopy.Today.emptyAction
+        ) {
+            tabRouter.openRoutines(andCreateNew: true)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
     }
 
     private func toggle(item: RoutineItem, routine: Routine) {
         guard !isRestToday else { return }
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+        withAnimation(AnchorMotion.spring(response: 0.35, dampingFraction: 0.7)) {
             do {
                 let log = try vm.todayLog(for: routine, context: modelContext)
                 let wasCompleted = log.completedItems.contains(item.id)
@@ -268,10 +246,27 @@ struct TodayView: View {
                 }
                 wasAllComplete = allDone
 
-                syncWidgetAndNotifications()
-                Task { await ShieldManager.refresh(modelContext: modelContext) }
+                syncAfterTodayChange()
             } catch {
-                // no-op
+                presentToggleError()
+            }
+        }
+    }
+
+    private func presentToggleError() {
+        errorToastTask?.cancel()
+        let gen = UINotificationFeedbackGenerator()
+        gen.notificationOccurred(.error)
+        withAnimation(AnchorMotion.spring(response: 0.32)) {
+            showErrorToast = true
+        }
+        errorToastTask = Task {
+            try? await Task.sleep(for: .seconds(2.8))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation {
+                    showErrorToast = false
+                }
             }
         }
     }
@@ -279,7 +274,7 @@ struct TodayView: View {
     private func presentUndo(item: RoutineItem, routine: Routine, wasCompleted: Bool) {
         undoTask?.cancel()
         pendingUndo = UndoSnapshot(item: item, routine: routine, wasCompleted: wasCompleted)
-        withAnimation(.spring(response: 0.32)) {
+        withAnimation(AnchorMotion.spring(response: 0.32)) {
             showUndoToast = true
         }
         undoTask = Task {
@@ -306,11 +301,9 @@ struct TodayView: View {
             )
             try modelContext.save()
             wasAllComplete = (try? vm.allRoutinesFullyCompletedToday(routines: routines, context: modelContext)) ?? false
-            try? NotificationManager.rescheduleAll(modelContext: modelContext)
-            syncWidgetAndNotifications()
-            Task { await ShieldManager.refresh(modelContext: modelContext) }
+            syncAfterTodayChange()
         } catch {
-            // no-op
+            presentToggleError()
         }
         withAnimation {
             showUndoToast = false
@@ -323,16 +316,15 @@ struct TodayView: View {
         wasAllComplete = allDone
     }
 
-    private func syncWidgetAndNotifications() {
-        WidgetSync.refresh(modelContext: modelContext, routines: routines)
-        let fullDays = HistoryView.weekFullDaysCount(
+    private func syncAfterTodayChange() {
+        RoutineSync.afterMutation(modelContext: modelContext)
+        let fullDays = HistoryAnalytics.weekFullDaysCount(
             logs: (try? modelContext.fetch(FetchDescriptor<DailyLog>())) ?? [],
             routines: routines.filter { !$0.items.isEmpty },
             now: Date(),
             cal: .current
         )
         NotificationManager.updateWeeklySummaryContent(fullDays: fullDays)
-        NotificationManager.refreshDailyClosureNotifications(modelContext: modelContext)
     }
 
     private var completionSheet: some View {

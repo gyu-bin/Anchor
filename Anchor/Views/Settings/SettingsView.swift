@@ -25,9 +25,11 @@ struct SettingsView: View {
     @State private var screenTimeStatus: AuthorizationStatus = .notDetermined
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @State private var paywallReason: PaywallReason?
+    @State private var bannerMessage: String?
 
     var body: some View {
         NavigationStack {
+            ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     AnchorScreenHeader(title: AppCopy.Settings.title, subtitle: AppCopy.Settings.subtitle)
@@ -163,9 +165,19 @@ struct SettingsView: View {
                             if screenTimeStatus != .approved {
                                 Button(AppCopy.Onboarding.screenTimeAllow) {
                                     Task {
-                                        try? await ShieldManager.requestAuthorization()
-                                        screenTimeStatus = ShieldManager.authorizationStatus()
-                                        await ShieldManager.refresh(modelContext: modelContext)
+                                        do {
+                                            try await ShieldManager.requestAuthorization()
+                                            screenTimeStatus = ShieldManager.authorizationStatus()
+                                            if screenTimeStatus == .approved {
+                                                showBanner(nil)
+                                                RoutineSync.afterMutation(modelContext: modelContext)
+                                            } else {
+                                                showBanner(AppCopy.Error.permissionFailed)
+                                            }
+                                        } catch {
+                                            screenTimeStatus = ShieldManager.authorizationStatus()
+                                            showBanner(AppCopy.Error.permissionFailed)
+                                        }
                                     }
                                 }
                                 .buttonStyle(AnchorSecondaryButtonStyle())
@@ -213,7 +225,15 @@ struct SettingsView: View {
                     }
                 }
                 .padding(.horizontal, AnchorLayout.screenHorizontal)
-                .padding(.bottom, 36)
+                .padding(.bottom, bannerMessage == nil ? 36 : 88)
+            }
+
+            if let bannerMessage {
+                AnchorBriefToast(message: bannerMessage)
+                    .padding(.horizontal, AnchorLayout.screenHorizontal)
+                    .padding(.bottom, 12)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
             }
             .anchorScreenBackground()
             .navigationBarTitleDisplayMode(.inline)
@@ -392,9 +412,34 @@ struct SettingsView: View {
         let granted = await NotificationManager.requestAuthorization()
         if granted {
             NotificationCenter.default.post(name: .anchorRegisterRemotePush, object: nil)
+            showBanner(nil)
+        } else {
+            showBanner(AppCopy.Error.permissionFailed)
         }
         refreshNotificationStatus()
         applyNotificationPrefs()
+    }
+
+    private func showBanner(_ message: String?) {
+        if let message {
+            withAnimation(AnchorMotion.spring(response: 0.32)) {
+                bannerMessage = message
+            }
+            Task {
+                try? await Task.sleep(for: .seconds(2.8))
+                await MainActor.run {
+                    withAnimation {
+                        if bannerMessage == message {
+                            bannerMessage = nil
+                        }
+                    }
+                }
+            }
+        } else {
+            withAnimation {
+                bannerMessage = nil
+            }
+        }
     }
 }
 

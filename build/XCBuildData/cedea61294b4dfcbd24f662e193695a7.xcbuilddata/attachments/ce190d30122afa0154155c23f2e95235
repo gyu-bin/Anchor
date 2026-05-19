@@ -1,0 +1,386 @@
+{
+  "" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary.dia",
+    "emit-module-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary-emit-module.dia",
+    "pch" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/AnchorApp.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorApp.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorApp.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorApp.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/AppDelegate.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppDelegate.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/ContentView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ContentView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Intents/AnchorAppIntents.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorAppIntents.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorAppIntents.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorAppIntents.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Models/DailyLog.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DailyLog.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DailyLog.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DailyLog.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Models/Routine+ModelAccess.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Routine+ModelAccess.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Routine+ModelAccess.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Routine+ModelAccess.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Models/Routine.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Routine.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Routine.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Routine.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Models/RoutineItem.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItem.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItem.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItem.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Models/RoutineSchedule.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSchedule.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSchedule.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSchedule.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AnchorDesign.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorDesign.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorDesign.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorDesign.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AnchorMotion.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorMotion.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorMotion.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorMotion.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AppBrand.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppBrand.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppBrand.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppBrand.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AppCopy.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppCopy.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppCopy.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppCopy.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AppInfo.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppInfo.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppInfo.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppInfo.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AppModelContextHolder.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppModelContextHolder.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppModelContextHolder.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppModelContextHolder.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AppReviewManager.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppReviewManager.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppReviewManager.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppReviewManager.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/AppearanceSettings.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppearanceSettings.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppearanceSettings.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppearanceSettings.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/BlockedDomainStyle.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedDomainStyle.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedDomainStyle.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedDomainStyle.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/Colors.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Colors.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Colors.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Colors.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/DeadlineGraceStore.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DeadlineGraceStore.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DeadlineGraceStore.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DeadlineGraceStore.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/DeviceActivityScheduleManager.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DeviceActivityScheduleManager.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DeviceActivityScheduleManager.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/DeviceActivityScheduleManager.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/Extensions.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Extensions.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Extensions.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Extensions.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/HistoryAnalytics.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryAnalytics.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryAnalytics.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryAnalytics.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/NotificationManager.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/NotificationManager.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/NotificationManager.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/NotificationManager.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/NotificationPreferences.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/NotificationPreferences.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/NotificationPreferences.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/NotificationPreferences.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/PremiumLimits.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumLimits.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumLimits.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumLimits.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/PremiumStore.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumStore.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumStore.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumStore.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/PreviewData.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PreviewData.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PreviewData.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PreviewData.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/RestDayStore.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RestDayStore.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RestDayStore.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RestDayStore.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/RoutineDeadline.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineDeadline.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineDeadline.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineDeadline.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/RoutineDuration.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineDuration.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineDuration.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineDuration.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/RoutineSync.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSync.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSync.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSync.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/SharedShieldStore.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/SharedShieldStore.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/SharedShieldStore.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/SharedShieldStore.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/ShieldManager+Summaries.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldManager+Summaries.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldManager+Summaries.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldManager+Summaries.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/ShieldManager.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldManager.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldManager.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldManager.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/ShieldScheduleWatcher.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldScheduleWatcher.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldScheduleWatcher.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ShieldScheduleWatcher.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/TabRouter.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TabRouter.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TabRouter.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TabRouter.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/WebDomainBlocking.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WebDomainBlocking.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WebDomainBlocking.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WebDomainBlocking.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/WidgetDataStore.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WidgetDataStore.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WidgetDataStore.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WidgetDataStore.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/WidgetSync.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WidgetSync.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WidgetSync.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WidgetSync.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/ViewModels/RoutineViewModel.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineViewModel.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineViewModel.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineViewModel.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/ViewModels/TodayViewModel.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayViewModel.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayViewModel.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayViewModel.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Components/AnchorBriefToast.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorBriefToast.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorBriefToast.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorBriefToast.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Components/AnchorButtonStyle.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorButtonStyle.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorButtonStyle.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorButtonStyle.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Components/AnchorCard.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorCard.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorCard.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorCard.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Components/AnchorEmptyState.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorEmptyState.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorEmptyState.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AnchorEmptyState.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Components/CompletionBanner.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/CompletionBanner.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/CompletionBanner.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/CompletionBanner.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Components/UndoToast.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/UndoToast.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/UndoToast.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/UndoToast.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Guide/AppGuideView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppGuideView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppGuideView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppGuideView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/History/CalendarView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/CalendarView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/CalendarView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/CalendarView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/History/HistoryDayDetailSheet.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryDayDetailSheet.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryDayDetailSheet.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryDayDetailSheet.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/History/HistoryStatusLegendItem.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryStatusLegendItem.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryStatusLegendItem.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryStatusLegendItem.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/History/HistoryView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/HistoryView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/History/WeeklyBarChart.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WeeklyBarChart.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WeeklyBarChart.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/WeeklyBarChart.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Premium/PaywallSheet.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PaywallSheet.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PaywallSheet.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PaywallSheet.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/BlockedAppsSection.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedAppsSection.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedAppsSection.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedAppsSection.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/BlockedSelectionSection.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedSelectionSection.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedSelectionSection.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedSelectionSection.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/BlockedWebSection.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedWebSection.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedWebSection.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedWebSection.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineCardView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineCardView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineCardView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineCardView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineItemEditSheet.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItemEditSheet.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItemEditSheet.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItemEditSheet.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineScheduleEditor.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineScheduleEditor.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineScheduleEditor.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineScheduleEditor.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Settings/SettingsView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/SettingsView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Splash/AppRootView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppRootView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppRootView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/AppRootView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Splash/PremiumFocusSplash.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumFocusSplash.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumFocusSplash.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/PremiumFocusSplash.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/BlockedAppIconsRow.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedAppIconsRow.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedAppIconsRow.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedAppIconsRow.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/BlockedShieldDisplay.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedShieldDisplay.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedShieldDisplay.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedShieldDisplay.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/BlockedWebIconsRow.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedWebIconsRow.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedWebIconsRow.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/BlockedWebIconsRow.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/OverallProgressCard.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/OverallProgressCard.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/OverallProgressCard.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/OverallProgressCard.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/ProgressRingView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ProgressRingView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ProgressRingView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/ProgressRingView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/RoutineItemRow.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItemRow.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItemRow.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineItemRow.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/RoutineSectionCard.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSectionCard.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSectionCard.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/RoutineSectionCard.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/TodayRoutineSetupCard.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayRoutineSetupCard.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayRoutineSetupCard.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayRoutineSetupCard.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/TodayView.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/TodayView.o"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

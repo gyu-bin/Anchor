@@ -1,0 +1,16 @@
+{
+  "" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/AnchorDeviceActivityMonitor-primary.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/AnchorDeviceActivityMonitor-primary.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/AnchorDeviceActivityMonitor-primary.dia",
+    "emit-module-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/AnchorDeviceActivityMonitor-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/AnchorDeviceActivityMonitor-primary-emit-module.dia",
+    "pch" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/AnchorDeviceActivityMonitor-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/AnchorDeviceActivityMonitor-primary.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorDeviceActivityMonitor/DeviceActivityMonitorExtension.swift" : {
+    "index-unit-output-path" : "/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/DeviceActivityMonitorExtension.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/DeviceActivityMonitorExtension.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorDeviceActivityMonitor.build/Objects-normal/arm64/DeviceActivityMonitorExtension.o"
+  }
+}

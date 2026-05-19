@@ -1,0 +1,72 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineCardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "탭하여 접기",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "탭하여 펼치기",
+        "location": {
+          "startingColumn": 66,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "루틴 삭제",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "루틴 이름",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "루틴 이름",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "항목",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 170
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ 편집",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 209
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ 삭제",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 221
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -10,6 +10,7 @@ enum AnchorLayout {
     static let cardPadding: CGFloat = 18
     static let sectionSpacing: CGFloat = 20
     static let cardRadius: CGFloat = 20
+    static let buttonRadius: CGFloat = 16
     static let chipRadius: CGFloat = 14
     static let rowRadius: CGFloat = 14
 }
@@ -83,6 +84,7 @@ struct AnchorSectionHeader: View {
 
 struct AnchorScreenHeader: View {
     @Environment(\.colorScheme) private var scheme
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 28
 
     let title: String
     let subtitle: String
@@ -90,7 +92,7 @@ struct AnchorScreenHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(AnchorTypography.screenTitle(scheme))
+                .font(.system(size: titleSize, weight: .bold, design: .default))
                 .foregroundStyle(Color.anchorText(scheme))
             Text(subtitle)
                 .font(.subheadline)
@@ -117,7 +119,7 @@ struct OnboardingPageShell<Content: View>: View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 10) {
                 Text(title)
-                    .font(.system(size: 26, weight: .bold))
+                    .font(AnchorTypography.screenTitle(scheme))
                     .foregroundStyle(Color.anchorText(scheme))
                 Text(subtitle)
                     .font(.body)

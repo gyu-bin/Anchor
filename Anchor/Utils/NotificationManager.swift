@@ -356,6 +356,59 @@ enum NotificationManager {
         return log.isFullyCompleted
     }
 
+    /// 매주 일요일 오전 9시 주간 요약
+    static func scheduleWeeklySummary() {
+        var comps = DateComponents()
+        comps.weekday = 1
+        comps.hour = 9
+        comps.minute = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
+        let content = UNMutableNotificationContent()
+        content.title = AppCopy.Notification.weeklyTitle
+        content.body = AppCopy.Notification.weeklyBodyPlaceholder
+        content.sound = .default
+        content.categoryIdentifier = weeklyCategoryId
+        content.userInfo = ["openHistory": true]
+
+        let request = UNNotificationRequest(
+            identifier: "weekly-summary",
+            content: content,
+            trigger: trigger
+        )
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    /// 앱 실행 시 이번 주 완료 일수로 주간 알림 문구 갱신
+    static func updateWeeklySummaryContent(fullDays: Int) {
+        guard NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium else { return }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["weekly-summary"])
+
+        var comps = DateComponents()
+        comps.weekday = 1
+        comps.hour = 9
+        comps.minute = 0
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
+        let content = UNMutableNotificationContent()
+        content.title = AppCopy.Notification.weeklyTitle
+        content.body = AppCopy.Notification.weeklyBody(days: fullDays)
+        content.sound = .default
+        content.categoryIdentifier = weeklyCategoryId
+        content.userInfo = ["openHistory": true]
+
+        let request = UNNotificationRequest(
+            identifier: "weekly-summary",
+            content: content,
+            trigger: trigger
+        )
+        UNUserNotificationCenter.current().add(request)
+    }
+}
+
+// MARK: - Daily closure (저녁·밤 알림)
+
+extension NotificationManager {
     /// 오늘 기준: 미완료면 저녁 알림, 전부 완료면 밤 격려 알림 예약
     static func refreshDailyClosureNotifications(modelContext: ModelContext) {
         guard NotificationPreferences.notificationsEnabled else {
@@ -512,54 +565,5 @@ enum NotificationManager {
             }
         }
         return true
-    }
-
-    /// 매주 일요일 오전 9시 주간 요약
-    static func scheduleWeeklySummary() {
-        var comps = DateComponents()
-        comps.weekday = 1
-        comps.hour = 9
-        comps.minute = 0
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
-        let content = UNMutableNotificationContent()
-        content.title = AppCopy.Notification.weeklyTitle
-        content.body = AppCopy.Notification.weeklyBodyPlaceholder
-        content.sound = .default
-        content.categoryIdentifier = weeklyCategoryId
-        content.userInfo = ["openHistory": true]
-
-        let request = UNNotificationRequest(
-            identifier: "weekly-summary",
-            content: content,
-            trigger: trigger
-        )
-        UNUserNotificationCenter.current().add(request)
-    }
-
-    /// 앱 실행 시 이번 주 완료 일수로 주간 알림 문구 갱신
-    static func updateWeeklySummaryContent(fullDays: Int) {
-        guard NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium else { return }
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["weekly-summary"])
-
-        var comps = DateComponents()
-        comps.weekday = 1
-        comps.hour = 9
-        comps.minute = 0
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
-        let content = UNMutableNotificationContent()
-        content.title = AppCopy.Notification.weeklyTitle
-        content.body = AppCopy.Notification.weeklyBody(days: fullDays)
-        content.sound = .default
-        content.categoryIdentifier = weeklyCategoryId
-        content.userInfo = ["openHistory": true]
-
-        let request = UNNotificationRequest(
-            identifier: "weekly-summary",
-            content: content,
-            trigger: trigger
-        )
-        UNUserNotificationCenter.current().add(request)
     }
 }

@@ -1,0 +1,56 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/BlockedAppsSection.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "권한",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 37
+        }
+      },
+      {
+        "comment": "",
+        "key": "Screen Time 권한 요청",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "앱 선택",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "앱 수정",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "차단할 앱 선택",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 52
+        }
+      },
+      {
+        "comment": "",
+        "key": "차단 앱 수정",
+        "location": {
+          "startingColumn": 84,
+          "startingLine": 52
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -115,7 +115,7 @@ struct AppGuideView: View {
             Spacer(minLength: 12)
 
             Text(AppCopy.Guide.howTitle)
-                .font(.system(size: 26, weight: .bold))
+                .font(AnchorTypography.screenTitle(scheme))
                 .foregroundStyle(Color.anchorText(scheme))
                 .padding(.horizontal, 24)
 
@@ -152,7 +152,7 @@ struct AppGuideView: View {
 
             VStack(spacing: 12) {
                 Text(AppCopy.Guide.screenTimeTitle)
-                    .font(.system(size: 26, weight: .bold))
+                    .font(AnchorTypography.screenTitle(scheme))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(Color.anchorText(scheme))
 
@@ -189,7 +189,7 @@ struct AppGuideView: View {
 
             VStack(spacing: 12) {
                 Text(AppCopy.Guide.startTitle)
-                    .font(.system(size: 26, weight: .bold))
+                    .font(AnchorTypography.screenTitle(scheme))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .foregroundStyle(Color.anchorText(scheme))
@@ -272,7 +272,7 @@ private struct GuideEmpathyPage: View {
             .clipShape(Capsule())
 
             Text(title)
-                .font(.system(size: 26, weight: .bold))
+                .font(AnchorTypography.screenTitle(scheme))
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
                 .foregroundStyle(Color.anchorText(scheme))

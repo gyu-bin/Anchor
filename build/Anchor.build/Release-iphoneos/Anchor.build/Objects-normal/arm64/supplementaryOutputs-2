@@ -1,0 +1,12 @@
+{
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Intents/AnchorAppIntents.swift" : {
+    "abi-baseline-json" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Keyring.abi.json",
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Anchor-primary.dia",
+    "objc-header" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Keyring-Swift.h",
+    "swiftdoc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Keyring.swiftdoc",
+    "swiftmodule" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Keyring.swiftmodule",
+    "swiftsourceinfo" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/Anchor.build/Objects-normal/arm64/Keyring.swiftsourceinfo"
+  }
+}

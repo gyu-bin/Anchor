@@ -9,10 +9,11 @@ import SwiftUI
 struct RoutineView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var tabRouter: TabRouter
+    @Environment(RoutineViewModel.self) private var routineVM
     @EnvironmentObject private var premium: PremiumStore
 
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
-    @StateObject private var vm = RoutineViewModel()
 
     @State private var editPayload: RoutineItemEditPayload?
     @State private var expandedRoutineIDs: Set<UUID> = []
@@ -20,66 +21,25 @@ struct RoutineView: View {
     @State private var paywallReason: PaywallReason?
 
     private var orderedRoutines: [Routine] {
-        vm.sortedRoutines(routines)
+        routineVM.sortedRoutines(routines)
     }
 
     var body: some View {
         NavigationStack {
-            Group {
-                if orderedRoutines.isEmpty {
-                    ScrollView {
-                        header
-                        emptyState
-                    }
-                } else {
-                    List {
-                        Section {
-                            header
-                                .listRowInsets(EdgeInsets())
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                        }
+            ScrollView {
+                VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
+                    header
 
-                        Section {
-                            ForEach(orderedRoutines, id: \.id) { routine in
-                                RoutineCardView(
-                                    routine: routine,
-                                    vm: vm,
-                                    allRoutines: routines,
-                                    editPayload: $editPayload,
-                                    paywallReason: $paywallReason,
-                                    isExpanded: Binding(
-                                        get: { expandedRoutineIDs.contains(routine.id) },
-                                        set: { expanded in
-                                            if expanded {
-                                                expandedRoutineIDs.insert(routine.id)
-                                            } else {
-                                                expandedRoutineIDs.remove(routine.id)
-                                            }
-                                        }
-                                    ),
-                                    focusNameOnAppear: focusNameRoutineID == routine.id,
-                                    onFinishEditing: {
-                                        if focusNameRoutineID == routine.id {
-                                            focusNameRoutineID = nil
-                                        }
-                                    }
-                                )
-                                .listRowInsets(EdgeInsets(
-                                    top: 6,
-                                    leading: AnchorLayout.screenHorizontal,
-                                    bottom: 6,
-                                    trailing: AnchorLayout.screenHorizontal
-                                ))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                            }
+                    if orderedRoutines.isEmpty {
+                        emptyState
+                    } else {
+                        ForEach(orderedRoutines, id: \.id) { routine in
+                            routineCard(for: routine)
+                                .padding(.horizontal, AnchorLayout.screenHorizontal)
                         }
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                    .contentMargins(.bottom, 36, for: .scrollContent)
                 }
+                .padding(.bottom, 36)
             }
             .anchorScreenBackground()
             .navigationBarTitleDisplayMode(.inline)
@@ -92,6 +52,14 @@ struct RoutineView: View {
             .sheet(item: $paywallReason) { reason in
                 PaywallSheet(reason: reason)
             }
+            .onAppear {
+                fulfillPendingCreateRoutine()
+            }
+            .onChange(of: tabRouter.selectedTab) { _, tab in
+                if tab == 1 {
+                    fulfillPendingCreateRoutine()
+                }
+            }
             .onChange(of: routines.map(\.id)) { _, _ in
                 expandedRoutineIDs = expandedRoutineIDs.filter { id in
                     routines.contains { $0.id == id }
@@ -100,8 +68,62 @@ struct RoutineView: View {
                    !routines.contains(where: { $0.id == focusID }) {
                     focusNameRoutineID = nil
                 }
-                Task { await ShieldManager.refresh(modelContext: modelContext) }
+                RoutineSync.afterMutation(modelContext: modelContext, refreshShield: false)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func routineCard(for routine: Routine) -> some View {
+        RoutineCardView(
+            routine: routine,
+            vm: routineVM,
+            allRoutines: routines,
+            editPayload: $editPayload,
+            paywallReason: $paywallReason,
+            isExpanded: Binding(
+                get: { expandedRoutineIDs.contains(routine.id) },
+                set: { expanded in
+                    if expanded {
+                        expandedRoutineIDs.insert(routine.id)
+                    } else {
+                        expandedRoutineIDs.remove(routine.id)
+                    }
+                }
+            ),
+            focusNameOnAppear: focusNameRoutineID == routine.id,
+            onFinishEditing: {
+                if focusNameRoutineID == routine.id {
+                    focusNameRoutineID = nil
+                }
+            }
+        )
+        .draggable(routine.id.uuidString) {
+            Image(systemName: "line.3.horizontal")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(Color.anchorSub(scheme))
+                .padding(8)
+                .background(Color.anchorSubBg(scheme))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .accessibilityLabel("순서 변경")
+        }
+        .dropDestination(for: String.self) { items, _ in
+            guard let dragged = items.first,
+                  let draggedID = UUID(uuidString: dragged),
+                  draggedID != routine.id,
+                  let fromIdx = orderedRoutines.firstIndex(where: { $0.id == draggedID }),
+                  let toIdx = orderedRoutines.firstIndex(where: { $0.id == routine.id }) else {
+                return false
+            }
+            withAnimation(AnchorMotion.spring()) {
+                routineVM.moveRoutine(
+                    from: IndexSet(integer: fromIdx),
+                    to: toIdx > fromIdx ? toIdx + 1 : toIdx,
+                    routines: routines,
+                    context: modelContext
+                )
+            }
+            return true
         }
     }
 
@@ -124,6 +146,7 @@ struct RoutineView: View {
                     .background(Color.anchorAccent(scheme))
                     .clipShape(Circle())
             }
+            .accessibilityLabel("새 루틴 추가")
             .padding(.top, 6)
         }
         .padding(.horizontal, AnchorLayout.screenHorizontal)
@@ -131,37 +154,33 @@ struct RoutineView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            VStack(spacing: 8) {
-                Text(AppCopy.Routine.emptyTitle)
-                    .font(.title3.bold())
-                    .foregroundStyle(Color.anchorText(scheme))
-                Text(AppCopy.Routine.emptyBody)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.anchorSub(scheme))
-                    .multilineTextAlignment(.center)
-            }
-
-            Button(AppCopy.Routine.emptyAction) {
-                addNewRoutine()
-            }
-            .buttonStyle(AnchorButtonStyle())
-            .padding(.horizontal, 32)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
+        AnchorEmptyState(
+            icon: "list.bullet.rectangle",
+            title: AppCopy.Routine.emptyTitle,
+            message: AppCopy.Routine.emptyBody,
+            actionTitle: AppCopy.Routine.emptyAction,
+            action: addNewRoutine
+        )
         .padding(.horizontal, AnchorLayout.screenHorizontal)
     }
 
+    private func fulfillPendingCreateRoutine() {
+        guard tabRouter.consumePendingCreateRoutine() else { return }
+        Task { @MainActor in
+            await Task.yield()
+            addNewRoutine()
+        }
+    }
+
     private func addNewRoutine() {
-        let routine = vm.addRoutine(
+        let routine = routineVM.addRoutine(
             name: "새 루틴",
             schedule: RoutineScheduleDraft(),
             context: modelContext,
             routines: routines
         )
         focusNameRoutineID = routine.id
-        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+        withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
             expandedRoutineIDs = [routine.id]
         }
     }
@@ -169,6 +188,8 @@ struct RoutineView: View {
 
 #Preview {
     RoutineView()
+        .environmentObject(TabRouter())
+        .environment(RoutineViewModel())
         .environmentObject(PremiumStore())
         .modelContainer(PreviewData.container)
 }

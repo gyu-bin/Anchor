@@ -1,0 +1,72 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/LockStatusWidget.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "잠금 상태",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "루틴으로 앱이 잠겨 있을 때 잠금 화면에 표시해요.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "앱 잠금 중",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "잠금 없음",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 89
+        }
+      },
+      {
+        "comment": "",
+        "key": "앱 잠금 중",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 107
+        }
+      },
+      {
+        "comment": "",
+        "key": "루틴을 마치면 풀려요",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "잠금 없음",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "지금은 자유롭게 쓸 수 있어요",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 121
+        }
+      }
+    ]
+  },
+  "version": 1
+}

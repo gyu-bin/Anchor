@@ -44,6 +44,9 @@ struct RoutineItemRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(item.name)
+        .accessibilityHint(isCompleted ? "완료됨. 다시 탭하면 취소" : "탭하여 완료")
+        .accessibilityAddTraits(isCompleted ? [.isSelected] : [])
     }
 
     private var iconBackground: Color {

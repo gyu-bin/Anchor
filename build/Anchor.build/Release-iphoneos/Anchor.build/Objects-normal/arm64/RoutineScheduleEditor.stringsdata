@@ -1,0 +1,40 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineScheduleEditor.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "마감 30분 전 알림 · 미완료 시 3회까지 즉시 해제, 이후 30분 뒤 해제",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "종료 시간 설정",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "종료 시간",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "반복할 요일을 선택하세요",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 69
+        }
+      }
+    ]
+  },
+  "version": 1
+}

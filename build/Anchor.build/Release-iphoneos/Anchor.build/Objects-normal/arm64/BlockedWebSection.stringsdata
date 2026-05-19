@@ -1,0 +1,72 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/BlockedWebSection.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "사이트 선택",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "사이트 수정",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "차단할 웹사이트 선택",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "차단 웹사이트 수정",
+        "location": {
+          "startingColumn": 96,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "도메인",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "추가",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 76
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ 삭제",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 105
+        }
+      }
+    ]
+  },
+  "version": 1
+}

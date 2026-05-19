@@ -51,6 +51,7 @@ enum AppCopy {
         static let restDayBody = "오늘은 잠금 없이 쉬어 가도 괜찮아요.\n연속 기록은 그대로 이어져요."
         static let undoMessage = "방금 체크를 되돌릴까요?"
         static let undoAction = "되돌리기"
+        static let toggleFailed = "잠시 문제가 생겼어요. 다시 시도해 주세요"
     }
 
     enum Guide {
@@ -124,8 +125,19 @@ enum AppCopy {
         static let emptyAction = "루틴 추가"
         static let addSheetTitle = "새 루틴"
         static let namePlaceholder = "예: 아침 루틴"
-        static let noItems = "항목을 하나만 추가해 주세요"
-        static let addItem = "항목 추가"
+        static let todosSection = "할일"
+        static let noItems = "할 일을 하나만 추가해 주세요"
+        static let addTodo = "할일 추가"
+        static let addTodoSheetTitle = "할일 추가"
+        static let editTodoSheetTitle = "할일 편집"
+        static let todoNamePlaceholder = "할 일 이름"
+        static let scheduleTimeSection = "반복 · 시간"
+        static let blockSection = "앱 · 웹 잠금"
+        static let blockSectionHint = "미완료일 때 선택한 앱·사이트를 잠가요"
+        static let endTimeToggle = "종료 시간 설정"
+        static let endTimeLabel = "종료 시간"
+        static let endTimeNote = "마감 30분 전 알림 · 미완료 시 3회까지 즉시 해제, 이후 30분 뒤 해제"
+        static let routineNameLabel = "루틴 이름"
         static let lockActive = "앱 잠금 중"
         static let lockScheduled = "시작 후 잠김"
         static func lockUnlocksAt(_ time: String) -> String { "잠금 \(time)에 해제" }
@@ -204,8 +216,14 @@ enum AppCopy {
         static let back = "이전"
         static let later = "다음에 할게요"
         static let cancel = "취소"
+        static let apply = "적용"
         static let save = "저장"
         static let add = "추가"
+    }
+
+    enum Error {
+        static let saveFailed = "저장에 실패했어요. 다시 시도해 주세요"
+        static let permissionFailed = "권한 요청에 실패했어요. 설정 앱에서 허용해 주세요"
     }
 
     enum Onboarding {

@@ -6,34 +6,56 @@
 import SwiftUI
 
 struct AnchorButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) private var scheme
+    @ScaledMetric(relativeTo: .body) private var minHeight: CGFloat = 52
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 17, weight: .semibold))
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 52)
+            .frame(minHeight: minHeight)
             .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color.anchorAccent(.light))
+                RoundedRectangle(cornerRadius: AnchorLayout.buttonRadius, style: .continuous)
+                    .fill(Color.anchorAccent(scheme))
             )
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .opacity(configuration.isPressed ? 0.92 : 1)
-            .animation(.spring(response: 0.26, dampingFraction: 0.72), value: configuration.isPressed)
+            .animation(AnchorMotion.spring(response: 0.26, dampingFraction: 0.72), value: configuration.isPressed)
+    }
+}
+
+struct AnchorTextButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) private var scheme
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(Color.anchorAccent(scheme))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color.anchorHighlight(scheme))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .opacity(configuration.isPressed ? 0.88 : 1)
+            .animation(AnchorMotion.spring(response: 0.24, dampingFraction: 0.8), value: configuration.isPressed)
     }
 }
 
 struct AnchorSecondaryButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) private var scheme
+    @ScaledMetric(relativeTo: .body) private var minHeight: CGFloat = 52
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 17, weight: .medium))
-            .foregroundStyle(Color.anchorText(.light))
+            .foregroundStyle(Color.anchorText(scheme))
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 52)
-            .background(Color.anchorSubBg(.light))
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .frame(minHeight: minHeight)
+            .background(Color.anchorSubBg(scheme))
+            .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.buttonRadius, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(Color.anchorBorder(.light), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AnchorLayout.buttonRadius, style: .continuous)
+                    .strokeBorder(Color.anchorBorder(scheme), lineWidth: 1)
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(response: 0.26, dampingFraction: 0.72), value: configuration.isPressed)

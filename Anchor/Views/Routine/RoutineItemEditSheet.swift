@@ -18,7 +18,7 @@ struct RoutineItemEditSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let payload: RoutineItemEditPayload
-    @StateObject private var vm = RoutineViewModel()
+    @Environment(RoutineViewModel.self) private var routineVM
 
     @State private var name: String
     @State private var icon: String
@@ -35,7 +35,7 @@ struct RoutineItemEditSheet: View {
         NavigationStack {
             Form {
                 Section("이름") {
-                    TextField("루틴 항목 이름", text: $name)
+                    TextField(AppCopy.Routine.todoNamePlaceholder, text: $name)
                 }
 
                 Section("예상 시간") {
@@ -77,7 +77,7 @@ struct RoutineItemEditSheet: View {
             }
             .scrollContentBackground(.hidden)
             .background(Color.anchorBg(scheme))
-            .navigationTitle(payload.item == nil ? "항목 추가" : "항목 편집")
+            .navigationTitle(payload.item == nil ? AppCopy.Routine.addTodoSheetTitle : AppCopy.Routine.editTodoSheetTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -99,7 +99,7 @@ struct RoutineItemEditSheet: View {
     private func save() {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if let item = payload.item {
-            vm.updateItem(
+            routineVM.updateItem(
                 item,
                 name: trimmed,
                 icon: icon,
@@ -107,7 +107,7 @@ struct RoutineItemEditSheet: View {
                 context: modelContext
             )
         } else {
-            vm.addItem(
+            routineVM.addItem(
                 to: payload.routine,
                 name: trimmed,
                 icon: icon,

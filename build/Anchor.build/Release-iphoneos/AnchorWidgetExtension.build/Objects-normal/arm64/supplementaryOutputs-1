@@ -1,0 +1,12 @@
+{
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/AnchorWidgetBundle.swift" : {
+    "abi-baseline-json" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension.abi.json",
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-primary.dia",
+    "objc-header" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension-Swift.h",
+    "swiftdoc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension.swiftdoc",
+    "swiftmodule" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension.swiftmodule",
+    "swiftsourceinfo" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/Anchor.build/Release-iphoneos/AnchorWidgetExtension.build/Objects-normal/arm64/AnchorWidgetExtension.swiftsourceinfo"
+  }
+}

@@ -12,10 +12,6 @@ struct RoutineScheduleEditor: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(AppCopy.Routine.scheduleSection)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.anchorSub(scheme))
-
             Picker(AppCopy.Routine.scheduleSection, selection: $draft.kind) {
                 ForEach(RoutineScheduleKind.allCases) { kind in
                     Text(kind.title).tag(kind)
@@ -32,6 +28,7 @@ struct RoutineScheduleEditor: View {
             case .daily:
                 Text(AppCopy.Routine.ScheduleKind.dailyNote)
                     .font(.caption)
+                    .lineSpacing(2)
                     .foregroundStyle(Color.anchorSub(scheme))
             case .weekdays:
                 weekdayPicker
@@ -39,25 +36,41 @@ struct RoutineScheduleEditor: View {
                 onceSection
             }
 
-            DatePicker(
-                AppCopy.Routine.startTimeLabel,
-                selection: $draft.startTime,
-                displayedComponents: .hourAndMinute
-            )
-            .environment(\.locale, Locale(identifier: "ko_KR"))
-
-            Toggle("종료 시간 설정", isOn: $draft.hasEndTime)
-
-            if draft.hasEndTime {
+            RoutineFormInsetGroup {
                 DatePicker(
-                    "종료 시간",
-                    selection: $draft.endTime,
+                    AppCopy.Routine.startTimeLabel,
+                    selection: $draft.startTime,
                     displayedComponents: .hourAndMinute
                 )
                 .environment(\.locale, Locale(identifier: "ko_KR"))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
 
-                Text("마감 30분 전 알림 · 미완료 시 3회까지 즉시 해제, 이후 30분 뒤 해제")
+                RoutineFormDivider()
+
+                Toggle(AppCopy.Routine.endTimeToggle, isOn: $draft.hasEndTime)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .tint(Color.anchorAccent(scheme))
+
+                if draft.hasEndTime {
+                    RoutineFormDivider()
+
+                    DatePicker(
+                        AppCopy.Routine.endTimeLabel,
+                        selection: $draft.endTime,
+                        displayedComponents: .hourAndMinute
+                    )
+                    .environment(\.locale, Locale(identifier: "ko_KR"))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                }
+            }
+
+            if draft.hasEndTime {
+                Text(AppCopy.Routine.endTimeNote)
                     .font(.caption)
+                    .lineSpacing(2)
                     .foregroundStyle(Color.anchorSub(scheme))
             }
         }
@@ -107,6 +120,7 @@ struct RoutineScheduleEditor: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(AppCopy.Routine.ScheduleKind.onceNote)
                 .font(.caption)
+                .lineSpacing(2)
                 .foregroundStyle(Color.anchorSub(scheme))
             DatePicker(
                 AppCopy.Routine.onceDateLabel,

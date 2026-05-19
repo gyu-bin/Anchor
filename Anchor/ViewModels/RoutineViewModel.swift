@@ -3,13 +3,14 @@
 //  Anchor
 //
 
-import Combine
 import Foundation
+import Observation
 import SwiftData
 import SwiftUI
 
 @MainActor
-final class RoutineViewModel: ObservableObject {
+@Observable
+final class RoutineViewModel {
     static let iconChoices: [String] = [
         "book", "figure.run", "brain.head.profile", "pencil",
         "music.note", "cup.and.saucer", "heart", "moon",
@@ -42,7 +43,7 @@ final class RoutineViewModel: ObservableObject {
         RoutineSchedule.apply(schedule, to: r)
         context.insert(r)
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
         return r
     }
 
@@ -50,13 +51,13 @@ final class RoutineViewModel: ObservableObject {
         guard draft.kind != .weekdays || !draft.activeWeekdays.isEmpty else { return }
         RoutineSchedule.apply(draft, to: routine)
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
     }
 
     func deleteRoutine(_ routine: Routine, context: ModelContext) {
         context.delete(routine)
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
     }
 
     func addItem(
@@ -71,7 +72,7 @@ final class RoutineViewModel: ObservableObject {
         context.insert(item)
         routine.items.append(item)
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
     }
 
     func updateItem(
@@ -85,7 +86,7 @@ final class RoutineViewModel: ObservableObject {
         item.icon = icon
         item.duration = max(0, duration)
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
     }
 
     @discardableResult
@@ -99,7 +100,7 @@ final class RoutineViewModel: ObservableObject {
             startTime: source.startTime,
             order: nextOrder(in: routines),
             blockedApps: source.blockedApps,
-            blockedWebs: source.blockedWebs,
+            blockedWebs: source.resolvedBlockedWebs(in: context),
             shieldSelectionData: source.shieldSelectionData,
             scheduleKindRaw: source.scheduleKindRaw,
             activeWeekdays: source.activeWeekdays,
@@ -118,14 +119,14 @@ final class RoutineViewModel: ObservableObject {
             copy.items.append(newItem)
         }
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
         return copy
     }
 
     func deleteItem(_ item: RoutineItem, context: ModelContext) {
         context.delete(item)
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
     }
 
     func deleteItems(at offsets: IndexSet, in routine: Routine, context: ModelContext) {
@@ -134,7 +135,7 @@ final class RoutineViewModel: ObservableObject {
             context.delete(sorted[index])
         }
         try? context.save()
-        try? NotificationManager.rescheduleAll(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context)
     }
 
     func moveItem(from source: IndexSet, to destination: Int, in routine: Routine, context: ModelContext) {
@@ -153,6 +154,7 @@ final class RoutineViewModel: ObservableObject {
             routine.order = index
         }
         try? context.save()
+        RoutineSync.afterMutation(modelContext: context, refreshShield: false)
     }
 
     func normalizeDomain(_ raw: String) -> String {
@@ -167,13 +169,15 @@ final class RoutineViewModel: ObservableObject {
     func addBlockedWeb(_ domain: String, to routine: Routine, context: ModelContext) {
         let d = normalizeDomain(domain)
         guard !d.isEmpty else { return }
-        if routine.blockedWebs.contains(d) { return }
+        if routine.resolvedBlockedWebs(in: context).contains(d) { return }
         routine.blockedWebs.append(d)
         try? context.save()
+        RoutineSync.afterMutation(modelContext: context)
     }
 
     func removeBlockedWeb(_ domain: String, from routine: Routine, context: ModelContext) {
         routine.blockedWebs.removeAll { $0 == domain }
         try? context.save()
+        RoutineSync.afterMutation(modelContext: context)
     }
 }
