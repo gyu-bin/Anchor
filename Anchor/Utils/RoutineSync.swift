@@ -13,11 +13,16 @@ enum RoutineSync {
         modelContext: ModelContext,
         refreshShield: Bool = true
     ) {
-        try? NotificationManager.rescheduleAll(modelContext: modelContext)
         let descriptor = FetchDescriptor<Routine>(sortBy: [SortDescriptor(\.order)])
         let routines = (try? modelContext.fetch(descriptor)) ?? []
+        let todayVM = TodayViewModel()
+        todayVM.reconcileTodayState(routines: routines, context: modelContext)
+        try? modelContext.save()
+
+        try? NotificationManager.rescheduleAll(modelContext: modelContext)
         WidgetSync.refresh(modelContext: modelContext, routines: routines)
         NotificationManager.refreshDailyClosureNotifications(modelContext: modelContext)
+        WidgetDataStore.reloadWidgetsImmediately()
         if refreshShield {
             Task { await ShieldManager.refresh(modelContext: modelContext) }
         }

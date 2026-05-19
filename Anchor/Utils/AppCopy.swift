@@ -258,11 +258,12 @@ enum AppCopy {
         static let reasonItem = "항목을 더 추가하려면 전체 기능이 필요해요."
         static let reasonApp = "막을 앱을 더 선택하려면 전체 기능을 열어 주세요."
         static let reasonWeb = "웹 차단을 더 쓰려면 전체 기능을 열어 주세요."
-        static let reasonHistory = "30일이 넘은 기록을 보려면 전체 기능을 열어 주세요."
+        static let reasonHistory = "이번 달이 아닌 기록을 보려면 전체 기능을 열어 주세요."
         static let reasonWeekly = "주간 요약 알림은 전체 기능에서 쓸 수 있어요."
         static let reasonGeneral = "루틴·잠금·기록 제한 없이 쓰실 수 있어요."
         static let freeTierTitle = "지금 무료로 쓰는 것"
-        static let freeTierSummary = "루틴 3개 · 항목 5개 · 앱 8개 · 웹 3개 · 기록 30일"
+        static let freeTierSummary =
+            "루틴 \(PremiumLimits.maxFreeRoutines)개 · 항목 \(PremiumLimits.maxItemsPerRoutine)개 · 앱 \(PremiumLimits.maxAppsPerRoutine)개 · 웹 \(PremiumLimits.maxWebDomainsPerRoutine)개 · 기록 이번 달"
         static let benefits = [
             "루틴·항목 무제한",
             "앱·웹 차단 무제한",
@@ -278,7 +279,7 @@ enum AppCopy {
         static let settingsUnlocked = "전체 기능을 쓰고 있어요"
         static let settingsLocked = "1회 결제로 제한 없이"
         static let settingsOpen = "전체 기능 열기"
-        static let historyBanner = "30일이 지난 기록은 전체 기능에서 볼 수 있어요."
+        static let historyBanner = "지난달부터의 기록은 전체 기능에서 볼 수 있어요."
         static let weeklyLocked = "전체 기능"
         static let productUnavailable = "결제 정보를 불러오지 못했어요. Xcode에서 Scheme → Run → StoreKit Configuration이 Products.storekit인지 확인한 뒤 앱을 다시 실행해 주세요."
         static let loadingProduct = "결제 정보를 불러오는 중이에요…"

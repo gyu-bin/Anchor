@@ -1,0 +1,16 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Routine/RoutineScheduleEditor.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "반복할 요일을 선택하세요",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 82
+        }
+      }
+    ]
+  },
+  "version": 1
+}

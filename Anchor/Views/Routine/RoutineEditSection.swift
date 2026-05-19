@@ -43,14 +43,7 @@ struct RoutineEditSection<Content: View>: View {
 
             content
         }
-        .padding(AnchorLayout.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.anchorCard(scheme))
-        .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.cardRadius, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: AnchorLayout.cardRadius, style: .continuous)
-                .strokeBorder(Color.anchorBorder(scheme).opacity(0.55), lineWidth: 1)
-        )
     }
 }
 

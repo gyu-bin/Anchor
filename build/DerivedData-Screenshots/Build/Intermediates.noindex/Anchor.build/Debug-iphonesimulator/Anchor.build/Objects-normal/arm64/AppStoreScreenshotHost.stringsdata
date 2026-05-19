@@ -1,0 +1,40 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/AppStore/AppStoreScreenshotHost.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "오늘",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "루틴",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "기록",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "설정",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 64
+        }
+      }
+    ]
+  },
+  "version": 1
+}

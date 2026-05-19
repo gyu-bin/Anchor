@@ -24,6 +24,13 @@ enum HistoryDayRoutineStatus {
     case upcoming
 }
 
+struct HistoryDayItemEntry: Identifiable {
+    let id: UUID
+    let name: String
+    let icon: String
+    let isCompleted: Bool
+}
+
 struct HistoryDayRoutineRow: Identifiable {
     let id: UUID
     let name: String
@@ -32,6 +39,7 @@ struct HistoryDayRoutineRow: Identifiable {
     let completedCount: Int
     let totalCount: Int
     let status: HistoryDayRoutineStatus
+    let items: [HistoryDayItemEntry]
 }
 
 struct HistoryDaySnapshot {
@@ -108,7 +116,8 @@ struct HistoryDaySnapshot {
     ) -> HistoryDayRoutineRow {
         let dayLogs = logs.filter { calendar.isDate($0.date, inSameDayAs: day) }
         let log = dayLogs.first { $0.routineId == routine.id }
-        let completed = log?.completedItems.count ?? 0
+        let routineItemIds = Set(routine.items.map { $0.id })
+        let completed = log?.completedItems.filter { routineItemIds.contains($0) }.count ?? 0
         let total = routine.items.count
 
         let timeDF = DateFormatter()
@@ -134,6 +143,16 @@ struct HistoryDaySnapshot {
             status = .waiting
         }
 
+        let sortedItems = routine.items.sorted { $0.order < $1.order }
+        let itemEntries = sortedItems.map { item in
+            HistoryDayItemEntry(
+                id: item.id,
+                name: item.name,
+                icon: item.icon,
+                isCompleted: log?.completedItems.contains(item.id) ?? false
+            )
+        }
+
         return HistoryDayRoutineRow(
             id: routine.id,
             name: routine.name,
@@ -141,7 +160,8 @@ struct HistoryDaySnapshot {
             subtitle: subtitle,
             completedCount: completed,
             totalCount: total,
-            status: status
+            status: status,
+            items: itemEntries
         )
     }
 
@@ -171,6 +191,8 @@ struct HistoryDayDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let snapshot: HistoryDaySnapshot
+
+    @State private var expandedRoutineId: UUID? = nil
 
     var body: some View {
         NavigationStack {
@@ -288,45 +310,106 @@ struct HistoryDayDetailSheet: View {
     }
 
     private func routineRowView(_ row: HistoryDayRoutineRow) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.anchorSubBg(scheme))
-                    .frame(width: 40, height: 40)
-                Image(systemName: row.icon)
-                    .font(.system(size: 17, weight: .medium))
-                    .foregroundStyle(Color.anchorText(scheme))
+        let isExpanded = expandedRoutineId == row.id
+
+        return VStack(spacing: 0) {
+            Button {
+                withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
+                    expandedRoutineId = isExpanded ? nil : row.id
+                }
+            } label: {
+                HStack(alignment: .top, spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color.anchorSubBg(scheme))
+                            .frame(width: 40, height: 40)
+                        Image(systemName: row.icon)
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundStyle(Color.anchorText(scheme))
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(row.name)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color.anchorText(scheme))
+
+                        Text(row.subtitle)
+                            .font(.caption)
+                            .foregroundStyle(Color.anchorSub(scheme))
+                            .lineLimit(2)
+
+                        if row.totalCount > 0, row.status == .partial || row.status == .waiting {
+                            Text(AppCopy.History.routineProgress(completed: row.completedCount, total: row.totalCount))
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(Color.anchorSub(scheme))
+                        }
+                    }
+
+                    Spacer(minLength: 8)
+
+                    HStack(spacing: 6) {
+                        if !row.items.isEmpty {
+                            Image(systemName: "chevron.down")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.anchorSub(scheme))
+                                .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        }
+
+                        Text(statusText(for: row.status))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(statusForeground(for: row.status))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(statusBackground(for: row.status))
+                            .clipShape(Capsule())
+                    }
+                }
+                .padding(.horizontal, AnchorLayout.cardPadding)
+                .padding(.vertical, 12)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(row.name)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Color.anchorText(scheme))
+            if isExpanded && !row.items.isEmpty {
+                Divider()
+                    .padding(.leading, 52)
 
-                Text(row.subtitle)
-                    .font(.caption)
-                    .foregroundStyle(Color.anchorSub(scheme))
-                    .lineLimit(2)
+                VStack(spacing: 0) {
+                    ForEach(row.items) { item in
+                        HStack(spacing: 12) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(item.isCompleted ? Color.anchorAccent(scheme).opacity(0.14) : Color.anchorHighlight(scheme))
+                                    .frame(width: 32, height: 32)
+                                Image(systemName: item.icon)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(Color.anchorAccent(scheme))
+                            }
 
-                if row.totalCount > 0, row.status == .partial || row.status == .waiting {
-                    Text(AppCopy.History.routineProgress(completed: row.completedCount, total: row.totalCount))
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(Color.anchorSub(scheme))
+                            Text(item.name)
+                                .font(.subheadline)
+                                .foregroundStyle(item.isCompleted ? Color.anchorSub(scheme) : Color.anchorText(scheme))
+                                .strikethrough(item.isCompleted, color: Color.anchorSub(scheme).opacity(0.5))
+
+                            Spacer(minLength: 0)
+
+                            Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                .font(.system(size: 18))
+                                .foregroundStyle(
+                                    item.isCompleted ? Color.anchorSuccess(scheme) : Color.anchorSub(scheme).opacity(0.3)
+                                )
+                        }
+                        .padding(.horizontal, AnchorLayout.cardPadding)
+                        .padding(.vertical, 10)
+
+                        if item.id != row.items.last?.id {
+                            Divider()
+                                .padding(.leading, 52)
+                        }
+                    }
                 }
             }
-
-            Spacer(minLength: 8)
-
-            Text(statusText(for: row.status))
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(statusForeground(for: row.status))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(statusBackground(for: row.status))
-                .clipShape(Capsule())
         }
-        .padding(.horizontal, AnchorLayout.cardPadding)
-        .padding(.vertical, 12)
     }
 
     private func statusText(for status: HistoryDayRoutineStatus) -> String {

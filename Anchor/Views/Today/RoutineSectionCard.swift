@@ -44,6 +44,26 @@ struct RoutineSectionCard: View {
         return text
     }
 
+    private var startTimeText: String {
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "ko_KR")
+        df.dateFormat = "a h:mm"
+        return df.string(from: routine.startTime)
+    }
+
+    private var isBeforeStartTime: Bool {
+        let cal = Calendar.current
+        let now = Date.now
+        let comps = cal.dateComponents([.hour, .minute], from: routine.startTime)
+        guard let todayStart = cal.date(
+            bySettingHour: comps.hour ?? 0,
+            minute: comps.minute ?? 0,
+            second: 0,
+            of: now
+        ) else { return false }
+        return now < todayStart
+    }
+
     var body: some View {
         AnchorCard {
             VStack(alignment: .leading, spacing: 0) {
@@ -55,6 +75,11 @@ struct RoutineSectionCard: View {
                         Text(progressSubtitle)
                             .font(.subheadline)
                             .foregroundStyle(Color.anchorSub(scheme))
+                        if !isFullyDone && isBeforeStartTime {
+                            Text("\(startTimeText)에 시작해요")
+                                .font(.caption)
+                                .foregroundStyle(Color.anchorSub(scheme).opacity(0.8))
+                        }
                     }
                     Spacer()
                     if isFullyDone {

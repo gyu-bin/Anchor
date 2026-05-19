@@ -118,7 +118,7 @@ struct RoutineCardView: View {
 
     @ViewBuilder
     private var expandedContent: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 0) {
             RoutineEditSection(title: AppCopy.Routine.routineNameLabel, systemImage: "pencil") {
                 TextField(AppCopy.Routine.namePlaceholder, text: $editingName)
                     .font(.body)
@@ -143,6 +143,8 @@ struct RoutineCardView: View {
                     }
             }
 
+            sectionDivider
+
             RoutineEditSection(
                 title: AppCopy.Routine.scheduleTimeSection,
                 systemImage: "calendar"
@@ -158,7 +160,11 @@ struct RoutineCardView: View {
                     }
             }
 
+            sectionDivider
+
             todosSection
+
+            sectionDivider
 
             RoutineEditSection(
                 title: AppCopy.Routine.blockSection,
@@ -172,7 +178,24 @@ struct RoutineCardView: View {
                     BlockedWebSection(routine: routine, paywallReason: $paywallReason)
                 }
             }
+
+            Button {
+                finishEditing()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark")
+                    Text("완료")
+                }
+            }
+            .buttonStyle(AnchorButtonStyle())
+            .padding(.top, 20)
         }
+    }
+
+    private var sectionDivider: some View {
+        Divider()
+            .overlay(Color.anchorBorder(scheme).opacity(0.4))
+            .padding(.vertical, 14)
     }
 
     @ViewBuilder

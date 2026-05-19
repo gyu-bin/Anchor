@@ -1,0 +1,24 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/History/WeeklyBarChart.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "요일",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 30
+        }
+      },
+      {
+        "comment": "",
+        "key": "진행",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 31
+        }
+      }
+    ]
+  },
+  "version": 1
+}

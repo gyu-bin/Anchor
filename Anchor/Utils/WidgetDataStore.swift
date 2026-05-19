@@ -10,6 +10,8 @@ import WidgetKit
 
 enum WidgetDataStore {
     static let progressKey = "widget.progressPercent"
+    static let completedItemsKey = "widget.completedItemCount"
+    static let totalItemsKey = "widget.totalItemCount"
     static let nextItemKey = "widget.nextItemName"
     static let nextRoutineKey = "widget.nextRoutineName"
     static let lockActiveKey = "widget.lockActive"
@@ -19,28 +21,43 @@ enum WidgetDataStore {
 
     static func publish(
         progressPercent: Int,
-        nextItemName: String?,
-        nextRoutineName: String?,
+        completedItemCount: Int,
+        totalItemCount: Int,
+        remainingItems: [WidgetPendingItem],
         isLockActive: Bool,
         lockRoutineName: String?
     ) {
+        let suite = SharedShieldStore.suite
         let clamped = min(100, max(0, progressPercent))
-        SharedShieldStore.suite?.set(clamped, forKey: progressKey)
-        SharedShieldStore.suite?.set(nextItemName, forKey: nextItemKey)
-        SharedShieldStore.suite?.set(nextRoutineName, forKey: nextRoutineKey)
-        SharedShieldStore.suite?.set(isLockActive, forKey: lockActiveKey)
-        SharedShieldStore.suite?.set(lockRoutineName, forKey: lockRoutineKey)
+        suite?.set(clamped, forKey: progressKey)
+        suite?.set(completedItemCount, forKey: completedItemsKey)
+        suite?.set(totalItemCount, forKey: totalItemsKey)
+        if let data = WidgetPendingItemCodec.encode(remainingItems) {
+            suite?.set(data, forKey: WidgetPendingItemCodec.storageKey)
+        } else {
+            suite?.removeObject(forKey: WidgetPendingItemCodec.storageKey)
+        }
+        let first = remainingItems.first
+        suite?.set(first?.itemName, forKey: nextItemKey)
+        suite?.set(first?.routineName, forKey: nextRoutineKey)
+        suite?.set(isLockActive, forKey: lockActiveKey)
+        suite?.set(lockRoutineName, forKey: lockRoutineKey)
+        reloadWidgetsImmediately()
+    }
+
+    static func reloadWidgetsImmediately() {
         #if canImport(WidgetKit)
         WidgetCenter.shared.reloadTimelines(ofKind: todayProgressKind)
         WidgetCenter.shared.reloadTimelines(ofKind: lockStatusKind)
         #endif
     }
 
-    static func read() -> (progress: Int, nextItem: String?, nextRoutine: String?) {
+    static func read() -> (progress: Int, completed: Int, total: Int, nextItem: String?, nextRoutine: String?) {
         let suite = SharedShieldStore.suite
-        let progress = suite?.integer(forKey: progressKey) ?? 0
         return (
-            progress,
+            suite?.integer(forKey: progressKey) ?? 0,
+            suite?.integer(forKey: completedItemsKey) ?? 0,
+            suite?.integer(forKey: totalItemsKey) ?? 0,
             suite?.string(forKey: nextItemKey),
             suite?.string(forKey: nextRoutineKey)
         )

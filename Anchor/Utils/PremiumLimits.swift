@@ -12,9 +12,8 @@ enum PremiumLimits {
 
     static let maxFreeRoutines = 3
     static let maxItemsPerRoutine = 5
-    static let maxAppsPerRoutine = 8
+    static let maxAppsPerRoutine = 5
     static let maxWebDomainsPerRoutine = 3
-    static let freeHistoryDays = 30
 
     static func canAddRoutine(currentCount: Int, isPremium: Bool) -> Bool {
         isPremium || currentCount < maxFreeRoutines
@@ -32,14 +31,37 @@ enum PremiumLimits {
         isPremium || currentCount < maxWebDomainsPerRoutine
     }
 
-    static func historyCutoffDate(calendar: Calendar = .current) -> Date {
-        let today = calendar.startOfDay(for: Date())
-        return calendar.date(byAdding: .day, value: -freeHistoryDays, to: today) ?? today
+    /// 무료 기록 조회 시작일 — 이번 달 1일 0시
+    static func currentMonthStart(calendar: Calendar = .current, now: Date = Date()) -> Date {
+        let comps = calendar.dateComponents([.year, .month], from: now)
+        return calendar.date(from: comps) ?? calendar.startOfDay(for: now)
     }
 
-    static func includesHistoryDate(_ date: Date, isPremium: Bool, calendar: Calendar = .current) -> Bool {
+    static func historyCutoffDate(calendar: Calendar = .current, now: Date = Date()) -> Date {
+        currentMonthStart(calendar: calendar, now: now)
+    }
+
+    static func includesHistoryDate(
+        _ date: Date,
+        isPremium: Bool,
+        calendar: Calendar = .current,
+        now: Date = Date()
+    ) -> Bool {
         if isPremium { return true }
-        return calendar.startOfDay(for: date) >= historyCutoffDate(calendar: calendar)
+        return calendar.startOfDay(for: date) >= historyCutoffDate(calendar: calendar, now: now)
+    }
+
+    /// 달력에서 보여 주는 달이 무료 범위인지 (이번 달만)
+    static func includesHistoryMonth(
+        _ monthStart: Date,
+        isPremium: Bool,
+        calendar: Calendar = .current,
+        now: Date = Date()
+    ) -> Bool {
+        if isPremium { return true }
+        let shown = calendar.dateComponents([.year, .month], from: monthStart)
+        let current = calendar.dateComponents([.year, .month], from: now)
+        return shown.year == current.year && shown.month == current.month
     }
 }
 

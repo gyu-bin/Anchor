@@ -147,8 +147,10 @@ struct TodayView: View {
                 syncAfterTodayChange()
             }
             .onChange(of: routines.map(\.id)) { _, _ in
-                refreshCompletionBannerState()
-                syncAfterTodayChange()
+                applyRoutineListChange()
+            }
+            .onChange(of: routines.map(\.items.count)) { _, _ in
+                applyRoutineListChange()
             }
             .sheet(isPresented: $showCompletionSheet) {
                 completionSheet
@@ -316,8 +318,22 @@ struct TodayView: View {
         wasAllComplete = allDone
     }
 
+    private func applyRoutineListChange() {
+        vm.reconcileTodayState(routines: sortedRoutines, context: modelContext)
+        try? modelContext.save()
+
+        let allDone = (try? vm.allRoutinesFullyCompletedToday(routines: routines, context: modelContext)) ?? false
+        if allDone && !wasAllComplete {
+            showCompletionSheet = true
+        }
+        wasAllComplete = allDone
+        syncAfterTodayChange()
+    }
+
     private func syncAfterTodayChange() {
-        RoutineSync.afterMutation(modelContext: modelContext)
+        try? modelContext.save()
+        RoutineSync.afterMutation(modelContext: modelContext, refreshShield: true)
+        WidgetDataStore.reloadWidgetsImmediately()
         let fullDays = HistoryAnalytics.weekFullDaysCount(
             logs: (try? modelContext.fetch(FetchDescriptor<DailyLog>())) ?? [],
             routines: routines.filter { !$0.items.isEmpty },

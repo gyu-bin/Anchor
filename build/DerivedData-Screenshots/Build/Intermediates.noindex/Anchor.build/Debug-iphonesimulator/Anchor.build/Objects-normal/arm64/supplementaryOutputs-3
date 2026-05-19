@@ -1,0 +1,72 @@
+{
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/Extensions.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/Extensions.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/Extensions.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/Extensions.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/Extensions.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/Extensions.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/HistoryAnalytics.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/HistoryAnalytics.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/HistoryAnalytics.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/HistoryAnalytics.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/HistoryAnalytics.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/HistoryAnalytics.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/NotificationManager.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationManager.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationManager.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationManager.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationManager.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationManager.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/NotificationPreferences.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationPreferences.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationPreferences.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationPreferences.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationPreferences.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/NotificationPreferences.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/PremiumLimits.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumLimits.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumLimits.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumLimits.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumLimits.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumLimits.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/PremiumStore.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumStore.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumStore.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumStore.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumStore.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PremiumStore.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/PreviewData.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PreviewData.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PreviewData.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PreviewData.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PreviewData.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/PreviewData.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/RestDayStore.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RestDayStore.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RestDayStore.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RestDayStore.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RestDayStore.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RestDayStore.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/RoutineDeadline.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDeadline.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDeadline.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDeadline.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDeadline.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDeadline.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Utils/RoutineDuration.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDuration.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDuration.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDuration.dia",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDuration.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/Anchor.build/Objects-normal/arm64/RoutineDuration.swiftdeps"
+  }
+}

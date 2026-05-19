@@ -167,9 +167,14 @@ enum RoutineSchedule {
         return calendar.startOfDay(for: Date())
     }
 
+    static let weekdaySet: Set<Int> = [2, 3, 4, 5, 6]
+    static let weekendSet: Set<Int> = [1, 7]
+
     static func weekdaySummary(_ weekdays: [Int]) -> String {
         let set = Set(weekdays)
         if set == allWeekdays { return AppCopy.Routine.repeatsDaily }
+        if set == weekdaySet   { return "평일" }
+        if set == weekendSet   { return "주말" }
         let labels = weekdayOptions
             .filter { set.contains($0.0) }
             .map(\.1)

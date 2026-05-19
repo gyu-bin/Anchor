@@ -1,0 +1,64 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/TodayProgressWidget.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "오늘 루틴",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "진행률과 다음 할 일을 보여줘요.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "오늘",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 86
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 89
+        }
+      },
+      {
+        "comment": "",
+        "key": "오늘",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "다음",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 108
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,73 @@
+{
+  "buildCommand" : {
+    "command" : "build",
+    "skipDependencies" : false,
+    "style" : "buildOnly"
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "05cbdcfc8589dc6c6d594869402e3aa67d0dad4d65a1d7d09875cd04815ab2bd"
+    }
+  ],
+  "containerPath" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor.xcodeproj",
+  "continueBuildingAfterErrors" : false,
+  "dependencyScope" : "workspace",
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "arm64",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : false,
+      "hostTargetedPlatform" : null,
+      "platform" : "iphonesimulator",
+      "sdk" : "iphonesimulator26.5",
+      "sdkVariant" : "iphonesimulator",
+      "supportedArchitectures" : [
+        "arm64"
+      ],
+      "targetArchitecture" : "arm64"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex",
+      "buildProductsPath" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Products",
+      "derivedDataPath" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots",
+      "indexDataStoreFolderPath" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Index.noindex/PrecompiledHeaders",
+      "pchPath" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/PrecompiledHeaders"
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "commandLine" : {
+        "table" : {
+
+        }
+      },
+      "synthesized" : {
+        "table" : {
+          "ACTION" : "build",
+          "ASSETCATALOG_FILTER_FOR_DEVICE_MODEL" : "iPhone18,2",
+          "ASSETCATALOG_FILTER_FOR_DEVICE_OS_VERSION" : "26.5",
+          "ASSETCATALOG_FILTER_FOR_THINNING_DEVICE_CONFIGURATION" : "iPhone18,2",
+          "BUILD_ACTIVE_RESOURCES_ONLY" : "YES",
+          "CLANG_COVERAGE_MAPPING" : "YES",
+          "CLANG_PROFILE_DATA_DIRECTORY" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/ProfileData",
+          "ENABLE_PREVIEWS" : "NO",
+          "ENABLE_XOJIT_PREVIEWS" : "YES",
+          "ONLY_ACTIVE_ARCH" : "YES",
+          "TARGET_DEVICE_IDENTIFIER" : "4250FC5A-A939-4CD7-BC19-286594CA9FB6",
+          "TARGET_DEVICE_MODEL" : "iPhone18,2",
+          "TARGET_DEVICE_OS_VERSION" : "26.5",
+          "TARGET_DEVICE_PLATFORM_NAME" : "iphonesimulator"
+        }
+      }
+    }
+  },
+  "schemeCommand" : "launch",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : false,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

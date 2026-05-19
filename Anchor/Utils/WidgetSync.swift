@@ -8,48 +8,57 @@ import SwiftData
 
 @MainActor
 enum WidgetSync {
+    /// 오늘 할 일(항목) 기준 진행률 — 앱 「N개 / M개 했어요」와 동일
     static func refresh(modelContext: ModelContext, routines: [Routine]) {
         let vm = TodayViewModel()
-        let withItems = vm.routinesForToday(routines)
-        let actionable = vm.actionableRoutinesForToday(routines)
+        let withItems = vm.actionableRoutinesForToday(routines)
         let isLockActive = ShieldManager.isAnyActivelyLocking(
-            routines: actionable,
+            routines: withItems,
             modelContext: modelContext
         )
-        let lockRoutine = actionable.first {
+        let lockRoutine = withItems.first {
             ShieldManager.isActivelyLocking(routine: $0, modelContext: modelContext)
         }
 
         guard !withItems.isEmpty else {
             WidgetDataStore.publish(
                 progressPercent: 0,
-                nextItemName: nil,
-                nextRoutineName: nil,
+                completedItemCount: 0,
+                totalItemCount: 0,
+                remainingItems: [],
                 isLockActive: isLockActive,
                 lockRoutineName: isLockActive ? lockRoutine?.name : nil
             )
             return
         }
 
-        var completedRoutines = 0
-        var nextItem: RoutineItem?
-        var nextRoutine: Routine?
+        var totalItems = 0
+        var completedItems = 0
+        var remaining: [WidgetPendingItem] = []
 
         for routine in withItems {
+            let items = vm.sortedItems(for: routine)
+            totalItems += items.count
             guard let log = try? vm.todayLog(for: routine, context: modelContext) else { continue }
-            if log.isFullyCompleted {
-                completedRoutines += 1
-            } else if nextItem == nil, let item = vm.firstIncompleteItem(routine: routine, log: log) {
-                nextItem = item
-                nextRoutine = routine
+            for item in items where !log.completedItems.contains(item.id) {
+                remaining.append(WidgetPendingItem(
+                    itemName: item.name,
+                    routineName: routine.name,
+                    icon: item.icon
+                ))
             }
+            completedItems += items.filter { log.completedItems.contains($0.id) }.count
         }
 
-        let progress = Int((Double(completedRoutines) / Double(withItems.count) * 100).rounded())
+        let progress = totalItems == 0
+            ? 0
+            : Int((Double(completedItems) / Double(totalItems) * 100).rounded())
+
         WidgetDataStore.publish(
             progressPercent: progress,
-            nextItemName: nextItem?.name,
-            nextRoutineName: nextRoutine?.name,
+            completedItemCount: completedItems,
+            totalItemCount: totalItems,
+            remainingItems: remaining,
             isLockActive: isLockActive,
             lockRoutineName: isLockActive ? lockRoutine?.name : nil
         )

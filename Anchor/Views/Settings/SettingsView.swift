@@ -72,20 +72,24 @@ struct SettingsView: View {
 
                                     SettingsInsetDivider()
 
-                                    Toggle(AppCopy.Settings.reminder, isOn: $reminderEnabled)
-                                        .padding(.horizontal, AnchorLayout.cardPadding)
-                                        .padding(.vertical, 12)
-
-                                    if reminderEnabled {
-                                        SettingsInsetDivider()
-                                        Picker(AppCopy.Settings.reminderDelay, selection: $reminderOffsetMinutes) {
-                                            ForEach(NotificationPreferences.reminderOffsetChoices, id: \.minutes) { choice in
-                                                Text(choice.label).tag(choice.minutes)
+                                    HStack {
+                                        Text(AppCopy.Settings.reminder)
+                                        Spacer()
+                                        if reminderEnabled {
+                                            Picker("", selection: $reminderOffsetMinutes) {
+                                                ForEach(NotificationPreferences.reminderOffsetChoices, id: \.minutes) { choice in
+                                                    Text(choice.label).tag(choice.minutes)
+                                                }
                                             }
+                                            .labelsHidden()
+                                            .pickerStyle(.menu)
                                         }
-                                        .padding(.horizontal, AnchorLayout.cardPadding)
-                                        .padding(.vertical, 10)
+                                        Toggle("", isOn: $reminderEnabled)
+                                            .labelsHidden()
+                                            .fixedSize()
                                     }
+                                    .padding(.horizontal, AnchorLayout.cardPadding)
+                                    .padding(.vertical, 12)
 
                                     SettingsInsetDivider()
                                     weeklySummaryRow

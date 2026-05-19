@@ -9,16 +9,19 @@ import Testing
 @testable import Keyring
 
 struct PremiumAndScheduleTests {
-  @Test func historyCutoff_excludesDatesOlderThanFreeWindow() {
+  @Test func history_freeTier_includesOnlyCurrentMonth() {
     let cal = Calendar.current
-    let today = cal.startOfDay(for: Date())
-    let recent = cal.date(byAdding: .day, value: -5, to: today)!
-    let tooOld = cal.date(byAdding: .day, value: -31, to: today)!
+    let now = cal.startOfDay(for: Date())
+    let monthStart = PremiumLimits.currentMonthStart(calendar: cal, now: now)
+    let lastMonth = cal.date(byAdding: .month, value: -1, to: monthStart)!
 
-    #expect(PremiumLimits.includesHistoryDate(today, isPremium: false, calendar: cal))
-    #expect(PremiumLimits.includesHistoryDate(recent, isPremium: false, calendar: cal))
-    #expect(!PremiumLimits.includesHistoryDate(tooOld, isPremium: false, calendar: cal))
-    #expect(PremiumLimits.includesHistoryDate(tooOld, isPremium: true, calendar: cal))
+    #expect(PremiumLimits.includesHistoryDate(now, isPremium: false, calendar: cal, now: now))
+    #expect(PremiumLimits.includesHistoryDate(monthStart, isPremium: false, calendar: cal, now: now))
+    #expect(!PremiumLimits.includesHistoryDate(lastMonth, isPremium: false, calendar: cal, now: now))
+    #expect(PremiumLimits.includesHistoryDate(lastMonth, isPremium: true, calendar: cal, now: now))
+
+    #expect(PremiumLimits.includesHistoryMonth(monthStart, isPremium: false, calendar: cal, now: now))
+    #expect(!PremiumLimits.includesHistoryMonth(lastMonth, isPremium: false, calendar: cal, now: now))
   }
 
   @MainActor

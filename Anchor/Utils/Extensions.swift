@@ -42,6 +42,20 @@ extension Date {
     }
 }
 
+extension Collection where Element: Encodable {
+    /// ApplicationToken / WebDomainToken 등 FamilyControls 불투명 토큰을 안정적 순서로 정렬.
+    /// String(describing:)은 메모리 주소를 포함할 수 있어 매 렌더마다 순서가 바뀌므로
+    /// plist 인코딩 바이트로 비교해 결정론적 순서를 보장한다.
+    func stableSorted() -> [Element] {
+        let encoder = PropertyListEncoder()
+        return sorted { a, b in
+            let da = (try? encoder.encode(a)) ?? Data()
+            let db = (try? encoder.encode(b)) ?? Data()
+            return da.lexicographicallyPrecedes(db)
+        }
+    }
+}
+
 extension Notification.Name {
     static let anchorOpenTodayTab = Notification.Name("anchorOpenTodayTab")
     static let anchorOpenHistoryTab = Notification.Name("anchorOpenHistoryTab")

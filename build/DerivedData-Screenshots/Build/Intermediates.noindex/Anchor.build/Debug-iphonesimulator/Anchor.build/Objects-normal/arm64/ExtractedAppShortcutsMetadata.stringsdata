@@ -1,0 +1,56 @@
+{
+  "version" : 2,
+  "source" : "\/Users\/mungyubin\/Desktop\/Code\/Anchor\/Anchor\/Anchor\/Intents\/AnchorAppIntents.swift",
+  "tables" : {
+    "AppShortcuts" : [
+      {
+        "location" : {
+          "startingLine" : 42,
+          "startingColumn" : 0
+        },
+        "key" : "${applicationName} 오늘",
+        "values" : [
+          "${applicationName} 오늘",
+          "오늘 루틴 in ${applicationName}"
+        ],
+        "appShortcutMetadata" : [
+          {
+            "parameterTypes" : {
+
+            },
+            "parameterDisplayRepresentations" : {
+
+            },
+            "actionIdentifier" : "OpenTodayIntent",
+            "title" : "오늘 루틴 열기",
+            "index" : 0
+          }
+        ]
+      },
+      {
+        "location" : {
+          "startingLine" : 42,
+          "startingColumn" : 0
+        },
+        "key" : "${applicationName} 다음 항목",
+        "values" : [
+          "${applicationName} 다음 항목",
+          "다음 루틴 완료 in ${applicationName}"
+        ],
+        "appShortcutMetadata" : [
+          {
+            "parameterTypes" : {
+
+            },
+            "parameterDisplayRepresentations" : {
+
+            },
+            "actionIdentifier" : "CompleteNextItemIntent",
+            "title" : "다음 항목 완료",
+            "index" : 1
+          }
+        ]
+      }
+    ]
+  }
+}

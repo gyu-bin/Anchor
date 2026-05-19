@@ -1,0 +1,16 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/History/HistoryView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "탭하여 프리미엄 안내 보기",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 155
+        }
+      }
+    ]
+  },
+  "version": 1
+}

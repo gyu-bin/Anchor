@@ -50,30 +50,18 @@ struct RoutineItemRow: View {
     }
 
     private var iconBackground: Color {
-        if isCompleted {
-            return Color.anchorAccent(scheme).opacity(0.14)
-        }
-        if isCurrent {
-            return Color.anchorHighlight(scheme)
-        }
-        return Color.anchorSubBg(scheme)
+        isCompleted
+            ? Color.anchorAccent(scheme).opacity(0.14)
+            : Color.anchorHighlight(scheme)
     }
 
     private var iconForeground: Color {
-        if isCompleted || isCurrent {
-            return Color.anchorAccent(scheme)
-        }
-        return Color.anchorSub(scheme)
+        isCompleted ? Color.anchorAccent(scheme) : Color.anchorAccent(scheme)
     }
 
-    @ViewBuilder
     private var rowBackground: some View {
-        if isCurrent {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.anchorHighlight(scheme))
-                .padding(.horizontal, 8)
-        } else {
-            Color.clear
-        }
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(Color.anchorSubBg(scheme))
+            .padding(.horizontal, 8)
     }
 }

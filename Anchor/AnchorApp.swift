@@ -14,9 +14,13 @@ struct AnchorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppRootView()
-                .environmentObject(tabRouter)
-                .environmentObject(premiumStore)
+            if let exportScreen = AppStoreScreenshotLaunch.screen {
+                AppStoreScreenshotExportView(screen: exportScreen)
+            } else {
+                AppRootView()
+                    .environmentObject(tabRouter)
+                    .environmentObject(premiumStore)
+            }
         }
     }
 }

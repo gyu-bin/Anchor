@@ -57,7 +57,13 @@ struct HistoryView: View {
             .anchorScreenBackground()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
-            .onAppear { refreshWeeklyNotification() }
+            .onAppear {
+                clampDisplayedMonthForFreeTier()
+                refreshWeeklyNotification()
+            }
+            .onChange(of: premium.isPremium) { _, _ in
+                clampDisplayedMonthForFreeTier()
+            }
             .sheet(item: $paywallReason) { reason in
                 PaywallSheet(reason: reason)
             }
@@ -86,6 +92,16 @@ struct HistoryView: View {
                 .foregroundStyle(Color.anchorText(scheme))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(AnchorLayout.cardPadding)
+        }
+    }
+
+    private func clampDisplayedMonthForFreeTier() {
+        guard !premium.isPremium else { return }
+        let cal = Calendar.current
+        let shown = cal.date(from: cal.dateComponents([.year, .month], from: displayedMonth)) ?? displayedMonth
+        let currentStart = PremiumLimits.currentMonthStart(calendar: cal)
+        if shown < currentStart {
+            displayedMonth = Date()
         }
     }
 
@@ -168,14 +184,6 @@ struct HistoryView: View {
             }
             metricTile(title: AppCopy.History.monthRate, value: "\(rate)", unit: "%", icon: "chart.pie.fill")
         }
-    }
-
-    /// `effectiveLogs` 기준 가장 오래된 달의 1일 (없으면 nil)
-    private var earliestHistoryMonthStart: Date? {
-        guard let oldest = effectiveLogs.map(\.date).min() else { return nil }
-        let cal = Calendar.current
-        let comps = cal.dateComponents([.year, .month], from: oldest)
-        return cal.date(from: comps)
     }
 
     private func metricTile(title: String, value: String, unit: String, icon: String) -> some View {
@@ -310,14 +318,18 @@ struct HistoryView: View {
             return y < ny || (y == ny && m < nm)
         }()
 
+        let isCurrentMonth = comps.year == nowComps.year && comps.month == nowComps.month
+
+        /// 무료: 이전 달 화살표는 보이되 탭 시 결제 안내. 유료: 이번 달 이전 과거로 이동 가능
         let canGoBackward: Bool = {
-            guard let earliest = earliestHistoryMonthStart,
-                  let prev = cal.date(byAdding: .month, value: -1, to: monthStart) else { return false }
-            let prevComps = cal.dateComponents([.year, .month], from: prev)
-            let earliestComps = cal.dateComponents([.year, .month], from: earliest)
-            guard let py = prevComps.year, let pm = prevComps.month,
-                  let ey = earliestComps.year, let em = earliestComps.month else { return false }
-            return py > ey || (py == ey && pm >= em)
+            if premium.isPremium {
+                guard let prev = cal.date(byAdding: .month, value: -1, to: monthStart) else { return false }
+                let prevComps = cal.dateComponents([.year, .month], from: prev)
+                guard let py = prevComps.year, let pm = prevComps.month,
+                      let ny = nowComps.year, let nm = nowComps.month else { return false }
+                return py < ny || (py == ny && pm <= nm)
+            }
+            return isCurrentMonth
         }()
 
         var statuses: [Int: WeekdayCompletion] = [:]
@@ -336,6 +348,10 @@ struct HistoryView: View {
                 canGoBackward: canGoBackward,
                 canGoForward: canGoForward,
                 onPreviousMonth: {
+                    if !premium.isPremium {
+                        paywallReason = .history
+                        return
+                    }
                     guard canGoBackward,
                           let prev = cal.date(byAdding: .month, value: -1, to: monthStart) else { return }
                     displayedMonth = prev

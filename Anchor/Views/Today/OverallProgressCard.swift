@@ -19,8 +19,12 @@ struct OverallProgressCard: View {
     }
 
     private var completedRoutines: Int {
-        let ids = Set(routinesWithItems.map(\.id))
-        return logs.filter { ids.contains($0.routineId) && $0.isFullyCompleted }.count
+        routinesWithItems.filter { routine in
+            guard let log = logs.first(where: { $0.routineId == routine.id }) else { return false }
+            let allIds = Set(routine.items.map(\.id))
+            guard !allIds.isEmpty else { return false }
+            return allIds.isSubset(of: Set(log.completedItems))
+        }.count
     }
 
     private var totalRoutines: Int {

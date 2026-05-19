@@ -1,0 +1,6 @@
+Target dependency graph (3 targets)
+Target 'Anchor' in project 'Anchor'
+➜ Explicit dependency on target 'AnchorDeviceActivityMonitor' in project 'Anchor'
+➜ Explicit dependency on target 'AnchorWidgetExtension' in project 'Anchor'
+Target 'AnchorWidgetExtension' in project 'Anchor' (no dependencies)
+Target 'AnchorDeviceActivityMonitor' in project 'Anchor' (no dependencies)

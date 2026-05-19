@@ -12,6 +12,7 @@ struct RoutineView: View {
     @EnvironmentObject private var tabRouter: TabRouter
     @Environment(RoutineViewModel.self) private var routineVM
     @EnvironmentObject private var premium: PremiumStore
+    @Environment(\.appStoreScreenshotExpandedRoutines) private var screenshotExpandedRoutines
 
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
 
@@ -53,6 +54,9 @@ struct RoutineView: View {
                 PaywallSheet(reason: reason)
             }
             .onAppear {
+                if let ids = screenshotExpandedRoutines, !ids.isEmpty, expandedRoutineIDs.isEmpty {
+                    expandedRoutineIDs = ids
+                }
                 fulfillPendingCreateRoutine()
             }
             .onChange(of: tabRouter.selectedTab) { _, tab in

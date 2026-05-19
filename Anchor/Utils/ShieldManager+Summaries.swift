@@ -64,8 +64,8 @@ extension ShieldManager {
         let webs = started && keepShield ? selection.webDomainTokens : []
 
         return BlockedShieldSummary(
-            appTokens: Array(apps).sorted { String(describing: $0) < String(describing: $1) },
-            webTokens: Array(webs).sorted { String(describing: $0) < String(describing: $1) },
+            appTokens: Array(apps).stableSorted(),
+            webTokens: Array(webs).stableSorted(),
             webDomains: started && keepShield ? routine.resolvedBlockedWebs(in: modelContext) : []
         )
     }
@@ -88,8 +88,8 @@ extension ShieldManager {
         }
         let selection = decodeSelection(routine.shieldSelectionData)
         return BlockedShieldSummary(
-            appTokens: Array(selection.applicationTokens).sorted { String(describing: $0) < String(describing: $1) },
-            webTokens: Array(selection.webDomainTokens).sorted { String(describing: $0) < String(describing: $1) },
+            appTokens: Array(selection.applicationTokens).stableSorted(),
+            webTokens: Array(selection.webDomainTokens).stableSorted(),
             webDomains: routine.resolvedBlockedWebs(in: modelContext)
         )
     }
@@ -109,8 +109,8 @@ extension ShieldManager {
         }
 
         return BlockedShieldSummary(
-            appTokens: apps.sorted { String(describing: $0) < String(describing: $1) },
-            webTokens: webs.sorted { String(describing: $0) < String(describing: $1) },
+            appTokens: apps.stableSorted(),
+            webTokens: webs.stableSorted(),
             webDomains: domains
         )
     }
@@ -133,8 +133,8 @@ extension ShieldManager {
         }
 
         return BlockedShieldSummary(
-            appTokens: apps.sorted { String(describing: $0) < String(describing: $1) },
-            webTokens: webs.sorted { String(describing: $0) < String(describing: $1) },
+            appTokens: apps.stableSorted(),
+            webTokens: webs.stableSorted(),
             webDomains: domains
         )
     }
@@ -167,7 +167,7 @@ extension ShieldManager {
             ) else { continue }
             tokens.formUnion(decodeSelection(routine.shieldSelectionData).applicationTokens)
         }
-        return tokens.sorted { String(describing: $0) < String(describing: $1) }
+        return tokens.stableSorted()
     }
 
     static func activeBlockedWebDomainTokens(
@@ -194,7 +194,7 @@ extension ShieldManager {
             ) else { continue }
             tokens.formUnion(decodeSelection(routine.shieldSelectionData).webDomainTokens)
         }
-        return tokens.sorted { String(describing: $0) < String(describing: $1) }
+        return tokens.stableSorted()
     }
 
     static func activeBlockedWebDomainStrings(
