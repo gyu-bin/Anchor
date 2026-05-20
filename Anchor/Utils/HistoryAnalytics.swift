@@ -138,9 +138,16 @@ enum HistoryAnalytics {
 
     static func streak(logs: [DailyLog], routines: [Routine], cal: Calendar) -> Int {
         guard !routines.isEmpty else { return 0 }
+
+        let today = cal.startOfDay(for: Date())
+        // 루틴 생성일 중 가장 이른 날 이전으로는 탐색하지 않음 (무한 루프 방지)
+        let earliest = routines
+            .map { RoutineSchedule.effectiveCreatedDay(for: $0, logs: logs, calendar: cal) }
+            .min() ?? today
+
         var count = 0
-        var day = cal.startOfDay(for: Date())
-        while true {
+        var day = today
+        while day >= earliest {
             let scheduled = RoutineSchedule.scheduledRoutines(routines, on: day, calendar: cal)
             let status: WeekdayCompletion
             if scheduled.isEmpty {

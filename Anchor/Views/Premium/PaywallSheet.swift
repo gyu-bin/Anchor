@@ -58,10 +58,11 @@ struct PaywallSheet: View {
                     }
 
                     if premium.productLoadFailed, premium.product == nil, !premium.isLoading {
-                        VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 10) {
                             Text(AppCopy.Premium.productUnavailable)
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.anchorSub(scheme))
+                            Spacer(minLength: 0)
                             Button(AppCopy.Premium.retryLoad) {
                                 Task { await premium.ensureProductLoaded() }
                             }
@@ -73,7 +74,7 @@ struct PaywallSheet: View {
                     if let error = premium.errorMessage {
                         Text(error)
                             .font(.caption)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.anchorSub(scheme))
                     }
 
                     Button {
