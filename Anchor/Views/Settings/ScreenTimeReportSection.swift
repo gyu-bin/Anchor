@@ -8,7 +8,8 @@ import FamilyControls
 import SwiftUI
 
 extension DeviceActivityReport.Context {
-    static let totalActivity = Self("Total Activity")
+    static let totalToday = Self("Total Activity Today")
+    static let totalWeek  = Self("Total Activity This Week")
 }
 
 enum ScreenTimePeriod: String, CaseIterable, Identifiable {
@@ -56,7 +57,10 @@ struct ScreenTimeReportSection: View {
     }
 
     private var reportContext: DeviceActivityReport.Context {
-        .totalActivity
+        switch period {
+        case .today:    return .totalToday
+        case .thisWeek: return .totalWeek
+        }
     }
 
     var body: some View {
@@ -73,7 +77,7 @@ struct ScreenTimeReportSection: View {
                     .padding(.top, 4)
 
                     DeviceActivityReport(reportContext, filter: filter(for: period))
-                        .frame(minHeight: period == .today ? 120 : 160)
+                        .frame(minHeight: 200)
                         .id(period)
 
                     Text(AppCopy.Settings.screenTimeFootnote)

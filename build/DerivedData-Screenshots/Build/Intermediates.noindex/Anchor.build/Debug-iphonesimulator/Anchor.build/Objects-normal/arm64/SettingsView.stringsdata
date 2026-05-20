@@ -7,7 +7,7 @@
         "key": "",
         "location": {
           "startingColumn": 52,
-          "startingLine": 82
+          "startingLine": 85
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "",
         "location": {
           "startingColumn": 48,
-          "startingLine": 90
+          "startingLine": 93
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "스크린타임",
         "location": {
           "startingColumn": 42,
-          "startingLine": 194
+          "startingLine": 197
         }
       }
     ]

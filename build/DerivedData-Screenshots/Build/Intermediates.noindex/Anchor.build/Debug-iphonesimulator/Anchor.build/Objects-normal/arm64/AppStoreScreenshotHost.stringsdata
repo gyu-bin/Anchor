@@ -6,32 +6,32 @@
         "comment": "",
         "key": "오늘",
         "location": {
-          "startingColumn": 34,
-          "startingLine": 65
+          "startingColumn": 42,
+          "startingLine": 74
         }
       },
       {
         "comment": "",
         "key": "루틴",
         "location": {
-          "startingColumn": 34,
-          "startingLine": 69
+          "startingColumn": 42,
+          "startingLine": 78
         }
       },
       {
         "comment": "",
         "key": "기록",
         "location": {
-          "startingColumn": 34,
-          "startingLine": 74
+          "startingColumn": 42,
+          "startingLine": 83
         }
       },
       {
         "comment": "",
         "key": "설정",
         "location": {
-          "startingColumn": 34,
-          "startingLine": 78
+          "startingColumn": 42,
+          "startingLine": 87
         }
       }
     ]

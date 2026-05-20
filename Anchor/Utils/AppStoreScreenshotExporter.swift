@@ -51,6 +51,47 @@ enum AppStoreScreenshotExporter {
         return ExportResult(directory: outDir, files: written)
     }
 
+    @MainActor
+    static func export(
+        screens: [AppStoreScreenshotHost.Screen],
+        to directory: URL
+    ) throws -> ExportResult {
+        let wasPremium = PremiumStorage.isPremium
+        PremiumStorage.setPremium(true)
+        UserDefaults.standard.set(true, forKey: AppGuideStorage.hasSeenGuideKey)
+        defer { PremiumStorage.setPremium(wasPremium) }
+
+        let seed = try AppStoreScreenshotData.makeSeed()
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+
+        var written: [URL] = []
+        for screen in screens {
+            let expanded: Set<UUID> = screen == .routine ? [seed.primaryRoutineID] : []
+            let view = AppStoreScreenshotHost(screen: screen, expandedRoutineIDs: expanded)
+                .modelContainer(seed.container)
+                .frame(
+                    width: AppStoreScreenshotData.exportWidth,
+                    height: AppStoreScreenshotData.exportHeight
+                )
+
+            let renderer = ImageRenderer(content: view)
+            renderer.scale = AppStoreScreenshotData.exportScale
+            renderer.isOpaque = true
+
+            guard let image = renderer.uiImage,
+                  let data = image.pngData()
+            else {
+                throw ExportError.renderFailed(screen.rawValue)
+            }
+
+            let url = directory.appendingPathComponent("\(screen.rawValue).png")
+            try data.write(to: url, options: .atomic)
+            written.append(url)
+        }
+
+        return ExportResult(directory: directory, files: written)
+    }
+
     /// 시뮬레이터 앱 Documents — `simctl get_app_container`로 Mac에 복사합니다.
     static func simulatorDocumentsOutputDirectory() -> URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!

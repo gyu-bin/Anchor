@@ -7,7 +7,7 @@
         "key": "%@ 후 잠금",
         "location": {
           "startingColumn": 34,
-          "startingLine": 122
+          "startingLine": 123
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "지금 잠금",
         "location": {
           "startingColumn": 36,
-          "startingLine": 126
+          "startingLine": 127
         }
       }
     ]

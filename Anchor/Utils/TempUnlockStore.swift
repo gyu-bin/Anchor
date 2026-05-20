@@ -29,8 +29,16 @@ enum TempUnlockStore {
         return max(0, Int(exp.timeIntervalSinceNow))
     }
 
+    private static let usedTodayKey = "tempUnlock.usedDate"
+
+    static var hasBeenUsedToday: Bool {
+        guard let date = defaults?.object(forKey: usedTodayKey) as? Date else { return false }
+        return Calendar.current.isDateInToday(date)
+    }
+
     static func activate(minutes: Int = 10) {
         expiresAt = Date().addingTimeInterval(TimeInterval(minutes * 60))
+        defaults?.set(Date(), forKey: usedTodayKey)
     }
 
     static func deactivate() {

@@ -45,36 +45,38 @@ struct ScreenTimeSummary {
 private enum ScreenTimeAggregation {
     static func buildSummary(
         from data: DeviceActivityResults<DeviceActivityData>,
-        periodLabel: String
+        periodLabel: String,
+        multiDay: Bool = false
     ) async -> ScreenTimeSummary {
         var perSource: [TimeInterval] = []
         var appSeconds: [Application: TimeInterval] = [:]
 
         for await activityData in data {
-            var durations: [TimeInterval] = []
+            var segmentDurations: [TimeInterval] = []
             for await segment in activityData.activitySegments {
-                durations.append(segment.totalActivityDuration)
+                segmentDurations.append(segment.totalActivityDuration)
                 for await category in segment.categories {
                     for await app in category.applications {
                         appSeconds[app.application, default: 0] += app.totalActivityDuration
                     }
                 }
             }
-            guard !durations.isEmpty else { continue }
+            guard !segmentDurations.isEmpty else { continue }
 
-            let sum = durations.reduce(0, +)
-            let peak = durations.max() ?? 0
             let contribution: TimeInterval
-            if durations.count == 1 {
-                contribution = peak
-            } else if sum > peak * 1.6 {
-                contribution = peak
+            if multiDay {
+                // 주간: 일별 세그먼트 합산
+                contribution = segmentDurations.reduce(0, +)
             } else {
-                contribution = sum
+                // 오늘: 여러 소스 중복 제거 (가장 큰 값 사용)
+                let sum = segmentDurations.reduce(0, +)
+                let peak = segmentDurations.max() ?? 0
+                contribution = (segmentDurations.count == 1 || sum <= peak * 1.6) ? sum : peak
             }
             perSource.append(contribution)
         }
 
+        // 여러 기기/유저 소스가 있을 때 최대값 선택 (중복 방지)
         let totalSeconds = perSource.max() ?? 0
         let apps = appSeconds
             .compactMap { application, seconds -> AppScreenTimeRow? in
@@ -113,6 +115,6 @@ struct WeekActivityReport: DeviceActivityReportScene {
     let content: (ScreenTimeSummary) -> TotalActivityView
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ScreenTimeSummary {
-        await ScreenTimeAggregation.buildSummary(from: data, periodLabel: "이번 주")
+        await ScreenTimeAggregation.buildSummary(from: data, periodLabel: "이번 주", multiDay: true)
     }
 }

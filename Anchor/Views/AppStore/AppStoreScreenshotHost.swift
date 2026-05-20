@@ -11,6 +11,8 @@ struct AppStoreScreenshotHost: View {
     enum Screen: String, CaseIterable {
         case today
         case routine
+        case guideMorning
+        case guideEvening
         case guideRelief
         case guideHow
         case history
@@ -18,6 +20,7 @@ struct AppStoreScreenshotHost: View {
         case settings
         case paywall
         case guideNotification
+        case guideStart
         case splash
     }
 
@@ -38,12 +41,18 @@ struct AppStoreScreenshotHost: View {
     var body: some View {
         Group {
             switch screen {
+            case .guideMorning:
+                AppGuideView(initialPage: 0, onFinish: {})
+            case .guideEvening:
+                AppGuideView(initialPage: 1, onFinish: {})
             case .guideRelief:
                 AppGuideView(initialPage: 2, onFinish: {})
             case .guideHow:
                 AppGuideView(initialPage: 3, onFinish: {})
             case .guideNotification:
                 AppGuideView(initialPage: 5, onFinish: {})
+            case .guideStart:
+                AppGuideView(initialPage: 6, onFinish: {})
             case .paywall:
                 PaywallSheet(reason: .general)
                     .environmentObject(premiumStore)
@@ -62,20 +71,20 @@ struct AppStoreScreenshotHost: View {
     private var tabShell: some View {
         TabView(selection: $selectedTab) {
             TodayView()
-                .tabItem { Label("오늘", systemImage: "sun.max.fill") }
+                .tabItem { SwiftUI.Label("오늘", systemImage: "sun.max.fill") }
                 .tag(0)
 
             RoutineView()
-                .tabItem { Label("루틴", systemImage: "list.bullet.rectangle.fill") }
+                .tabItem { SwiftUI.Label("루틴", systemImage: "list.bullet.rectangle.fill") }
                 .tag(1)
                 .environment(\.appStoreScreenshotExpandedRoutines, expandedRoutineIDs)
 
             HistoryView()
-                .tabItem { Label("기록", systemImage: "chart.bar.fill") }
+                .tabItem { SwiftUI.Label("기록", systemImage: "chart.bar.fill") }
                 .tag(2)
 
             SettingsView()
-                .tabItem { Label("설정", systemImage: "gearshape.fill") }
+                .tabItem { SwiftUI.Label("설정", systemImage: "gearshape.fill") }
                 .tag(3)
                 .environment(
                     \.appStoreScreenshotExpandScreenTime,

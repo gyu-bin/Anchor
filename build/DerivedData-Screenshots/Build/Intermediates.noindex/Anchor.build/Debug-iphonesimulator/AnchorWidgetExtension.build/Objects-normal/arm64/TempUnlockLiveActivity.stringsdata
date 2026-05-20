@@ -1,0 +1,40 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/TempUnlockLiveActivity.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "후 잠금",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "앱 잠금 임시 해제 중",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 21
+        }
+      },
+      {
+        "comment": "",
+        "key": "잠금 해제",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "타이머가 끝나면 자동으로 앱이 잠겨요",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 50
+        }
+      }
+    ]
+  },
+  "version": 1
+}

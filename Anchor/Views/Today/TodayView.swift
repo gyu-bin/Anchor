@@ -30,6 +30,7 @@ struct TodayView: View {
     @State private var isRestToday = RestDayStore.isRestToday()
     @State private var unlockSecondsLeft: Int = 0
     @State private var unlockTimerTask: Task<Void, Never>? = nil
+    @State private var tempUnlockUsedToday: Bool = TempUnlockStore.hasBeenUsedToday
 
     private var sortedRoutines: [Routine] {
         vm.sortedRoutines(routines)
@@ -102,6 +103,7 @@ struct TodayView: View {
                                                 modelContext: modelContext
                                             ),
                                             unlockSecondsLeft: unlockSecondsLeft,
+                                            tempUnlockUsedToday: tempUnlockUsedToday,
                                             canExtendDeadline: RoutineDeadline.canExtendDeadlineToday(
                                                 for: routine,
                                                 isComplete: log.isFullyCompleted
@@ -358,7 +360,11 @@ struct TodayView: View {
 
     private func handleTempUnlock() {
         TempUnlockStore.activate(minutes: 10)
+        tempUnlockUsedToday = true
         unlockSecondsLeft = TempUnlockStore.remainingSeconds
+        if let expiresAt = TempUnlockStore.expiresAt {
+            TempUnlockActivityManager.start(expiresAt: expiresAt)
+        }
         Task { await ShieldManager.refresh(modelContext: modelContext) }
         startUnlockCountdown()
     }
@@ -368,6 +374,7 @@ struct TodayView: View {
         unlockTimerTask = nil
         TempUnlockStore.deactivate()
         unlockSecondsLeft = 0
+        TempUnlockActivityManager.end()
         Task { await ShieldManager.refresh(modelContext: modelContext) }
     }
 
@@ -381,6 +388,7 @@ struct TodayView: View {
                 unlockSecondsLeft = remaining
                 if remaining == 0 {
                     TempUnlockStore.deactivate()
+                    TempUnlockActivityManager.end()
                     await ShieldManager.refresh(modelContext: modelContext)
                     break
                 }

@@ -15,6 +15,7 @@ struct RoutineSectionCard: View {
     let blockSummary: BlockedShieldSummary
     let isActivelyLocking: Bool
     var unlockSecondsLeft: Int = 0
+    var tempUnlockUsedToday: Bool = false
     var canExtendDeadline: Bool = false
     var onUnlock: (() -> Void)? = nil
     var onRelockNow: (() -> Void)? = nil
@@ -151,9 +152,10 @@ struct RoutineSectionCard: View {
                                         lockCapsuleButton(AppCopy.Routine.extendDeadline) {
                                             onExtendDeadline?()
                                         }
-                                    }
-                                    lockCapsuleButton(AppCopy.Routine.tempUnlockTenMin) {
-                                        onUnlock?()
+                                    } else if !tempUnlockUsedToday {
+                                        lockCapsuleButton(AppCopy.Routine.tempUnlockTenMin) {
+                                            onUnlock?()
+                                        }
                                     }
                                 }
                                 .padding(.horizontal, AnchorLayout.cardPadding)
