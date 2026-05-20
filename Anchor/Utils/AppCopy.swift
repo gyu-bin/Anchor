@@ -335,7 +335,7 @@ enum AppCopy {
         static let settingsOpen = "전체 기능 열기"
         static let historyBanner = "지난달부터의 기록은 전체 기능에서 볼 수 있어요."
         static let weeklyLocked = "전체 기능"
-        static let productUnavailable = "결제 정보를 불러오지 못했어요. Xcode에서 Scheme → Run → StoreKit Configuration이 Products.storekit인지 확인한 뒤 앱을 다시 실행해 주세요."
+        static let productUnavailable = "결제 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
         static let loadingProduct = "결제 정보를 불러오는 중이에요…"
         static let retryLoad = "다시 불러오기"
         static let purchaseFailed = "결제에 실패했어요. 다시 시도해 주세요."

@@ -7,6 +7,10 @@ import DeviceActivity
 import FamilyControls
 import SwiftUI
 
+extension DeviceActivityReport.Context {
+    static let totalActivity = Self("Total Activity")
+}
+
 enum ScreenTimePeriod: String, CaseIterable, Identifiable {
     case today
     case thisWeek
@@ -21,10 +25,7 @@ enum ScreenTimePeriod: String, CaseIterable, Identifiable {
     }
 }
 
-extension DeviceActivityReport.Context {
-    static let totalToday = Self("Total Activity Today")
-    static let totalWeek = Self("Total Activity This Week")
-}
+
 
 /// 설정·기타 화면에 넣는 스크린타임 리포트 (전체·앱별, 오늘·이번 주).
 struct ScreenTimeReportSection: View {
@@ -55,7 +56,7 @@ struct ScreenTimeReportSection: View {
     }
 
     private var reportContext: DeviceActivityReport.Context {
-        period == .today ? .totalToday : .totalWeek
+        .totalActivity
     }
 
     var body: some View {

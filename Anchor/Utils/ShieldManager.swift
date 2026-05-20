@@ -213,6 +213,12 @@ enum ShieldManager {
 
     static func routineLockMessage(routine: Routine, modelContext: ModelContext) -> String {
         if isActivelyLocking(routine: routine, modelContext: modelContext) {
+            if let endTime = routine.endTime {
+                let df = DateFormatter()
+                df.locale = Locale(identifier: "ko_KR")
+                df.dateFormat = "a h:mm"
+                return "앱 잠금 중 · \(df.string(from: endTime))까지"
+            }
             return AppCopy.Routine.lockActive
         }
         guard routine.endTime != nil else { return AppCopy.Routine.lockScheduled }
