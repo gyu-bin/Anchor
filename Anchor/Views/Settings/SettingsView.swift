@@ -29,6 +29,9 @@ struct SettingsView: View {
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @State private var paywallReason: PaywallReason?
     @State private var bannerMessage: String?
+    #if DEBUG
+    @State private var devTapCount = 0
+    #endif
 
     var body: some View {
         NavigationStack {
@@ -236,6 +239,18 @@ struct SettingsView: View {
                                 title: AppCopy.Settings.versionRow,
                                 value: AppInfo.versionLabel
                             )
+                            #if DEBUG
+                            .onTapGesture {
+                                devTapCount += 1
+                                if devTapCount >= 5 {
+                                    devTapCount = 0
+                                    let next = !PremiumStorage.isPremium
+                                    PremiumStorage.setPremium(next)
+                                    premium.syncFromStorage()
+                                    bannerMessage = next ? "[DEV] 프리미엄 활성화됨" : "[DEV] 프리미엄 해제됨"
+                                }
+                            }
+                            #endif
 
                             SettingsInsetDivider()
 

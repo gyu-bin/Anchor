@@ -145,6 +145,12 @@ final class PremiumStore: ObservableObject {
         }
     }
 
+    #if DEBUG
+    func syncFromStorage() {
+        isPremium = PremiumStorage.isPremium
+    }
+    #endif
+
     private func applyPremium(_ unlocked: Bool) {
         isPremium = unlocked
         PremiumStorage.setPremium(unlocked)
