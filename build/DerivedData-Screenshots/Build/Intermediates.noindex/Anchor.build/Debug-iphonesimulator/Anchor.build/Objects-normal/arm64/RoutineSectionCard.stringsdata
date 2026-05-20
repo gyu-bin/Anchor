@@ -1,5 +1,24 @@
 {
   "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/RoutineSectionCard.swift",
-  "tables": {},
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%@ 후 잠금",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "지금 잠금",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 126
+        }
+      }
+    ]
+  },
   "version": 1
 }

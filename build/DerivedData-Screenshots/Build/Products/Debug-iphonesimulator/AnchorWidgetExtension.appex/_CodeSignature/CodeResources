@@ -6,11 +6,23 @@
 	<dict>
 		<key>AnchorWidgetExtension.debug.dylib</key>
 		<data>
-		gd4NIEJRDVQTEd4kIlV5b8nfAWA=
+		ijhpQomLwRbKQs3m2uNU0zzj7X0=
+		</data>
+		<key>Assets.car</key>
+		<data>
+		SCKeZR5TG1cMJ+HGxaaQAD0Q1f4=
 		</data>
 		<key>Info.plist</key>
 		<data>
 		gqTk1s+bKPFj0qhe0hbBs3Wdjs0=
+		</data>
+		<key>Metadata.appintents/extract.actionsdata</key>
+		<data>
+		GNlEXqaqZhgGx96tgqChJUw2lT8=
+		</data>
+		<key>Metadata.appintents/version.json</key>
+		<data>
+		wAy5/jWLeV2u7MQBpSTlUcWfnVM=
 		</data>
 		<key>__preview.dylib</key>
 		<data>
@@ -23,7 +35,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			qxYJ0fUPlfEgazO10lt41sUl9USUi9SSmmsPBXEHHBE=
+			vycYwzjDV78nAO0BBY2vQmiyjTVj3udJjhFiySd784s=
+			</data>
+		</dict>
+		<key>Assets.car</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			KsvDH+fCWrQBsNDERSPPlC7tBg0ruHCiKP6WjldDM/8=
+			</data>
+		</dict>
+		<key>Metadata.appintents/extract.actionsdata</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nHhzonVKLPkJJNoDfcPo1qhXq7w2L/TUxybIyBu4h8M=
+			</data>
+		</dict>
+		<key>Metadata.appintents/version.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bxnT9MM8adQ3wqVvr+cZLV78na6qtETwB21JINXt0IU=
 			</data>
 		</dict>
 		<key>__preview.dylib</key>

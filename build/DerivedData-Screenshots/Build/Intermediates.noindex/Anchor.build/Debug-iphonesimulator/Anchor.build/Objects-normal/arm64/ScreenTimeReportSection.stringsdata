@@ -1,0 +1,16 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Settings/ScreenTimeReportSection.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "기간",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 65
+        }
+      }
+    ]
+  },
+  "version": 1
+}

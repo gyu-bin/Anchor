@@ -3,27 +3,12 @@
 //  Anchor
 //
 
-import DeviceActivity
+import FamilyControls
 import SwiftUI
-
-extension DeviceActivityReport.Context {
-    static let totalActivity = Self("Total Activity")
-}
 
 struct ScreenTimeCard: View {
     @Environment(\.colorScheme) private var scheme
-
-    private var todayFilter: DeviceActivityFilter {
-        let cal = Calendar.current
-        let now = Date()
-        let interval = cal.dateInterval(of: .day, for: now)
-            ?? DateInterval(start: now, duration: 86400)
-        return DeviceActivityFilter(
-            segment: .daily(during: interval),
-            users: .all,
-            devices: .init([.iPhone])
-        )
-    }
+    @State private var authorizationStatus = ShieldManager.authorizationStatus()
 
     var body: some View {
         AnchorCard {
@@ -40,8 +25,19 @@ struct ScreenTimeCard: View {
                 .padding(.top, AnchorLayout.cardPadding)
                 .padding(.bottom, 4)
 
-                DeviceActivityReport(.totalActivity, filter: todayFilter)
+                ScreenTimeReportSection(
+                    authorizationStatus: authorizationStatus,
+                    onRequestAuthorization: {
+                        Task {
+                            try? await ShieldManager.requestAuthorization()
+                            authorizationStatus = ShieldManager.authorizationStatus()
+                        }
+                    }
+                )
             }
+        }
+        .onAppear {
+            authorizationStatus = ShieldManager.authorizationStatus()
         }
     }
 }

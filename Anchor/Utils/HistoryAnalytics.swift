@@ -17,6 +17,16 @@ struct ItemTotalRow: Identifiable {
     }
 }
 
+struct MonthCompletionSummary {
+    let completedSlots: Int
+    let scheduledSlots: Int
+
+    var percent: Int {
+        guard scheduledSlots > 0 else { return 0 }
+        return Int((Double(completedSlots) / Double(scheduledSlots) * 100.0).rounded())
+    }
+}
+
 enum HistoryAnalytics {
     static func dayStatus(logs: [DailyLog], routines: [Routine], day: Date, cal: Calendar) -> WeekdayCompletion {
         if RoutineDeadline.isFutureDay(day, calendar: cal) { return .none }
@@ -149,33 +159,55 @@ enum HistoryAnalytics {
         return count
     }
 
-    static func monthCompletionRate(logs: [DailyLog], routines: [Routine], now: Date, cal: Calendar) -> Int {
-        guard !routines.isEmpty else { return 0 }
+    /// 이번 달 1일~오늘, 루틴이 있던 날의 「예정 루틴」 칸 중 전부 완료한 비율.
+    static func monthCompletionSummary(
+        logs: [DailyLog],
+        routines: [Routine],
+        now: Date,
+        cal: Calendar
+    ) -> MonthCompletionSummary {
+        guard !routines.isEmpty else {
+            return MonthCompletionSummary(completedSlots: 0, scheduledSlots: 0)
+        }
         let comps = cal.dateComponents([.year, .month], from: now)
-        guard let monthStart = cal.date(from: comps) else { return 0 }
-        guard let monthRange = cal.range(of: .day, in: .month, for: monthStart) else { return 0 }
+        guard let monthStart = cal.date(from: comps),
+              let monthRange = cal.range(of: .day, in: .month, for: monthStart) else {
+            return MonthCompletionSummary(completedSlots: 0, scheduledSlots: 0)
+        }
 
         let todayStart = cal.startOfDay(for: now)
         let todayDay = cal.component(.day, from: now)
 
-        var numer = 0
-        var denom = 0
+        var completedSlots = 0
+        var scheduledSlots = 0
         for day in monthRange where day <= todayDay {
             guard let d = cal.date(byAdding: .day, value: day - 1, to: monthStart) else { continue }
             if d > todayStart { break }
-            let scheduled = RoutineSchedule.scheduledRoutines(routines, on: d, calendar: cal)
-            denom += scheduled.count
+            if RestDayStore.isRestDay(d, calendar: cal) { continue }
+
+            let scheduled = RoutineSchedule.scheduledRoutinesExisting(
+                routines,
+                logs: logs,
+                on: d,
+                calendar: cal
+            )
+            guard !scheduled.isEmpty else { continue }
+
+            scheduledSlots += scheduled.count
             let start = d.startOfDay(in: cal)
             let dayLogs = logs.filter { cal.isDate($0.date, inSameDayAs: start) }
             let map = Dictionary(uniqueKeysWithValues: dayLogs.map { ($0.routineId, $0) })
             for r in scheduled {
                 if let log = map[r.id], log.isFullyCompleted {
-                    numer += 1
+                    completedSlots += 1
                 }
             }
         }
-        guard denom > 0 else { return 0 }
-        return Int((Double(numer) / Double(denom) * 100.0).rounded())
+        return MonthCompletionSummary(completedSlots: completedSlots, scheduledSlots: scheduledSlots)
+    }
+
+    static func monthCompletionRate(logs: [DailyLog], routines: [Routine], now: Date, cal: Calendar) -> Int {
+        monthCompletionSummary(logs: logs, routines: routines, now: now, cal: cal).percent
     }
 
     static func itemCompletionCounts(logs: [DailyLog], routines: [Routine]) -> [ItemTotalRow] {

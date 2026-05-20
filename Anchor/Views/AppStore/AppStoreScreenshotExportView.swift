@@ -14,7 +14,11 @@ struct AppStoreScreenshotExportView: View {
     init(screen: AppStoreScreenshotHost.Screen) {
         self.screen = screen
         UserDefaults.standard.set(true, forKey: AppGuideStorage.hasSeenGuideKey)
-        PremiumStorage.setPremium(true)
+        if screen != .paywall {
+            PremiumStorage.setPremium(true)
+        } else {
+            PremiumStorage.setPremium(false)
+        }
         guard let made = try? AppStoreScreenshotData.makeSeed() else {
             fatalError("AppStoreScreenshotData.makeSeed failed")
         }

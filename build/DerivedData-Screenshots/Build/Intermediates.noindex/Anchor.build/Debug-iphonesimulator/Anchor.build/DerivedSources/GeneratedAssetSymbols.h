@@ -9,6 +9,9 @@
 /// The resource bundle ID.
 static NSString * const ACBundleID AC_SWIFT_PRIVATE = @"com.rbqls6651.anchor";
 
+/// The "AccentColor" asset catalog color resource.
+static NSString * const ACColorNameAccentColor AC_SWIFT_PRIVATE = @"AccentColor";
+
 /// The "AnchorAccent" asset catalog color resource.
 static NSString * const ACColorNameAnchorAccent AC_SWIFT_PRIVATE = @"AnchorAccent";
 

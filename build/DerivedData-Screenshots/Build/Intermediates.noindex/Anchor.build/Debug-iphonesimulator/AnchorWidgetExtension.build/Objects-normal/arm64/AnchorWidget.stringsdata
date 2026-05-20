@@ -1,0 +1,24 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/AnchorWidget.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "다음 항목 완료",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 16
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 46
+        }
+      }
+    ]
+  },
+  "version": 1
+}

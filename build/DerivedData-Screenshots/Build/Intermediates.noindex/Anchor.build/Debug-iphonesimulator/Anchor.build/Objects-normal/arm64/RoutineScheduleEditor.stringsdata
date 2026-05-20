@@ -4,10 +4,10 @@
     "Localizable": [
       {
         "comment": "",
-        "key": "반복할 요일을 선택하세요",
+        "key": "",
         "location": {
-          "startingColumn": 22,
-          "startingLine": 82
+          "startingColumn": 20,
+          "startingLine": 92
         }
       }
     ]

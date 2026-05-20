@@ -74,6 +74,9 @@ enum AppCopy {
 
         static let screenTimeTitle = "잠금을 쓰려면\n한 번만 허용해 주세요"
         static let screenTimeBody = "iPhone의 Screen Time으로만 앱을 막을 수 있어요.\n키링은 선택한 앱만 잠그고, 나머지는 그대로 두어요."
+        static let notificationTitle = "루틴 시작을\n놓치지 않게 알려 드릴게요"
+        static let notificationBody = "시작·마감 알림만 보내요.\n광고나 소식 알림은 없어요."
+        static let notificationAllow = "알림 허용하기"
         static let startTitle = "이제 아침을,\n내 루틴부터 시작해 볼까요?"
         static let startBody = "루틴 탭에서 첫 루틴을 만들어 주세요.\n기록은 이 iPhone에만 저장돼요."
         static let start = "시작하기"
@@ -102,6 +105,12 @@ enum AppCopy {
         static let notificationOff = "알림을 켜면 루틴을 놓치지 않아요"
         static let notificationDenied = "설정 앱에서 알림을 허용해 주세요"
         static let screenTime = "Screen Time"
+        static let screenTimeNeedsPermission =
+            "스크린타임을 보려면 위 「앱 잠금」에서 스크린 타임 연결을 허용해 주세요."
+        static let screenTimeToday = "오늘"
+        static let screenTimeThisWeek = "이번 주"
+        static let screenTimeFootnote =
+            "설정의 「스크린 타임」과 같게 이 iPhone 기준으로 맞춰요. API 특성상 1~2분 차이는 날 수 있어요."
         static let about = "앱 정보"
         static let aboutBody = "루틴이 끝날 때까지 선택한 앱을 잠가 드리고, 완료하면 바로 풀어 드려요."
         static let versionRow = "버전"
@@ -153,6 +162,9 @@ enum AppCopy {
         static let lockReleasedAfterDeadline = "마감 지남 · 미완료"
         static func sectionProgress(done: Int, total: Int) -> String {
             "\(done)개 / \(total)개 했어요"
+        }
+        static func startsAt(_ time: String) -> String {
+            "\(time)에 시작해요"
         }
         static let repeatsDaily = "매일"
         static let scheduleSection = "반복"
@@ -220,7 +232,11 @@ enum AppCopy {
         static let emptyAction = "루틴 만들기"
         static let streak = "연속 완료"
         static let bestStreak = "최고 기록"
-        static let monthRate = "이번 달"
+        static let monthRate = "이번 달 완료율"
+        static let monthRateHint = "이번 달 1일부터 오늘까지, 예정된 루틴을 끝까지 한 비율이에요"
+        static func monthRateDetail(completed: Int, scheduled: Int) -> String {
+            "완료 \(completed) / 예정 \(scheduled)"
+        }
         static let thisWeek = "이번 주"
         static let byItem = "항목별"
         static let noLogs = "조금만 더 하면 기록이 생겨요"

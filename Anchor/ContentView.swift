@@ -110,7 +110,7 @@ struct ContentView: View {
 
     private func bootstrapAfterGuide() {
         Task { @MainActor in
-            _ = await NotificationManager.requestAuthorization()
+            await AppPermissions.requestEssentialPermissions()
             RoutineSync.afterMutation(modelContext: modelContext)
         }
     }

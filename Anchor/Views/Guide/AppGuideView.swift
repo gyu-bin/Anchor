@@ -9,11 +9,19 @@ struct AppGuideView: View {
     @Environment(\.colorScheme) private var scheme
 
     var isReplay: Bool = false
+    var initialPage: Int = 0
     var onFinish: () -> Void
 
-    @State private var page = 0
+    @State private var page: Int
 
-    private let pageCount = 6
+    private let pageCount = 7
+
+    init(isReplay: Bool = false, initialPage: Int = 0, onFinish: @escaping () -> Void) {
+        self.isReplay = isReplay
+        self.initialPage = min(max(0, initialPage), 6)
+        self.onFinish = onFinish
+        _page = State(initialValue: min(max(0, initialPage), 6))
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +31,8 @@ struct AppGuideView: View {
                 reliefPage.tag(2)
                 howItWorksPage.tag(3)
                 screenTimePage.tag(4)
-                startPage.tag(5)
+                notificationPage.tag(5)
+                startPage.tag(6)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .animation(.easeInOut(duration: 0.28), value: page)
@@ -166,14 +175,53 @@ struct AppGuideView: View {
             .padding(.horizontal, 28)
 
             Button(AppCopy.Onboarding.screenTimeAllow) {
-                Task {
-                    try? await ShieldManager.requestAuthorization()
-                }
+                Task { await AppPermissions.requestFamilyControlsIfNeeded() }
             }
             .buttonStyle(AnchorSecondaryButtonStyle())
             .padding(.horizontal, 28)
 
             Spacer(minLength: 16)
+        }
+        .task {
+            guard !isReplay else { return }
+            await AppPermissions.requestFamilyControlsIfNeeded()
+        }
+    }
+
+    private var notificationPage: some View {
+        VStack(spacing: 22) {
+            Spacer(minLength: 16)
+
+            GuideIconBadge(
+                systemName: "bell.badge.fill",
+                tint: Color.anchorAccent(scheme)
+            )
+
+            VStack(spacing: 12) {
+                Text(AppCopy.Guide.notificationTitle)
+                    .font(AnchorTypography.screenTitle(scheme))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color.anchorText(scheme))
+
+                Text(AppCopy.Guide.notificationBody)
+                    .font(.body)
+                    .lineSpacing(5)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color.anchorSub(scheme))
+            }
+            .padding(.horizontal, 28)
+
+            Button(AppCopy.Guide.notificationAllow) {
+                Task { await AppPermissions.requestNotificationsIfNeeded() }
+            }
+            .buttonStyle(AnchorSecondaryButtonStyle())
+            .padding(.horizontal, 28)
+
+            Spacer(minLength: 16)
+        }
+        .task {
+            guard !isReplay else { return }
+            await AppPermissions.requestNotificationsIfNeeded()
         }
     }
 

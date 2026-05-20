@@ -11,9 +11,14 @@ struct AppStoreScreenshotHost: View {
     enum Screen: String, CaseIterable {
         case today
         case routine
+        case guideRelief
+        case guideHow
         case history
+        case settingsScreenTime
         case settings
-        case guide
+        case paywall
+        case guideNotification
+        case splash
     }
 
     let screen: Screen
@@ -33,8 +38,17 @@ struct AppStoreScreenshotHost: View {
     var body: some View {
         Group {
             switch screen {
-            case .guide:
-                AppGuideView(onFinish: {})
+            case .guideRelief:
+                AppGuideView(initialPage: 2, onFinish: {})
+            case .guideHow:
+                AppGuideView(initialPage: 3, onFinish: {})
+            case .guideNotification:
+                AppGuideView(initialPage: 5, onFinish: {})
+            case .paywall:
+                PaywallSheet(reason: .general)
+                    .environmentObject(premiumStore)
+            case .splash:
+                SplashStaticView()
             default:
                 tabShell
             }
@@ -63,6 +77,10 @@ struct AppStoreScreenshotHost: View {
             SettingsView()
                 .tabItem { Label("설정", systemImage: "gearshape.fill") }
                 .tag(3)
+                .environment(
+                    \.appStoreScreenshotExpandScreenTime,
+                    screen == .settingsScreenTime
+                )
         }
         .tint(Color("AnchorAccent"))
         .toolbarBackground(.ultraThinMaterial, for: .tabBar)
@@ -76,11 +94,11 @@ struct AppStoreScreenshotHost: View {
 private extension AppStoreScreenshotHost.Screen {
     var tabIndex: Int {
         switch self {
-        case .today: 0
+        case .today, .splash: 0
         case .routine: 1
         case .history: 2
-        case .settings: 3
-        case .guide: 0
+        case .settings, .settingsScreenTime: 3
+        default: 0
         }
     }
 }

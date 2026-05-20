@@ -161,14 +161,74 @@ struct HistoryView: View {
         let cal = Calendar.current
         let streak = HistoryAnalytics.streak(logs: effectiveLogs, routines: routinesWithItems, cal: cal)
         let best = HistoryAnalytics.bestStreak(logs: effectiveLogs, routines: routinesWithItems, cal: cal)
-        let rate = HistoryAnalytics.monthCompletionRate(logs: effectiveLogs, routines: routinesWithItems, now: Date(), cal: cal)
+        let month = HistoryAnalytics.monthCompletionSummary(
+            logs: effectiveLogs,
+            routines: routinesWithItems,
+            now: Date(),
+            cal: cal
+        )
 
         return VStack(spacing: 12) {
             HStack(spacing: 12) {
                 metricTile(title: AppCopy.History.streak, value: "\(streak)", unit: "일", icon: "flame.fill")
                 metricTile(title: AppCopy.History.bestStreak, value: "\(best)", unit: "일", icon: "trophy.fill")
             }
-            metricTile(title: AppCopy.History.monthRate, value: "\(rate)", unit: "%", icon: "chart.pie.fill")
+            monthRateMetricTile(month: month)
+        }
+    }
+
+    private func monthRateMetricTile(month: MonthCompletionSummary) -> some View {
+        let progress: Double = month.scheduledSlots > 0
+            ? Double(month.completedSlots) / Double(month.scheduledSlots)
+            : 0
+
+        return AnchorCard {
+            HStack(alignment: .center, spacing: 18) {
+                ZStack {
+                    ProgressRingView(progress: progress, lineWidth: 7)
+                    VStack(spacing: 0) {
+                        Text("\(month.percent)")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color.anchorText(scheme))
+                        Text("%")
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color.anchorSub(scheme))
+                    }
+                }
+                .frame(width: 76, height: 76)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(AppCopy.History.monthRate) \(month.percent)%")
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(AppCopy.History.monthRate)
+                        .font(AnchorTypography.cardTitle(scheme))
+                        .foregroundStyle(Color.anchorText(scheme))
+
+                    Text(AppCopy.History.monthRateHint)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.anchorSub(scheme))
+                        .lineSpacing(4)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if month.scheduledSlots > 0 {
+                        Text(
+                            AppCopy.History.monthRateDetail(
+                                completed: month.completedSlots,
+                                scheduled: month.scheduledSlots
+                            )
+                        )
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.anchorAccent(scheme))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.anchorAccent(scheme).opacity(0.12))
+                        .clipShape(Capsule())
+                    }
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(AnchorLayout.cardPadding)
         }
     }
 

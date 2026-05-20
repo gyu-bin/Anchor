@@ -7,63 +7,87 @@
         "key": "잠금 상태",
         "location": {
           "startingColumn": 35,
-          "startingLine": 57
+          "startingLine": 74
         }
       },
       {
         "comment": "",
-        "key": "루틴으로 앱이 잠겨 있을 때 잠금 화면에 표시해요.",
+        "key": "루틴 진행 중 잠금화면에서 진행률과 잠금 상태를 확인해요.",
         "location": {
           "startingColumn": 22,
-          "startingLine": 58
+          "startingLine": 75
+        }
+      },
+      {
+        "comment": "",
+        "key": "루틴 완료",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 98
         }
       },
       {
         "comment": "",
         "key": "앱 잠금 중",
         "location": {
-          "startingColumn": 19,
-          "startingLine": 87
+          "startingColumn": 47,
+          "startingLine": 102
         }
       },
       {
         "comment": "",
         "key": "잠금 없음",
         "location": {
-          "startingColumn": 19,
-          "startingLine": 89
+          "startingColumn": 66,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 115
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%% 완료",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 146
+        }
+      },
+      {
+        "comment": "",
+        "key": "다음: %@ · %lld%% 완료",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 141
+        }
+      },
+      {
+        "comment": "",
+        "key": "오늘 루틴 완료!",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 125
         }
       },
       {
         "comment": "",
         "key": "앱 잠금 중",
         "location": {
-          "startingColumn": 26,
-          "startingLine": 107
+          "startingColumn": 54,
+          "startingLine": 136
         }
       },
       {
         "comment": "",
-        "key": "루틴을 마치면 풀려요",
+        "key": "루틴 진행 중",
         "location": {
-          "startingColumn": 30,
-          "startingLine": 114
-        }
-      },
-      {
-        "comment": "",
-        "key": "잠금 없음",
-        "location": {
-          "startingColumn": 26,
-          "startingLine": 119
-        }
-      },
-      {
-        "comment": "",
-        "key": "지금은 자유롭게 쓸 수 있어요",
-        "location": {
-          "startingColumn": 26,
-          "startingLine": 121
+          "startingColumn": 73,
+          "startingLine": 136
         }
       }
     ]

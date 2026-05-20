@@ -8,6 +8,16 @@
 			<key>catalogPath</key>
 			<string>/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Assets.xcassets</string>
 			<key>objcSymbol</key>
+			<string>ACColorNameAccentColor</string>
+			<key>relativePath</key>
+			<string>./AccentColor.colorset</string>
+			<key>swiftSymbol</key>
+			<string>accent</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Assets.xcassets</string>
+			<key>objcSymbol</key>
 			<string>ACColorNameAnchorAccent</string>
 			<key>relativePath</key>
 			<string>./AnchorAccent.colorset</string>

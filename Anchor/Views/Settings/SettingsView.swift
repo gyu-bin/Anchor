@@ -13,6 +13,7 @@ import UserNotifications
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.appStoreScreenshotExpandScreenTime) private var screenshotExpandScreenTime
     @EnvironmentObject private var premium: PremiumStore
 
     @AppStorage(NotificationPreferencesKey.enabled) private var notificationsEnabled = true
@@ -170,21 +171,7 @@ struct SettingsView: View {
 
                             if screenTimeStatus != .approved {
                                 Button(AppCopy.Onboarding.screenTimeAllow) {
-                                    Task {
-                                        do {
-                                            try await ShieldManager.requestAuthorization()
-                                            screenTimeStatus = ShieldManager.authorizationStatus()
-                                            if screenTimeStatus == .approved {
-                                                showBanner(nil)
-                                                RoutineSync.afterMutation(modelContext: modelContext)
-                                            } else {
-                                                showBanner(AppCopy.Error.permissionFailed)
-                                            }
-                                        } catch {
-                                            screenTimeStatus = ShieldManager.authorizationStatus()
-                                            showBanner(AppCopy.Error.permissionFailed)
-                                        }
-                                    }
+                                    requestScreenTimeAuthorization()
                                 }
                                 .buttonStyle(AnchorSecondaryButtonStyle())
                             }
@@ -204,7 +191,7 @@ struct SettingsView: View {
                                         .font(.body)
                                         .foregroundStyle(Color.anchorAccent(scheme))
                                         .frame(width: 28)
-                                    Text("오늘 스크린타임")
+                                    Text("스크린타임")
                                         .font(.body.weight(.medium))
                                         .foregroundStyle(Color.anchorText(scheme))
                                     Spacer(minLength: 8)
@@ -220,16 +207,9 @@ struct SettingsView: View {
 
                             if showScreenTime {
                                 SettingsInsetDivider()
-                                let cal = Calendar.current
-                                let interval = cal.dateInterval(of: .day, for: Date())
-                                    ?? DateInterval(start: Date(), duration: 86400)
-                                DeviceActivityReport(
-                                    .totalActivity,
-                                    filter: DeviceActivityFilter(
-                                        segment: .daily(during: interval),
-                                        users: .all,
-                                        devices: .init([.iPhone])
-                                    )
+                                ScreenTimeReportSection(
+                                    authorizationStatus: screenTimeStatus,
+                                    onRequestAuthorization: requestScreenTimeAuthorization
                                 )
                                 .padding(.bottom, 4)
                             }
@@ -289,7 +269,12 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
             .onAppear {
-                screenTimeStatus = ShieldManager.authorizationStatus()
+                if screenshotExpandScreenTime {
+                    showScreenTime = true
+                    screenTimeStatus = .approved
+                } else {
+                    screenTimeStatus = ShieldManager.authorizationStatus()
+                }
                 refreshNotificationStatus()
                 syncNotificationPrefs()
                 if !premium.isPremium, weeklySummaryEnabled {
@@ -309,6 +294,24 @@ struct SettingsView: View {
             }
             .sheet(item: $paywallReason) { reason in
                 PaywallSheet(reason: reason)
+            }
+        }
+    }
+
+    private func requestScreenTimeAuthorization() {
+        Task {
+            do {
+                try await ShieldManager.requestAuthorization()
+                screenTimeStatus = ShieldManager.authorizationStatus()
+                if screenTimeStatus == .approved {
+                    showBanner(nil)
+                    RoutineSync.afterMutation(modelContext: modelContext)
+                } else {
+                    showBanner(AppCopy.Error.permissionFailed)
+                }
+            } catch {
+                screenTimeStatus = ShieldManager.authorizationStatus()
+                showBanner(AppCopy.Error.permissionFailed)
             }
         }
     }

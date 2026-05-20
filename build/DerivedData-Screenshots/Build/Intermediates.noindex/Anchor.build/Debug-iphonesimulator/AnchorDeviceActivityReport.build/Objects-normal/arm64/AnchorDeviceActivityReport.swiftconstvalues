@@ -1,0 +1,98 @@
+[
+  {
+    "typeName": "AnchorDeviceActivityReport.AnchorDeviceActivityReport",
+    "mangledTypeName": "26AnchorDeviceActivityReportAAV",
+    "kind": "struct",
+    "file": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorDeviceActivityReport/AnchorDeviceActivityReport.swift",
+    "line": 11,
+    "conformances": [
+      "_DeviceActivity_SwiftUI.DeviceActivityReportExtension",
+      "ExtensionFoundation.AppExtension",
+      "Swift.Sendable",
+      "Swift.BitwiseCopyable"
+    ],
+    "allConformances": [
+      {
+        "protocolName": "_DeviceActivity_SwiftUI.DeviceActivityReportExtension",
+        "conformanceDefiningModule": "AnchorDeviceActivityReport"
+      },
+      {
+        "protocolName": "ExtensionFoundation.AppExtension",
+        "conformanceDefiningModule": "AnchorDeviceActivityReport"
+      },
+      {
+        "protocolName": "Swift.Sendable",
+        "conformanceDefiningModule": "AnchorDeviceActivityReport"
+      },
+      {
+        "protocolName": "Swift.BitwiseCopyable",
+        "conformanceDefiningModule": "AnchorDeviceActivityReport"
+      }
+    ],
+    "associatedTypeAliases": [
+      {
+        "typeAliasName": "Body",
+        "substitutedTypeName": "some _DeviceActivity_SwiftUI.DeviceActivityReportScene",
+        "substitutedMangledTypeName": "26AnchorDeviceActivityReportAAV4bodyQrvpQOy_Qo_",
+        "opaqueTypeProtocolRequirements": [
+          "_DeviceActivity_SwiftUI.DeviceActivityReportScene"
+        ],
+        "opaqueTypeSameTypeRequirements": []
+      },
+      {
+        "typeAliasName": "Configuration",
+        "substitutedTypeName": "ExtensionKit.AppExtensionSceneConfiguration",
+        "substitutedMangledTypeName": "12ExtensionKit03AppA18SceneConfigurationV"
+      }
+    ],
+    "properties": [
+      {
+        "label": "body",
+        "type": "some _DeviceActivity_SwiftUI.DeviceActivityReportScene",
+        "mangledTypeName": "n/a - deprecated",
+        "isStatic": "false",
+        "isComputed": "true",
+        "file": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorDeviceActivityReport/AnchorDeviceActivityReport.swift",
+        "line": 12,
+        "valueKind": "Builder",
+        "value": {
+          "type": "_DeviceActivity_SwiftUI.DeviceActivityReportBuilder",
+          "members": [
+            {
+              "kind": "buildExpression",
+              "element": {
+                "valueKind": "InitCall",
+                "value": {
+                  "type": "AnchorDeviceActivityReport.TodayActivityReport",
+                  "arguments": [
+                    {
+                      "label": "content",
+                      "type": "(AnchorDeviceActivityReport.ScreenTimeSummary) -> AnchorDeviceActivityReport.TotalActivityView",
+                      "valueKind": "Runtime"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "kind": "buildExpression",
+              "element": {
+                "valueKind": "InitCall",
+                "value": {
+                  "type": "AnchorDeviceActivityReport.WeekActivityReport",
+                  "arguments": [
+                    {
+                      "label": "content",
+                      "type": "(AnchorDeviceActivityReport.ScreenTimeSummary) -> AnchorDeviceActivityReport.TotalActivityView",
+                      "valueKind": "Runtime"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

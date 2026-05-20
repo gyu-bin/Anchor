@@ -7,7 +7,7 @@
         "key": "순서 변경",
         "location": {
           "startingColumn": 37,
-          "startingLine": 112
+          "startingLine": 140
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "새 루틴 추가",
         "location": {
           "startingColumn": 33,
-          "startingLine": 153
+          "startingLine": 185
         }
       }
     ]

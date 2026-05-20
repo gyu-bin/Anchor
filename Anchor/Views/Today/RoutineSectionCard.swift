@@ -47,12 +47,33 @@ struct RoutineSectionCard: View {
         sortedItems.first { !log.completedItems.contains($0.id) }?.id
     }
 
+    private var hasRoutineStartedToday: Bool {
+        ShieldManager.hasRoutineStartedToday(routine)
+    }
+
     private var progressSubtitle: String {
         var text = AppCopy.Routine.sectionProgress(done: completedCount, total: totalCount)
         if let duration = RoutineDuration.formattedTotal(items: routine.items) {
             text += " · \(duration)"
         }
         return text
+    }
+
+    @ViewBuilder
+    private var headerSubtitle: some View {
+        if isFullyDone {
+            Text(progressSubtitle)
+                .font(.subheadline)
+                .foregroundStyle(Color.anchorSub(scheme))
+        } else if !hasRoutineStartedToday {
+            Text(AppCopy.Routine.startsAt(startTimeText))
+                .font(.subheadline)
+                .foregroundStyle(Color.anchorSub(scheme))
+        } else {
+            Text(progressSubtitle)
+                .font(.subheadline)
+                .foregroundStyle(Color.anchorSub(scheme))
+        }
     }
 
     private var startTimeText: String {
@@ -72,19 +93,6 @@ struct RoutineSectionCard: View {
             .clipShape(Capsule())
     }
 
-    private var isBeforeStartTime: Bool {
-        let cal = Calendar.current
-        let now = Date.now
-        let comps = cal.dateComponents([.hour, .minute], from: routine.startTime)
-        guard let todayStart = cal.date(
-            bySettingHour: comps.hour ?? 0,
-            minute: comps.minute ?? 0,
-            second: 0,
-            of: now
-        ) else { return false }
-        return now < todayStart
-    }
-
     var body: some View {
         AnchorCard {
             VStack(alignment: .leading, spacing: 0) {
@@ -93,14 +101,7 @@ struct RoutineSectionCard: View {
                         Text(routine.name)
                             .font(AnchorTypography.cardTitle(scheme))
                             .foregroundStyle(Color.anchorText(scheme))
-                        Text(progressSubtitle)
-                            .font(.subheadline)
-                            .foregroundStyle(Color.anchorSub(scheme))
-                        if !isFullyDone && isBeforeStartTime {
-                            Text("\(startTimeText)에 시작해요")
-                                .font(.caption)
-                                .foregroundStyle(Color.anchorSub(scheme).opacity(0.8))
-                        }
+                        headerSubtitle
                     }
                     Spacer()
                     if isFullyDone {

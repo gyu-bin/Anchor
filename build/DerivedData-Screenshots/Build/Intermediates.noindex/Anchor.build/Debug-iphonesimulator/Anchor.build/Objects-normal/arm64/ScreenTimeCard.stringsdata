@@ -1,0 +1,16 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Today/ScreenTimeCard.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "스크린타임",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 20
+        }
+      }
+    ]
+  },
+  "version": 1
+}

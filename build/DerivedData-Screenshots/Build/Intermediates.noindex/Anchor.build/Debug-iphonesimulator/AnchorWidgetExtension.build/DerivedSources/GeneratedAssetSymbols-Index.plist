@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>colors</key>
+	<array>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameAnchorAccent</string>
+			<key>relativePath</key>
+			<string>./AnchorAccent.colorset</string>
+			<key>swiftSymbol</key>
+			<string>anchorAccent</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameAnchorBackground</string>
+			<key>relativePath</key>
+			<string>./AnchorBackground.colorset</string>
+			<key>swiftSymbol</key>
+			<string>anchorBackground</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameAnchorCard</string>
+			<key>relativePath</key>
+			<string>./AnchorCard.colorset</string>
+			<key>swiftSymbol</key>
+			<string>anchorCard</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorWidget/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameAnchorSubBg</string>
+			<key>relativePath</key>
+			<string>./AnchorSubBg.colorset</string>
+			<key>swiftSymbol</key>
+			<string>anchorSubBg</string>
+		</dict>
+	</array>
+	<key>images</key>
+	<array/>
+	<key>symbols</key>
+	<array/>
+</dict>
+</plist>

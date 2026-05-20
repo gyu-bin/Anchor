@@ -7,7 +7,31 @@
         "key": "탭하여 프리미엄 안내 보기",
         "location": {
           "startingColumn": 28,
-          "startingLine": 155
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %lld%%",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "%",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 193
         }
       }
     ]

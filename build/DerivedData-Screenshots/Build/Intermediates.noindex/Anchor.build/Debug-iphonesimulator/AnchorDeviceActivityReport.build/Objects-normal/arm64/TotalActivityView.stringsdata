@@ -1,0 +1,24 @@
+{
+  "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorDeviceActivityReport/TotalActivityView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "앱별",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 25
+        }
+      },
+      {
+        "comment": "",
+        "key": "전체 · %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 18
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -6,27 +6,59 @@
 	<dict>
 		<key>AppIcon60x60@2x.png</key>
 		<data>
-		+FODP3wnMo6tYkHy5ltmuf7qt/s=
+		3zys9YgBPqsbu0viffz2pmg28Jk=
 		</data>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<data>
-		xSuE15sa6HYFxqflsba56fPBvY0=
+		1nEmAzC7MTAtx5Fzsq0ITHYQKGM=
 		</data>
 		<key>Assets.car</key>
 		<data>
-		RmlsRu8nF3AyBpYh+ai2dgTw0qo=
+		yH6Z7LdPBE6g8CCxI49SEgVJb9o=
+		</data>
+		<key>Extensions/AnchorDeviceActivityReport.appex/AnchorDeviceActivityReport</key>
+		<data>
+		iUcxpJN3aysb+L2G7n3gqU6dpRg=
+		</data>
+		<key>Extensions/AnchorDeviceActivityReport.appex/AnchorDeviceActivityReport.debug.dylib</key>
+		<data>
+		TqELQJwWV1sEe4cSjRbTek7cXlU=
+		</data>
+		<key>Extensions/AnchorDeviceActivityReport.appex/Info.plist</key>
+		<data>
+		8V2b3XTd01FBtfFn7hQqWiVVe2E=
+		</data>
+		<key>Extensions/AnchorDeviceActivityReport.appex/_CodeSignature/CodeResources</key>
+		<data>
+		xb12d0QTrDgel3qc8reJAL9Uboo=
+		</data>
+		<key>Extensions/AnchorDeviceActivityReport.appex/__preview.dylib</key>
+		<data>
+		X1hVvpE+gYXYbtZwZIuwqBqQPO8=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		znDZoTxSSBwsvNxCZeV15uZGZYQ=
+		BYBsqORXiFXI2a+nE/AzqMq/RKA=
 		</data>
 		<key>Keyring.debug.dylib</key>
 		<data>
-		ASQkmZJoIipB80PuJPMVlkCRPeU=
+		7EfqDgdk//miTDjVBaof7dYmCFM=
 		</data>
 		<key>Metadata.appintents/extract.actionsdata</key>
 		<data>
 		B/eN8Zb6fN9wFchnhUYnSNubJTY=
+		</data>
+		<key>Metadata.appintents/nlu/bfdbc581d7e8da531420f460ac272466.version</key>
+		<data>
+		W6k8nbDP+T9StSHXQg5D9u2ieE8=
+		</data>
+		<key>Metadata.appintents/nlu/nlu.lzfse</key>
+		<data>
+		aEr3l6ZxtclhN+8XWK+F2toObYc=
+		</data>
+		<key>Metadata.appintents/root.ssu.yaml</key>
+		<data>
+		QTKt+cF3Y/pnd3kGc7xKyhNvDj0=
 		</data>
 		<key>Metadata.appintents/version.json</key>
 		<data>
@@ -58,19 +90,31 @@
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/AnchorWidgetExtension</key>
 		<data>
-		V+AOd5YtPLJq2Gm9Rx0JthQeoh0=
+		pjqtvqWx8Af6hJUesSY/JVYJAIw=
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/AnchorWidgetExtension.debug.dylib</key>
 		<data>
-		gd4NIEJRDVQTEd4kIlV5b8nfAWA=
+		ijhpQomLwRbKQs3m2uNU0zzj7X0=
+		</data>
+		<key>PlugIns/AnchorWidgetExtension.appex/Assets.car</key>
+		<data>
+		SCKeZR5TG1cMJ+HGxaaQAD0Q1f4=
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/Info.plist</key>
 		<data>
 		gqTk1s+bKPFj0qhe0hbBs3Wdjs0=
 		</data>
+		<key>PlugIns/AnchorWidgetExtension.appex/Metadata.appintents/extract.actionsdata</key>
+		<data>
+		GNlEXqaqZhgGx96tgqChJUw2lT8=
+		</data>
+		<key>PlugIns/AnchorWidgetExtension.appex/Metadata.appintents/version.json</key>
+		<data>
+		wAy5/jWLeV2u7MQBpSTlUcWfnVM=
+		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/_CodeSignature/CodeResources</key>
 		<data>
-		21BJ4ar/25re4o288rfIt6onFjo=
+		bB6G4enEW3zDm5Jijwsh3MXT8aY=
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/__preview.dylib</key>
 		<data>
@@ -87,28 +131,63 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			tzc1p+laSu7jQGcO081lNxko7fbD0Sdi9YLDDVREF9Q=
+			j7X9jar9/F6ntu/PGwbIEN+eCchHOSBnpsu+Znb7SA0=
 			</data>
 		</dict>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Rr2XYw0W8qgepIsKiYNSsxUVD7lzFIaEeFLFUihEvJk=
+			LbidcSRdddoVJ1wpeqnLPMzrDzhj/R5oavWj9UvFbKY=
 			</data>
 		</dict>
 		<key>Assets.car</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			f51ESCuxcdRf/zEjXF8weK2lZ3L+7HuMFqH11y1N0M0=
+			wj/8RbZlndHm9CUEZcp4Gvt9rtSuHu8rkl8xDmMF33o=
+			</data>
+		</dict>
+		<key>Extensions/AnchorDeviceActivityReport.appex/AnchorDeviceActivityReport</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			21pTo6hILxI2HDq3pgSp5/8f2YmufUc8ucf3jEpxtOg=
+			</data>
+		</dict>
+		<key>Extensions/AnchorDeviceActivityReport.appex/AnchorDeviceActivityReport.debug.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			P6JkKVMkA3OLRDTOj8kMdX9CRnPn1IRTW0v6jDxOdHg=
+			</data>
+		</dict>
+		<key>Extensions/AnchorDeviceActivityReport.appex/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			JRbywVigIATwlXmAld18ksaWBYQF5AmyBwqGiNUVIkI=
+			</data>
+		</dict>
+		<key>Extensions/AnchorDeviceActivityReport.appex/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xBQwLKLWmfwoFbMTh2mVGMzo2ELcEGIWErts9dElR+I=
+			</data>
+		</dict>
+		<key>Extensions/AnchorDeviceActivityReport.appex/__preview.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bYzH0trz7dl7dp2du2DK25fF0Orjs1SbqAAN3qTbQdk=
 			</data>
 		</dict>
 		<key>Keyring.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			0eB63B24kXopp499NnurvUOS9B1fRu40nUrXTjhVHlw=
+			Y7q9uNnH/GCsy/eJ4KuNzwIqHNZBYUWeZ1qfiLZC+R0=
 			</data>
 		</dict>
 		<key>Metadata.appintents/extract.actionsdata</key>
@@ -116,6 +195,27 @@
 			<key>hash2</key>
 			<data>
 			bNcA7Iio/4VerzflDA1cZUrSrpdRJ9LoR6+YMJyXg7w=
+			</data>
+		</dict>
+		<key>Metadata.appintents/nlu/bfdbc581d7e8da531420f460ac272466.version</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bjQLnP+zepicpUTmu3gKLHiQHT+zNzh2hRGjBhevoB0=
+			</data>
+		</dict>
+		<key>Metadata.appintents/nlu/nlu.lzfse</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			JYUw2AE7bWkA5VsAkIYNv2+eX8coJTP09OUoeyJW+O8=
+			</data>
+		</dict>
+		<key>Metadata.appintents/root.ssu.yaml</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xZqhISj3JrZU4Knx87R6RCoHpXBcn4n3pPtg+RS9ZXU=
 			</data>
 		</dict>
 		<key>Metadata.appintents/version.json</key>
@@ -164,14 +264,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			uLL1VeR0LTtUy+YbmeMs/bCOPZB0NMVTc+UjDxZYGLU=
+			ggwZYgmg+7OzxWire4PefkgRYZtXVlV71FKYk+F2/W0=
 			</data>
 		</dict>
 		<key>PlugIns/AnchorWidgetExtension.appex/AnchorWidgetExtension.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			qxYJ0fUPlfEgazO10lt41sUl9USUi9SSmmsPBXEHHBE=
+			vycYwzjDV78nAO0BBY2vQmiyjTVj3udJjhFiySd784s=
+			</data>
+		</dict>
+		<key>PlugIns/AnchorWidgetExtension.appex/Assets.car</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			KsvDH+fCWrQBsNDERSPPlC7tBg0ruHCiKP6WjldDM/8=
 			</data>
 		</dict>
 		<key>PlugIns/AnchorWidgetExtension.appex/Info.plist</key>
@@ -181,11 +288,25 @@
 			DNupL75T494qdjoJgIgZVx1FFw2NNGG+XhJVKIyBz3E=
 			</data>
 		</dict>
+		<key>PlugIns/AnchorWidgetExtension.appex/Metadata.appintents/extract.actionsdata</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nHhzonVKLPkJJNoDfcPo1qhXq7w2L/TUxybIyBu4h8M=
+			</data>
+		</dict>
+		<key>PlugIns/AnchorWidgetExtension.appex/Metadata.appintents/version.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bxnT9MM8adQ3wqVvr+cZLV78na6qtETwB21JINXt0IU=
+			</data>
+		</dict>
 		<key>PlugIns/AnchorWidgetExtension.appex/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			V3TnHmEp42rmDZlznZjJNGk3L13aSFW/jHP9HEYOhog=
+			oePRfyBdt/QSc5UO3m7ijxjrme+6/fiuqTG+nWLvULs=
 			</data>
 		</dict>
 		<key>PlugIns/AnchorWidgetExtension.appex/__preview.dylib</key>

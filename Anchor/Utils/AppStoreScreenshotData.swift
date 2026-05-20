@@ -6,10 +6,12 @@
 import Foundation
 import SwiftData
 
-/// App Store Connect 6.9" (iPhone 16 Pro Max) 논리 해상도.
+/// App Store Connect 6.7" — 1284×2778 (@3x 논리 크기).
 enum AppStoreScreenshotData {
-    static let exportWidth: CGFloat = 440
-    static let exportHeight: CGFloat = 956
+    static let pixelWidth = 1284
+    static let pixelHeight = 2778
+    static let exportWidth: CGFloat = CGFloat(pixelWidth) / 3
+    static let exportHeight: CGFloat = CGFloat(pixelHeight) / 3
     static let exportScale: CGFloat = 3
 
     struct Seed {

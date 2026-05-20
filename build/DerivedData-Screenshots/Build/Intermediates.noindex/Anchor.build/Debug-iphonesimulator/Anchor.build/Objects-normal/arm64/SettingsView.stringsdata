@@ -1,5 +1,32 @@
 {
   "source": "/Users/mungyubin/Desktop/Code/Anchor/Anchor/Anchor/Views/Settings/SettingsView.swift",
-  "tables": {},
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 82
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 90
+        }
+      },
+      {
+        "comment": "",
+        "key": "스크린타임",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 194
+        }
+      }
+    ]
+  },
   "version": 1
 }
