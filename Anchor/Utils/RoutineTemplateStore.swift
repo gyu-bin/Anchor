@@ -56,7 +56,7 @@ enum RoutineTemplateStore {
         routines: [Routine],
         order: Int
     ) -> Routine {
-        var draft = draftForNewRoutine(from: template)
+        let draft = draftForNewRoutine(from: template)
         let routine = Routine(
             name: template.name,
             startTime: draft.startTime,

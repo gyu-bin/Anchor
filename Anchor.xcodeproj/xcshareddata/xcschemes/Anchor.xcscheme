@@ -55,6 +55,17 @@
                ReferencedContainer = "container:Anchor.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1DD00AC52FB55D3E00D55358"
+               BuildableName = "AnchorUITests.xctest"
+               BlueprintName = "AnchorUITests"
+               ReferencedContainer = "container:Anchor.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

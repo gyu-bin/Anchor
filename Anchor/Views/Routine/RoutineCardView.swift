@@ -204,13 +204,10 @@ struct RoutineCardView: View {
 
         RoutineEditSection(
             title: AppCopy.Routine.todosSection,
-            subtitle: sorted.isEmpty ? AppCopy.Routine.noItems : nil,
             systemImage: "checklist"
         ) {
             VStack(alignment: .leading, spacing: 12) {
-                if sorted.isEmpty {
-                    emptyTodosPlaceholder
-                } else {
+                if !sorted.isEmpty {
                     VStack(spacing: 8) {
                         ForEach(sorted, id: \.id) { item in
                             todoRow(item)
@@ -233,19 +230,6 @@ struct RoutineCardView: View {
                 .buttonStyle(AnchorTextButtonStyle())
             }
         }
-    }
-
-    private var emptyTodosPlaceholder: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "square.and.pencil")
-                .font(.title3)
-                .foregroundStyle(Color.anchorSub(scheme).opacity(0.7))
-            Text(AppCopy.Routine.noItems)
-                .font(.subheadline)
-                .foregroundStyle(Color.anchorSub(scheme))
-            Spacer(minLength: 0)
-        }
-        .padding(.vertical, 4)
     }
 
     private func todoRow(_ item: RoutineItem) -> some View {

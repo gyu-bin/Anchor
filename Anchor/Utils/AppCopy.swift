@@ -33,12 +33,9 @@ enum AppCopy {
         static let lockScheduled = "루틴 시작 후 잠겨요"
 
         static let emptyTitle = "아직 루틴이 없어요"
-        static let emptyBody = "루틴 탭에서 첫 루틴을 만들어 주세요"
-        static let emptyAction = "루틴 만들기"
+        static let emptyBody = "루틴 탭에서 +로 첫 루틴을 만들어 주세요"
         static let noScheduleTitle = "오늘은 예정된 루틴이 없어요"
         static let noScheduleBody = "루틴 탭에서 반복·기간 설정을 확인해 보세요"
-        static let setupItemsBody = "루틴 탭에서 할 일을 추가하면 오늘부터 체크할 수 있어요"
-        static let setupItemsAction = "루틴 탭으로"
 
         static let completeTitle = "오늘도 해내셨네요"
         static let completeBody = "잠금을 풀어 두었어요. 편히 쉬세요"
@@ -132,7 +129,6 @@ enum AppCopy {
         static let addSheetTitle = "새 루틴"
         static let namePlaceholder = "예: 아침 루틴"
         static let todosSection = "할일"
-        static let noItems = "할 일을 하나만 추가해 주세요"
         static let addTodo = "할일 추가"
         static let addTodoSheetTitle = "할일 추가"
         static let editTodoSheetTitle = "할일 편집"
@@ -151,6 +147,8 @@ enum AppCopy {
         static let routineNameLabel = "루틴 이름"
         static let lockActive = "앱 잠금 중"
         static let lockScheduled = "시작 후 잠김"
+        static let extendDeadline = "30분 연장"
+        static let tempUnlockTenMin = "10분 해제"
         static func lockUnlocksAt(_ time: String) -> String { "잠금 \(time)에 해제" }
         static let lockReleasedAfterDeadline = "마감 지남 · 미완료"
         static func sectionProgress(done: Int, total: Int) -> String {

@@ -15,8 +15,10 @@ struct RoutineSectionCard: View {
     let blockSummary: BlockedShieldSummary
     let isActivelyLocking: Bool
     var unlockSecondsLeft: Int = 0
+    var canExtendDeadline: Bool = false
     var onUnlock: (() -> Void)? = nil
     var onRelockNow: (() -> Void)? = nil
+    var onExtendDeadline: (() -> Void)? = nil
     let onToggle: (RoutineItem) -> Void
 
     private var sortedItems: [RoutineItem] {
@@ -58,6 +60,16 @@ struct RoutineSectionCard: View {
         df.locale = Locale(identifier: "ko_KR")
         df.dateFormat = "a h:mm"
         return df.string(from: routine.startTime)
+    }
+
+    private func lockCapsuleButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(title, action: action)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(Color.anchorAccent(scheme))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(Color.anchorAccent(scheme).opacity(0.1))
+            .clipShape(Capsule())
     }
 
     private var isBeforeStartTime: Bool {
@@ -127,21 +139,37 @@ struct RoutineSectionCard: View {
                         let lockMessage = ShieldManager.routineLockMessage(routine: routine, modelContext: modelContext)
                         if blockSummary.hasAnyBlock || lockMessage != AppCopy.Routine.lockScheduled {
                             if blockSummary.hasAnyBlock && isActivelyLocking {
-                                HStack(spacing: 8) {
+                                HStack(spacing: 6) {
                                     Text(lockMessage)
                                         .font(.caption.weight(.medium))
                                         .foregroundStyle(Color.anchorWarning(scheme))
-                                    Spacer()
-                                    Button("10분 해제") { onUnlock?() }
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(Color.anchorAccent(scheme))
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 5)
-                                        .background(Color.anchorAccent(scheme).opacity(0.1))
-                                        .clipShape(Capsule())
+                                        .lineLimit(2)
+                                        .minimumScaleFactor(0.85)
+                                    Spacer(minLength: 4)
+                                    if canExtendDeadline {
+                                        lockCapsuleButton(AppCopy.Routine.extendDeadline) {
+                                            onExtendDeadline?()
+                                        }
+                                    }
+                                    lockCapsuleButton(AppCopy.Routine.tempUnlockTenMin) {
+                                        onUnlock?()
+                                    }
                                 }
                                 .padding(.horizontal, AnchorLayout.cardPadding)
                                 .padding(.bottom, 4)
+                            } else if canExtendDeadline, lockMessage != AppCopy.Routine.lockScheduled {
+                                HStack(spacing: 8) {
+                                    Text(lockMessage)
+                                        .font(.caption.weight(.medium))
+                                        .foregroundStyle(Color.anchorSub(scheme))
+                                        .lineLimit(2)
+                                    Spacer(minLength: 4)
+                                    lockCapsuleButton(AppCopy.Routine.extendDeadline) {
+                                        onExtendDeadline?()
+                                    }
+                                }
+                                .padding(.horizontal, AnchorLayout.cardPadding)
+                                .padding(.bottom, blockSummary.hasAnyBlock ? 4 : 10)
                             } else {
                                 Text(lockMessage)
                                     .font(.caption.weight(.medium))

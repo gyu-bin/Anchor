@@ -31,6 +31,7 @@ struct AppGuideView: View {
             bottomBar
         }
         .anchorScreenBackground()
+        .preferredColorScheme(.light)
     }
 
     // MARK: - Pages

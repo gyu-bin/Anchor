@@ -10,6 +10,9 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
     case light
     case dark
 
+    /// 앱 기본값 — 시스템 다크 여부와 무관하게 첫 실행은 라이트
+    static let defaultMode: AppearanceMode = .light
+
     var id: String { rawValue }
 
     var title: String {

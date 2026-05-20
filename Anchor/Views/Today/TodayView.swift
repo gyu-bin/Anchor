@@ -15,7 +15,6 @@ private struct UndoSnapshot {
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
-    @EnvironmentObject private var tabRouter: TabRouter
 
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
     @State private var vm = TodayViewModel()
@@ -36,7 +35,7 @@ struct TodayView: View {
         vm.sortedRoutines(routines)
     }
 
-    /// 오늘 일정에 맞는 루틴 (항목 없어도 표시).
+    /// 오늘 일정에 맞는 루틴 (할 일 없는 루틴은 오늘 탭에 표시하지 않음).
     private var scheduledRoutinesToday: [Routine] {
         vm.routinesForToday(sortedRoutines)
     }
@@ -71,9 +70,9 @@ struct TodayView: View {
                         VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
                             AnchorScreenHeader(title: greeting, subtitle: dateTitle)
 
-                            if routines.isEmpty {
+                            if routines.isEmpty, TodayEmptyHintStore.shouldShow {
                                 emptyState
-                            } else if scheduledRoutinesToday.isEmpty {
+                            } else if scheduledRoutinesToday.isEmpty, TodayEmptyHintStore.shouldShow {
                                 noScheduleTodayState
                             } else if isRestToday {
                                 restDayCard
@@ -89,13 +88,8 @@ struct TodayView: View {
                                     )
                                 }
 
-                                ForEach(scheduledRoutinesToday, id: \.id) { routine in
-                                    if routine.items.isEmpty {
-                                        TodayRoutineSetupCard(routine: routine) {
-                                            tabRouter.selectedTab = 1
-                                        }
-                                        .id(routine.id)
-                                    } else if let log = try? vm.todayLog(for: routine, context: modelContext) {
+                                ForEach(actionableRoutinesToday, id: \.id) { routine in
+                                    if let log = try? vm.todayLog(for: routine, context: modelContext) {
                                         RoutineSectionCard(
                                             routine: routine,
                                             log: log,
@@ -108,8 +102,13 @@ struct TodayView: View {
                                                 modelContext: modelContext
                                             ),
                                             unlockSecondsLeft: unlockSecondsLeft,
+                                            canExtendDeadline: RoutineDeadline.canExtendDeadlineToday(
+                                                for: routine,
+                                                isComplete: log.isFullyCompleted
+                                            ),
                                             onUnlock: { handleTempUnlock() },
                                             onRelockNow: { handleRelockNow() },
+                                            onExtendDeadline: { handleExtendDeadline(for: routine) },
                                             onToggle: { item in
                                                 toggle(item: item, routine: routine)
                                             }
@@ -169,6 +168,9 @@ struct TodayView: View {
             .onChange(of: routines.map(\.items.count)) { _, _ in
                 applyRoutineListChange()
             }
+            .onChange(of: actionableRoutinesToday.map(\.id)) { _, ids in
+                if !ids.isEmpty { TodayEmptyHintStore.markSeen() }
+            }
             .sheet(isPresented: $showCompletionSheet) {
                 completionSheet
                     .presentationDetents([.height(300)])
@@ -210,6 +212,7 @@ struct TodayView: View {
             title: AppCopy.Today.noScheduleTitle,
             message: AppCopy.Today.noScheduleBody
         )
+        .onAppear { TodayEmptyHintStore.markSeen() }
     }
 
     private var bottomScrollInset: CGFloat {
@@ -218,15 +221,14 @@ struct TodayView: View {
         return 36
     }
 
+    /// 루틴이 없을 때 처음 한 번만 안내(버튼 없음 — 추가는 루틴 탭에서).
     private var emptyState: some View {
         AnchorEmptyState(
             icon: "sun.max",
             title: AppCopy.Today.emptyTitle,
-            message: AppCopy.Today.emptyBody,
-            actionTitle: AppCopy.Today.emptyAction
-        ) {
-            tabRouter.openRoutines(andCreateNew: true)
-        }
+            message: AppCopy.Today.emptyBody
+        )
+        .onAppear { TodayEmptyHintStore.markSeen() }
     }
 
     private func toggle(item: RoutineItem, routine: Routine) {
@@ -345,6 +347,13 @@ struct TodayView: View {
         }
         wasAllComplete = allDone
         syncAfterTodayChange()
+    }
+
+    private func handleExtendDeadline(for routine: Routine) {
+        guard RoutineDeadlineExtensionStore.applyExtension(routineID: routine.id) else { return }
+        NotificationManager.refreshTodayDeadlineReminderAfterExtension(for: routine)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
     }
 
     private func handleTempUnlock() {

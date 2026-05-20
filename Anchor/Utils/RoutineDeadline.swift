@@ -15,12 +15,43 @@ enum RoutineDeadline {
     guard let end = routine.endTime else { return nil }
     let comps = calendar.dateComponents([.hour, .minute], from: end)
     guard let hour = comps.hour, let minute = comps.minute else { return nil }
-    return calendar.date(
+    guard let base = calendar.date(
       bySettingHour: hour,
       minute: minute,
       second: 0,
       of: calendar.startOfDay(for: now)
+    ) else { return nil }
+    let extra = RoutineDeadlineExtensionStore.extraMinutes(
+      routineID: routine.id,
+      on: now,
+      calendar: calendar
     )
+    guard extra > 0 else { return base }
+    return calendar.date(byAdding: .minute, value: extra, to: base)
+  }
+
+  /// 종료 시간이 있고, 마감 전 1시간~자동 해제 전이며, 오늘 연장 횟수가 남아 있을 때.
+  static func canExtendDeadlineToday(
+    for routine: Routine,
+    isComplete: Bool,
+    now: Date = Date(),
+    calendar: Calendar = .current
+  ) -> Bool {
+    guard routine.endTime != nil, !routine.items.isEmpty, !isComplete else { return false }
+    guard RoutineDeadlineExtensionStore.remainingUses(
+      routineID: routine.id,
+      on: now,
+      calendar: calendar
+    ) > 0 else { return false }
+    guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else { return false }
+    guard let end = endTimeToday(for: routine, now: now, calendar: calendar),
+          let unlock = unlockTimeToday(for: routine, now: now, calendar: calendar),
+          let windowStart = calendar.date(
+            byAdding: .minute,
+            value: -RoutineDeadlineExtensionStore.offerWindowMinutesBeforeEnd,
+            to: end
+          ) else { return false }
+    return now >= windowStart && now < unlock
   }
 
   /// 미완료 시 잠금이 풀리는 시각. `endTime` 없으면 nil(완료할 때까지 유지).

@@ -13,7 +13,7 @@ struct ContentView: View {
     @State private var routineViewModel = RoutineViewModel()
 
     @AppStorage(AppGuideStorage.hasSeenGuideKey) private var hasSeenAppGuide = false
-    @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
+    @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.defaultMode.rawValue
     @State private var showGuide = false
 
     private var appearanceMode: AppearanceMode {

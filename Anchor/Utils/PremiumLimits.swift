@@ -5,9 +5,9 @@
 
 import Foundation
 
-/// A안 무료 한도 · 1,900원 평생 해제
+/// A안 무료 한도 · 3,900원 평생 해제
 enum PremiumLimits {
-    static let displayPriceKRW = "₩1,900"
+    static let displayPriceKRW = "₩3,900"
     static let productID = "com.rbqls6651.anchor.unlock"
 
     static let maxFreeRoutines = 3

@@ -84,16 +84,23 @@ struct RoutineView: View {
                     expandedRoutineIDs = ids
                 }
                 RoutineScheduleMaintenance.run(modelContext: modelContext)
-                fulfillPendingCreateRoutine()
+                fulfillPendingNavigation()
             }
             .onChange(of: tabRouter.selectedTab) { _, tab in
                 if tab == 1 {
                     RoutineScheduleMaintenance.run(modelContext: modelContext)
-                    fulfillPendingCreateRoutine()
+                    fulfillPendingNavigation()
                 }
+            }
+            .onChange(of: tabRouter.pendingExpandRoutineID) { _, _ in
+                guard tabRouter.selectedTab == 1 else { return }
+                fulfillPendingNavigation()
             }
             .onChange(of: routines.count) { _, _ in
                 syncRoutineListState()
+                if tabRouter.selectedTab == 1 {
+                    fulfillPendingNavigation()
+                }
             }
         }
     }
@@ -211,6 +218,26 @@ struct RoutineView: View {
         RoutineSync.afterMutation(modelContext: modelContext, refreshShield: false)
     }
 
+    private func fulfillPendingNavigation() {
+        if tabRouter.pendingExpandRoutineID != nil {
+            fulfillPendingExpandRoutine()
+            return
+        }
+        fulfillPendingCreateRoutine()
+    }
+
+    private func fulfillPendingExpandRoutine() {
+        guard let routineID = tabRouter.consumePendingExpandRoutineID() else { return }
+        Task { @MainActor in
+            await Task.yield()
+            if !routines.contains(where: { $0.id == routineID }) {
+                try? await Task.sleep(for: .milliseconds(80))
+            }
+            guard routines.contains(where: { $0.id == routineID }) else { return }
+            presentExpandedRoutine(routineID: routineID, focusName: true)
+        }
+    }
+
     private func fulfillPendingCreateRoutine() {
         guard tabRouter.consumePendingCreateRoutine() else { return }
         Task { @MainActor in
@@ -226,9 +253,16 @@ struct RoutineView: View {
             context: modelContext,
             routines: routines
         )
-        focusNameRoutineID = routine.id
+        presentExpandedRoutine(routineID: routine.id, focusName: true)
+    }
+
+    /// 상단 + 로 새 루틴 만들 때와 동일 — 카드 펼침 + 이름 포커스
+    private func presentExpandedRoutine(routineID: UUID, focusName: Bool) {
+        if focusName {
+            focusNameRoutineID = routineID
+        }
         withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
-            expandedRoutineIDs = [routine.id]
+            expandedRoutineIDs = [routineID]
         }
     }
 }

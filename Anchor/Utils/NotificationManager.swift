@@ -341,10 +341,43 @@ enum NotificationManager {
         return !complete
     }
 
+    /// 오늘 마감 연장 후, 연장된 시각 기준 30분 전 일회 알림을 다시 잡습니다.
+    static func refreshTodayDeadlineReminderAfterExtension(for routine: Routine) {
+        guard NotificationPreferences.notificationsEnabled else { return }
+        guard routine.endTime != nil else { return }
+
+        let calendar = Calendar.current
+        let dayKey = RoutineDeadlineExtensionStore.dayKey(for: Date(), calendar: calendar)
+        let identifier = "routine-deadline-ext-\(routine.id.uuidString)-\(dayKey)"
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+
+        guard let end = RoutineDeadline.endTimeToday(for: routine),
+              let notifyDate = calendar.date(byAdding: .minute, value: -30, to: end),
+              notifyDate > Date() else { return }
+
+        let content = UNMutableNotificationContent()
+        let copy = AppCopy.Notification.deadlineReminder(name: routine.name)
+        content.title = copy.title
+        content.body = copy.body
+        content.sound = .default
+        content.categoryIdentifier = deadlineCategoryId
+        content.userInfo = [
+            "openToday": true,
+            "routineId": routine.id.uuidString,
+            "isDeadlineReminder": true,
+        ]
+
+        let interval = max(1, notifyDate.timeIntervalSinceNow)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request)
+    }
+
     static func cancelReminders(for routine: Routine) {
         let prefixes = [
             "routine-reminder-\(routine.id.uuidString)-",
             "routine-deadline-\(routine.id.uuidString)-",
+            "routine-deadline-ext-\(routine.id.uuidString)-",
         ]
         UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
             let ids = requests.filter { req in

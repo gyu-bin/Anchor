@@ -3,6 +3,7 @@
 //  Anchor
 //
 
+import DeviceActivity
 import FamilyControls
 import SwiftData
 import SwiftUI
@@ -19,9 +20,10 @@ struct SettingsView: View {
     @AppStorage(NotificationPreferencesKey.reminder) private var reminderEnabled = true
     @AppStorage(NotificationPreferencesKey.weeklySummary) private var weeklySummaryEnabled = true
     @AppStorage(NotificationPreferencesKey.reminderOffset) private var reminderOffsetMinutes = 30
-    @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.system.rawValue
+    @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.defaultMode.rawValue
 
     @State private var showGuide = false
+    @State private var showScreenTime = false
     @State private var screenTimeStatus: AuthorizationStatus = .notDetermined
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @State private var paywallReason: PaywallReason?
@@ -188,6 +190,50 @@ struct SettingsView: View {
                             }
                         }
                         .padding(AnchorLayout.cardPadding)
+                    }
+
+                    settingsGroup("스크린타임 사용 현황") {
+                        VStack(spacing: 0) {
+                            Button {
+                                withAnimation(AnchorMotion.spring(response: 0.35, dampingFraction: 0.8)) {
+                                    showScreenTime.toggle()
+                                }
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "hourglass")
+                                        .font(.body)
+                                        .foregroundStyle(Color.anchorAccent(scheme))
+                                        .frame(width: 28)
+                                    Text("오늘 스크린타임")
+                                        .font(.body.weight(.medium))
+                                        .foregroundStyle(Color.anchorText(scheme))
+                                    Spacer(minLength: 8)
+                                    Image(systemName: showScreenTime ? "chevron.up" : "chevron.down")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(Color.anchorSub(scheme).opacity(0.7))
+                                }
+                                .padding(AnchorLayout.cardPadding)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(SettingsRowButtonStyle())
+
+                            if showScreenTime {
+                                SettingsInsetDivider()
+                                let cal = Calendar.current
+                                let interval = cal.dateInterval(of: .day, for: Date())
+                                    ?? DateInterval(start: Date(), duration: 86400)
+                                DeviceActivityReport(
+                                    .totalActivity,
+                                    filter: DeviceActivityFilter(
+                                        segment: .daily(during: interval),
+                                        users: .all,
+                                        devices: .init([.iPhone])
+                                    )
+                                )
+                                .padding(.bottom, 4)
+                            }
+                        }
                     }
 
                     settingsGroup(AppCopy.Settings.sectionAbout) {
