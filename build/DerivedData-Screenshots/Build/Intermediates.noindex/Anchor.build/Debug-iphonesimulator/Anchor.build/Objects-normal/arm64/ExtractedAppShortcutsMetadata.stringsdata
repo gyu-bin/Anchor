@@ -1,56 +1,56 @@
 {
-  "source" : "\/Users\/mungyubin\/Desktop\/Code\/Anchor\/Anchor\/Anchor\/Intents\/AnchorAppIntents.swift",
   "tables" : {
     "AppShortcuts" : [
       {
-        "appShortcutMetadata" : [
-          {
-            "actionIdentifier" : "OpenTodayIntent",
-            "index" : 0,
-            "parameterTypes" : {
-
-            },
-            "parameterDisplayRepresentations" : {
-
-            },
-            "title" : "오늘 루틴 열기"
-          }
-        ],
         "key" : "${applicationName} 오늘",
-        "location" : {
-          "startingLine" : 42,
-          "startingColumn" : 0
-        },
         "values" : [
           "${applicationName} 오늘",
           "오늘 루틴 in ${applicationName}"
-        ]
-      },
-      {
+        ],
         "appShortcutMetadata" : [
           {
-            "actionIdentifier" : "CompleteNextItemIntent",
-            "index" : 1,
-            "parameterTypes" : {
-
-            },
+            "index" : 0,
+            "title" : "오늘 루틴 열기",
             "parameterDisplayRepresentations" : {
 
             },
-            "title" : "다음 항목 완료"
+            "parameterTypes" : {
+
+            },
+            "actionIdentifier" : "OpenTodayIntent"
           }
         ],
-        "key" : "${applicationName} 다음 항목",
         "location" : {
-          "startingLine" : 42,
-          "startingColumn" : 0
-        },
+          "startingColumn" : 0,
+          "startingLine" : 42
+        }
+      },
+      {
+        "key" : "${applicationName} 다음 항목",
         "values" : [
           "${applicationName} 다음 항목",
           "다음 루틴 완료 in ${applicationName}"
-        ]
+        ],
+        "appShortcutMetadata" : [
+          {
+            "index" : 1,
+            "title" : "다음 항목 완료",
+            "parameterDisplayRepresentations" : {
+
+            },
+            "parameterTypes" : {
+
+            },
+            "actionIdentifier" : "CompleteNextItemIntent"
+          }
+        ],
+        "location" : {
+          "startingColumn" : 0,
+          "startingLine" : 42
+        }
       }
     ]
   },
-  "version" : 2
+  "version" : 2,
+  "source" : "\/Users\/mungyubin\/Desktop\/Code\/Anchor\/Anchor\/Anchor\/Intents\/AnchorAppIntents.swift"
 }

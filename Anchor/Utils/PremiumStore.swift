@@ -26,6 +26,8 @@ final class PremiumStore: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var productLoadFailed = false
     @Published var errorMessage: String?
+    /// App Store 심사 스크린샷 — StoreKit 없이 ₩7,900 구매 UI 표시
+    @Published var previewShowsPurchaseUI = false
 
     func bootstrap() async {
         isPremium = PremiumStorage.isPremium

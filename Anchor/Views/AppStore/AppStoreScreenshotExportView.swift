@@ -14,10 +14,11 @@ struct AppStoreScreenshotExportView: View {
     init(screen: AppStoreScreenshotHost.Screen) {
         self.screen = screen
         UserDefaults.standard.set(true, forKey: AppGuideStorage.hasSeenGuideKey)
-        if screen != .paywall {
-            PremiumStorage.setPremium(true)
-        } else {
+        switch screen {
+        case .paywall, .paywallFromSettings:
             PremiumStorage.setPremium(false)
+        default:
+            PremiumStorage.setPremium(true)
         }
         guard let made = try? AppStoreScreenshotData.makeSeed() else {
             fatalError("AppStoreScreenshotData.makeSeed failed")
@@ -26,11 +27,17 @@ struct AppStoreScreenshotExportView: View {
     }
 
     var body: some View {
-        AppStoreScreenshotHost(
-            screen: screen,
-            expandedRoutineIDs: screen == .routine ? [seed.primaryRoutineID] : []
-        )
-        .modelContainer(seed.container)
+        Group {
+            if screen == .paywallFromSettings {
+                AppStorePaywallFromSettingsExportView(seed: seed)
+            } else {
+                AppStoreScreenshotHost(
+                    screen: screen,
+                    expandedRoutineIDs: screen == .routine ? [seed.primaryRoutineID] : []
+                )
+                .modelContainer(seed.container)
+            }
+        }
         .preferredColorScheme(.light)
     }
 }

@@ -19,6 +19,7 @@ struct AppStoreScreenshotHost: View {
         case settingsScreenTime
         case settings
         case paywall
+        case paywallFromSettings
         case guideNotification
         case guideStart
         case splash

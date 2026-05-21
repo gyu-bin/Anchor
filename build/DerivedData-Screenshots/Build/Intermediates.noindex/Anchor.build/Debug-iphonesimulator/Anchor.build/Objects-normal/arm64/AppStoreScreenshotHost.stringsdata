@@ -7,7 +7,7 @@
         "key": "오늘",
         "location": {
           "startingColumn": 42,
-          "startingLine": 74
+          "startingLine": 75
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "루틴",
         "location": {
           "startingColumn": 42,
-          "startingLine": 78
+          "startingLine": 79
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "기록",
         "location": {
           "startingColumn": 42,
-          "startingLine": 83
+          "startingLine": 84
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "설정",
         "location": {
           "startingColumn": 42,
-          "startingLine": 87
+          "startingLine": 88
         }
       }
     ]

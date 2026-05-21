@@ -38,15 +38,27 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		BYBsqORXiFXI2a+nE/AzqMq/RKA=
+		qVFdmh0g7zGZvkmqilzJslV/ITg=
 		</data>
 		<key>Keyring.debug.dylib</key>
 		<data>
-		t925btZMn8x6vENq9cUvhAdnuu8=
+		esljanAkGjvpvEAjVYYpqW7Jy+s=
 		</data>
 		<key>Metadata.appintents/extract.actionsdata</key>
 		<data>
 		B/eN8Zb6fN9wFchnhUYnSNubJTY=
+		</data>
+		<key>Metadata.appintents/nlu/bfdbc581d7e8da531420f460ac272466.version</key>
+		<data>
+		W6k8nbDP+T9StSHXQg5D9u2ieE8=
+		</data>
+		<key>Metadata.appintents/nlu/nlu.lzfse</key>
+		<data>
+		QX8j44tU7AgKpWMDECOGMS7lBgw=
+		</data>
+		<key>Metadata.appintents/root.ssu.yaml</key>
+		<data>
+		QTKt+cF3Y/pnd3kGc7xKyhNvDj0=
 		</data>
 		<key>Metadata.appintents/version.json</key>
 		<data>
@@ -78,11 +90,11 @@
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/AnchorWidgetExtension</key>
 		<data>
-		NbgeDfbftrENEvbZrQqhbQAAq9g=
+		yZ8knX175xWofQmkYKBPIEVbe8o=
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/AnchorWidgetExtension.debug.dylib</key>
 		<data>
-		Oh3GseqYwC9bqxOahzZXb8/11NY=
+		2BHMbIFsCvA1NcyfKtf8URL34sM=
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/Assets.car</key>
 		<data>
@@ -102,7 +114,7 @@
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/_CodeSignature/CodeResources</key>
 		<data>
-		YZXMU/hNGdEwN2W7uNDIt215XrM=
+		D+sNlK+aREmeAje4xaJ7ZvzTfNc=
 		</data>
 		<key>PlugIns/AnchorWidgetExtension.appex/__preview.dylib</key>
 		<data>
@@ -175,7 +187,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Tihp7FbNGD8rsQIrFaSAi9ACdAGbeCxvFS144Bs20jY=
+			i74O8OD8bHPD/eyAJ1vUAFeEQ96sY68UsOtKmRfSfW4=
 			</data>
 		</dict>
 		<key>Metadata.appintents/extract.actionsdata</key>
@@ -183,6 +195,27 @@
 			<key>hash2</key>
 			<data>
 			bNcA7Iio/4VerzflDA1cZUrSrpdRJ9LoR6+YMJyXg7w=
+			</data>
+		</dict>
+		<key>Metadata.appintents/nlu/bfdbc581d7e8da531420f460ac272466.version</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bjQLnP+zepicpUTmu3gKLHiQHT+zNzh2hRGjBhevoB0=
+			</data>
+		</dict>
+		<key>Metadata.appintents/nlu/nlu.lzfse</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			l35rXQO2R3EyLRhHfhfSmeMiycpXWNWInUGHzdb0p+w=
+			</data>
+		</dict>
+		<key>Metadata.appintents/root.ssu.yaml</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xZqhISj3JrZU4Knx87R6RCoHpXBcn4n3pPtg+RS9ZXU=
 			</data>
 		</dict>
 		<key>Metadata.appintents/version.json</key>
@@ -231,14 +264,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			F3zhxDKAACi25g9Xpq5P1PjeWm7SKqa0ZfFlHSYTrus=
+			NzEFXwt2XFu5mB303pGG0qH3M51ZRHimOk4pZXZaw3I=
 			</data>
 		</dict>
 		<key>PlugIns/AnchorWidgetExtension.appex/AnchorWidgetExtension.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			FNyo0Z/LPmuYVp/W+OSJlG9Ba/EukBjOR8Q0PVWSNyU=
+			yyTNJVTil+2ujMjoPRkvrWqKEdqzcgJGuDO+XPreG3g=
 			</data>
 		</dict>
 		<key>PlugIns/AnchorWidgetExtension.appex/Assets.car</key>
@@ -273,7 +306,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			4s12m47b3iyuSMi2iYsDx5m2VuBPaAlrC7xycnCzNZg=
+			hsiDEQ8wU0tQt57J7FGKFEmDW4JLaRYOQVIAbyPwddw=
 			</data>
 		</dict>
 		<key>PlugIns/AnchorWidgetExtension.appex/__preview.dylib</key>

@@ -1,0 +1,49 @@
+apiVersion: ssu/v1
+nlu:
+  shortcuts:
+    bundleIdentifier: com.rbqls6651.anchor
+    intents:
+    - metadata:
+        name: OpenTodayIntent_0
+        title: 오늘 루틴 열기
+      corpuses:
+        training:
+        - locale: en
+          utterances:
+          - '{${+prefix} }${+applicationName} 오늘'
+          - '{${+prefix} }오늘 루틴 in ${+applicationName}'
+    - metadata:
+        name: CompleteNextItemIntent_1
+        title: 다음 항목 완료
+      corpuses:
+        training:
+        - locale: en
+          utterances:
+          - '{${+prefix} }${+applicationName} 다음 항목'
+          - '{${+prefix} }다음 루틴 완료 in ${+applicationName}'
+    - metadata:
+        name: +negative
+      corpuses:
+        training:
+        - locale: en
+          utterances:
+          - '{${+prefix} }${+standardAppShortcutNegatives}'
+variables:
+- name: +applicationName
+  type: ssu/expansion
+  definitions:
+  - locale: en
+    synomyms:
+    - 키링:Keyring
+- name: +prefix
+  type: ssu/expansion
+  definitions:
+  - locale: en
+    synomyms:
+      $ref: ssu://Resources/prefix/en.yaml
+- name: +standardAppShortcutNegatives
+  type: ssu/expansion
+  definitions:
+  - locale: en
+    synomyms:
+      $ref: ssu://Resources/standardAppShortcutNegatives/en.yaml

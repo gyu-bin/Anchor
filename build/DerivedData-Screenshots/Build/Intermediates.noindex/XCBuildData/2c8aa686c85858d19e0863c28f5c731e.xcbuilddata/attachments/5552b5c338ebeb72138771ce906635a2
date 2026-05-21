@@ -1,0 +1,39 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport-primary.dia",
+    "emit-module-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport-primary-emit-module.dia",
+    "pch" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport-primary.swiftdeps"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorDeviceActivityReport/AnchorDeviceActivityReport.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport.dia",
+    "index-unit-output-path" : "/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport.swiftdeps",
+    "swiftmodule" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/AnchorDeviceActivityReport~partial.swiftmodule"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorDeviceActivityReport/TotalActivityReport.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport.dia",
+    "index-unit-output-path" : "/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport.swiftdeps",
+    "swiftmodule" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityReport~partial.swiftmodule"
+  },
+  "/Users/mungyubin/Desktop/Code/Anchor/Anchor/AnchorDeviceActivityReport/TotalActivityView.swift" : {
+    "const-values" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView.swiftconstvalues",
+    "dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView.d",
+    "diagnostics" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView.dia",
+    "index-unit-output-path" : "/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView.o",
+    "llvm-bc" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView.bc",
+    "object" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView.o",
+    "swift-dependencies" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView.swiftdeps",
+    "swiftmodule" : "/Users/mungyubin/Desktop/Code/Anchor/Anchor/build/DerivedData-Screenshots/Build/Intermediates.noindex/Anchor.build/Debug-iphonesimulator/AnchorDeviceActivityReport.build/Objects-normal/arm64/TotalActivityView~partial.swiftmodule"
+  }
+}

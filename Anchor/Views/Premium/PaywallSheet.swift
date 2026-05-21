@@ -91,7 +91,11 @@ struct PaywallSheet: View {
                         .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(AnchorButtonStyle())
-                    .disabled(premium.isLoading || premium.isPremium || premium.product == nil)
+                    .disabled(
+                        premium.isLoading
+                            || premium.isPremium
+                            || (premium.product == nil && !premium.previewShowsPurchaseUI)
+                    )
 
                     Button(AppCopy.Premium.restore) {
                         Task { await premium.restore() }
