@@ -11,43 +11,25 @@ import WidgetKit
 struct TempUnlockLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TempUnlockAttributes.self) { context in
-            // 잠금화면 / 알림센터에 보이는 뷰
-            HStack(spacing: 12) {
-                Image(systemName: "lock.open.fill")
-                    .font(.title3)
-                    .foregroundStyle(.orange)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("앱 잠금 임시 해제 중")
-                        .font(.subheadline.weight(.semibold))
-                    Text(context.state.expiresAt, style: .timer)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .monospacedDigit()
-                }
-
-                Spacer()
-
-                Text("후 잠금")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            tempUnlockBanner(context: context)
+                .activityBackgroundTint(Color.black.opacity(0.75))
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Label("잠금 해제", systemImage: "lock.open.fill")
-                        .font(.headline)
-                        .foregroundStyle(.orange)
+                    HStack(spacing: 6) {
+                        Image(systemName: "lock.open.fill")
+                            .foregroundStyle(.orange)
+                        Text("10분 해제")
+                            .font(.subheadline.weight(.semibold))
+                    }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     Text(context.state.expiresAt, style: .timer)
                         .font(.headline.monospacedDigit())
-                        .foregroundStyle(.primary)
+                        .monospacedDigit()
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("타이머가 끝나면 자동으로 앱이 잠겨요")
+                    Text("끝나면 다시 앱이 잠겨요")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -57,11 +39,33 @@ struct TempUnlockLiveActivity: Widget {
             } compactTrailing: {
                 Text(context.state.expiresAt, style: .timer)
                     .font(.caption2.monospacedDigit())
-                    .foregroundStyle(.primary)
+                    .monospacedDigit()
             } minimal: {
                 Image(systemName: "lock.open.fill")
                     .foregroundStyle(.orange)
             }
         }
+    }
+
+    @ViewBuilder
+    private func tempUnlockBanner(context: ActivityViewContext<TempUnlockAttributes>) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "lock.open.fill")
+                .font(.title3)
+                .foregroundStyle(.orange)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("앱 잠금 임시 해제")
+                    .font(.subheadline.weight(.semibold))
+                Text(context.state.expiresAt, style: .timer)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
     }
 }

@@ -9,12 +9,18 @@ struct AnchorBriefToast: View {
     @Environment(\.colorScheme) private var scheme
 
     let message: String
+    var systemImage: String = "exclamationmark.circle.fill"
+    var iconColor: ((ColorScheme) -> Color)? = nil
+
+    private var resolvedIconColor: Color {
+        iconColor?(scheme) ?? Color.anchorWarning(scheme)
+    }
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: "exclamationmark.circle.fill")
+            Image(systemName: systemImage)
                 .font(.body.weight(.semibold))
-                .foregroundStyle(Color.anchorWarning(scheme))
+                .foregroundStyle(resolvedIconColor)
             Text(message)
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(Color.anchorText(scheme))

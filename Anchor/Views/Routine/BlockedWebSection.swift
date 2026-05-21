@@ -20,6 +20,8 @@ struct BlockedWebSection: View {
     @State private var selection = FamilyActivitySelection()
     @State private var showPicker = false
     @State private var domainInput: String = ""
+    @State private var isScreenTimeAuthorized = false
+    @State private var didCheckAuth = false
 
     private let presets: [String] = [
         "youtube.com",
@@ -57,7 +59,7 @@ struct BlockedWebSection: View {
             .buttonStyle(.borderedProminent)
             .tint(Color.anchorAccent(scheme))
             .frame(maxWidth: .infinity, alignment: .leading)
-            .disabled(ShieldManager.authorizationStatus() != .approved)
+            .disabled(!isScreenTimeAuthorized)
             .accessibilityLabel(savedWebTokens.isEmpty ? "차단할 웹사이트 선택" : "차단 웹사이트 수정")
 
             if !savedWebTokens.isEmpty {
@@ -108,6 +110,7 @@ struct BlockedWebSection: View {
                 }
             }
         }
+        .onAppear { refreshAuthStatusDeferred() }
         .sheet(isPresented: $showPicker) {
             FamilyActivityPickerSheet(
                 selection: $selection,
@@ -153,6 +156,15 @@ struct BlockedWebSection: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(BlockedDomainStyle.displayTitle(for: domain)) \(added ? "제거" : "추가")")
+    }
+
+    private func refreshAuthStatusDeferred() {
+        guard !didCheckAuth else { return }
+        didCheckAuth = true
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            isScreenTimeAuthorized = ShieldManager.authorizationStatus() == .approved
+        }
     }
 
     private func syncSelectionFromRoutine() {

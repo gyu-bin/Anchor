@@ -208,19 +208,14 @@ struct SettingsView: View {
                             }
                             .buttonStyle(SettingsRowButtonStyle())
 
-                            // 뷰를 파괴하지 않고 숨겨서 DeviceActivityReport가 계속 살아있게 유지
-                            SettingsInsetDivider()
-                                .frame(height: showScreenTime ? nil : 0)
-                                .opacity(showScreenTime ? 1 : 0)
-                                .clipped()
-                            ScreenTimeReportSection(
-                                authorizationStatus: screenTimeStatus,
-                                onRequestAuthorization: requestScreenTimeAuthorization
-                            )
-                            .padding(.bottom, showScreenTime ? 4 : 0)
-                            .frame(maxHeight: showScreenTime ? .infinity : 0)
-                            .opacity(showScreenTime ? 1 : 0)
-                            .clipped()
+                            if showScreenTime {
+                                SettingsInsetDivider()
+                                ScreenTimeReportSection(
+                                    authorizationStatus: screenTimeStatus,
+                                    onRequestAuthorization: requestScreenTimeAuthorization
+                                )
+                                .padding(.bottom, 4)
+                            }
                         }
                     }
 

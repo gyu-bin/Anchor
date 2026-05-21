@@ -59,6 +59,24 @@ struct RoutineDeadlineExtensionTests {
     clearExtension(routineID: routineID, calendar: cal)
   }
 
+  @Test func isTodayDeadlinePassed_afterEndTime() {
+    let cal = Calendar.current
+    let now = Date()
+    guard let pastEnd = cal.date(byAdding: .hour, value: -1, to: now),
+          let start = cal.date(byAdding: .hour, value: -4, to: now) else { return }
+    let routine = Routine(name: "아침", startTime: start, order: 0)
+    routine.endTime = pastEnd
+    routine.items = [RoutineItem(name: "물", icon: "drop.fill", order: 0)]
+
+    #expect(RoutineDeadline.isTodayDeadlinePassed(for: routine, now: now, calendar: cal))
+  }
+
+  @Test func isTodayDeadlinePassed_falseBeforeEnd() {
+    let cal = Calendar.current
+    guard let (routine, now) = routineEndingInTwoHours(calendar: cal) else { return }
+    #expect(!RoutineDeadline.isTodayDeadlinePassed(for: routine, now: now, calendar: cal))
+  }
+
   @Test func canExtendDeadlineToday_onlyInsideWindow() {
     let cal = Calendar.current
     guard let (routine, now) = routineEndingInTwoHours(calendar: cal) else { return }

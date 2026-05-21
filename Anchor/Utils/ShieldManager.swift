@@ -69,11 +69,11 @@ enum ShieldManager {
         }
 
         if RestDayStore.isRestToday(calendar: calendar) {
-            settings.clearAllSettings()
             if let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) {
                 DeviceActivityScheduleManager.stopAllMonitoring(routines: routines)
             }
             SharedShieldStore.clearMergedSelection()
+            applyShieldSettings(apps: [], webTokens: [], webDomainStrings: [])
             return
         }
 
@@ -170,13 +170,20 @@ enum ShieldManager {
         webTokens: [WebDomainToken],
         webDomainStrings: [String]
     ) {
-        if apps.isEmpty && webTokens.isEmpty && webDomainStrings.isEmpty {
+        var finalApps = apps
+        var finalWebTokens = webTokens
+        if QuickLockStore.isActive && !TempUnlockStore.isActive {
+            let sel = decodeSelection(QuickLockStore.selectionData)
+            finalApps = Array(Set(finalApps).union(sel.applicationTokens))
+            finalWebTokens = Array(Set(finalWebTokens).union(sel.webDomainTokens))
+        }
+        if finalApps.isEmpty && finalWebTokens.isEmpty && webDomainStrings.isEmpty {
             settings.clearAllSettings()
         } else {
-            settings.shield.applications = apps.isEmpty ? nil : Set(apps)
+            settings.shield.applications = finalApps.isEmpty ? nil : Set(finalApps)
             WebDomainBlocking.apply(
                 to: settings,
-                webTokens: Set(webTokens),
+                webTokens: Set(finalWebTokens),
                 domainStrings: webDomainStrings
             )
         }
@@ -213,11 +220,13 @@ enum ShieldManager {
 
     static func routineLockMessage(routine: Routine, modelContext: ModelContext) -> String {
         if isActivelyLocking(routine: routine, modelContext: modelContext) {
-            if let endTime = routine.endTime {
+            let calendar = Calendar.current
+            let now = Date()
+            if let end = RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar) {
                 let df = DateFormatter()
                 df.locale = Locale(identifier: "ko_KR")
                 df.dateFormat = "a h:mm"
-                return "앱 잠금 중 · \(df.string(from: endTime))까지"
+                return "앱 잠금 중 · \(df.string(from: end))까지"
             }
             return AppCopy.Routine.lockActive
         }

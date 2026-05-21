@@ -24,9 +24,13 @@ struct HistoryView: View {
     }
 
     private var effectiveLogs: [DailyLog] {
-        guard !premium.isPremium else { return logs }
-        let cutoff = PremiumLimits.historyCutoffDate()
-        return logs.filter { $0.date >= cutoff }
+        let liveIds = Set(routines.map(\.id))
+        let minimum = premium.isPremium ? nil : PremiumLimits.historyCutoffDate()
+        return DailyLogFetcher.fetchedLogs(
+            liveRoutineIds: liveIds,
+            context: modelContext,
+            minimumDate: minimum
+        )
     }
 
     private var hasOlderHistory: Bool {

@@ -56,13 +56,6 @@ struct ScreenTimeReportSection: View {
         )
     }
 
-    private var reportContext: DeviceActivityReport.Context {
-        switch period {
-        case .today:    return .totalToday
-        case .thisWeek: return .totalWeek
-        }
-    }
-
     var body: some View {
         Group {
             if authorizationStatus == .approved {
@@ -76,9 +69,18 @@ struct ScreenTimeReportSection: View {
                     .padding(.horizontal, AnchorLayout.cardPadding)
                     .padding(.top, 4)
 
-                    DeviceActivityReport(reportContext, filter: filter(for: period))
-                        .frame(minHeight: 200)
-                        .id(period)
+                    // 두 리포트를 항상 살려두고 보이기/숨기기만 해서 재로딩을 방지합니다
+                    DeviceActivityReport(.totalToday, filter: filter(for: .today))
+                        .frame(minHeight: period == .today ? 200 : 0)
+                        .frame(maxHeight: period == .today ? .infinity : 0)
+                        .opacity(period == .today ? 1 : 0)
+                        .clipped()
+
+                    DeviceActivityReport(.totalWeek, filter: filter(for: .thisWeek))
+                        .frame(minHeight: period == .thisWeek ? 200 : 0)
+                        .frame(maxHeight: period == .thisWeek ? .infinity : 0)
+                        .opacity(period == .thisWeek ? 1 : 0)
+                        .clipped()
 
                     Text(AppCopy.Settings.screenTimeFootnote)
                         .font(.caption2)

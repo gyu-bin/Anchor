@@ -115,6 +115,19 @@ extension ShieldManager {
         )
     }
 
+    /// 즉시 잠금(빠른 잠금)에 선택된 앱·웹 — 오늘 탭 표시용.
+    static func quickLockDisplaySummary() -> BlockedShieldSummary {
+        guard QuickLockStore.isActive else {
+            return BlockedShieldSummary(appTokens: [], webTokens: [], webDomains: [])
+        }
+        let selection = decodeSelection(QuickLockStore.selectionData)
+        return BlockedShieldSummary(
+            appTokens: Array(selection.applicationTokens).stableSorted(),
+            webTokens: Array(selection.webDomainTokens).stableSorted(),
+            webDomains: []
+        )
+    }
+
     static func aggregatedBlockedSummary(
         routines: [Routine],
         modelContext: ModelContext

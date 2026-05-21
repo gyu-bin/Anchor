@@ -63,21 +63,24 @@ private enum ScreenTimeAggregation {
             }
             guard !segmentDurations.isEmpty else { continue }
 
-            let contribution: TimeInterval
-            if multiDay {
-                // 주간: 일별 세그먼트 합산
-                contribution = segmentDurations.reduce(0, +)
-            } else {
+            if !multiDay {
                 // 오늘: 여러 소스 중복 제거 (가장 큰 값 사용)
                 let sum = segmentDurations.reduce(0, +)
                 let peak = segmentDurations.max() ?? 0
-                contribution = (segmentDurations.count == 1 || sum <= peak * 1.6) ? sum : peak
+                let contribution = (segmentDurations.count == 1 || sum <= peak * 1.6) ? sum : peak
+                perSource.append(contribution)
             }
-            perSource.append(contribution)
         }
 
-        // 여러 기기/유저 소스가 있을 때 최대값 선택 (중복 방지)
-        let totalSeconds = perSource.max() ?? 0
+        // 주간: data가 날짜별로 쪼개져 오므로 perSource.max()가 최대 하루값이 됨.
+        // 앱별 누적합을 쓰면 날짜 구조 무관하게 주간 전체 시간이 됨.
+        let totalSeconds: TimeInterval
+        if multiDay {
+            totalSeconds = appSeconds.values.reduce(0, +)
+        } else {
+            totalSeconds = perSource.max() ?? 0
+        }
+
         let apps = appSeconds
             .compactMap { application, seconds -> AppScreenTimeRow? in
                 guard let token = application.token else { return nil }

@@ -60,6 +60,8 @@ extension Notification.Name {
     static let anchorOpenTodayTab = Notification.Name("anchorOpenTodayTab")
     static let anchorOpenHistoryTab = Notification.Name("anchorOpenHistoryTab")
     static let anchorRefreshShield = Notification.Name("anchorRefreshShield")
+    /// 루틴 시작·마감 등 일정 구간이 바뀔 때 오늘 탭 UI 갱신
+    static let anchorTodayScheduleRefresh = Notification.Name("anchorTodayScheduleRefresh")
     static let anchorCompleteNextItem = Notification.Name("anchorCompleteNextItem")
     static let anchorRegisterRemotePush = Notification.Name("anchorRegisterRemotePush")
 }

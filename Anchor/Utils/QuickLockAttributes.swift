@@ -1,13 +1,14 @@
 //
-//  TempUnlockAttributes.swift
+//  QuickLockAttributes.swift
 //  Anchor
 //
 
 import ActivityKit
 import Foundation
 
-struct TempUnlockAttributes: ActivityAttributes {
+struct QuickLockAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         var expiresAt: Date
+        var appCount: Int
     }
 }

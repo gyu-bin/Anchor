@@ -10,7 +10,8 @@ struct OverallProgressCard: View {
     @Environment(\.colorScheme) private var scheme
 
     let routines: [Routine]
-    let logs: [DailyLog]
+    let logSnapshots: [TodayLogSnapshot]
+    let lockSnapshot: TodayProgressSnapshot
     /// 지금 실제로 잠금 중인 앱·웹만 포함 (시작 전 루틴의 예정 차단은 제외).
     let blockSummary: BlockedShieldSummary
 
@@ -20,10 +21,10 @@ struct OverallProgressCard: View {
 
     private var completedRoutines: Int {
         routinesWithItems.filter { routine in
-            guard let log = logs.first(where: { $0.routineId == routine.id }) else { return false }
+            guard let snap = logSnapshots.first(where: { $0.routineId == routine.id }) else { return false }
             let allIds = Set(routine.items.map(\.id))
             guard !allIds.isEmpty else { return false }
-            return allIds.isSubset(of: Set(log.completedItems))
+            return allIds.isSubset(of: snap.completedItemIds)
         }.count
     }
 
@@ -47,6 +48,16 @@ struct OverallProgressCard: View {
                 .frame(width: 64, height: 64)
 
                 VStack(alignment: .leading, spacing: 6) {
+                    if lockSnapshot.isActivelyLocking || lockSnapshot.remainingItemCount > 0 {
+                        Text(AppCopy.Today.lockHeroBadge)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(Color.anchorAccent(scheme))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.anchorAccent(scheme).opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+
                     Text(AppCopy.Today.progressTitle(completed: completedRoutines, total: totalRoutines))
                         .font(AnchorTypography.cardTitle(scheme))
                         .foregroundStyle(Color.anchorText(scheme))
@@ -55,12 +66,23 @@ struct OverallProgressCard: View {
                         .font(.subheadline)
                         .foregroundStyle(Color.anchorSub(scheme))
 
-                    if completedRoutines < totalRoutines, blockSummary.hasAnyBlock {
-                        Text(AppCopy.Today.lockActive)
+                    if lockSnapshot.isActivelyLocking, blockSummary.hasAnyBlock {
+                        HStack(alignment: .center, spacing: 8) {
+                            Text(AppCopy.Today.lockingAppsLabel)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.anchorWarning(scheme))
+                                .fixedSize(horizontal: true, vertical: false)
+                            BlockedShieldDisplay(
+                                summary: blockSummary,
+                                maxApps: 5,
+                                maxWebs: 3,
+                                iconSize: 24
+                            )
+                        }
+                    } else if completedRoutines < totalRoutines, lockSnapshot.remainingItemCount > 0 {
+                        Text(AppCopy.Today.lockScheduled)
                             .font(.caption.weight(.medium))
-                            .foregroundStyle(Color.anchorWarning(scheme))
-
-                        BlockedShieldDisplay(summary: blockSummary, maxApps: 6, maxWebs: 6)
+                            .foregroundStyle(Color.anchorSub(scheme))
                     }
                 }
                 Spacer(minLength: 0)

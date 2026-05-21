@@ -224,7 +224,8 @@ enum HistoryAnalytics {
             .flatMap(\.items)
             .reduce(into: [:]) { $0[$1.id] = $1 }
 
-        for log in logs {
+        let liveRoutineIds = Set(routines.map(\.id))
+        for log in logs where liveRoutineIds.contains(log.routineId) {
             for itemId in log.completedItems {
                 guard let item = itemById[itemId] else { continue }
                 let prev = totals[itemId]?.count ?? 0

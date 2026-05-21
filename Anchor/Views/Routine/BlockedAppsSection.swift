@@ -18,7 +18,8 @@ struct BlockedAppsSection: View {
 
     @State private var selection = FamilyActivitySelection()
     @State private var showPicker = false
-    @State private var authStatus: AuthorizationStatus = ShieldManager.authorizationStatus()
+    @State private var authStatus: AuthorizationStatus = .notDetermined
+    @State private var didCheckAuth = false
     @State private var authError: String?
 
     private var savedTokens: [ApplicationToken] {
@@ -71,8 +72,8 @@ struct BlockedAppsSection: View {
             }
         }
         .onAppear {
-            authStatus = ShieldManager.authorizationStatus()
             syncSelectionFromRoutine()
+            refreshAuthStatusDeferred()
         }
         .sheet(isPresented: $showPicker) {
             FamilyActivityPickerSheet(
@@ -82,6 +83,15 @@ struct BlockedAppsSection: View {
                 onApply: applyAppSelection,
                 onCancelSync: syncSelectionFromRoutine
             )
+        }
+    }
+
+    private func refreshAuthStatusDeferred() {
+        guard !didCheckAuth else { return }
+        didCheckAuth = true
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            authStatus = ShieldManager.authorizationStatus()
         }
     }
 

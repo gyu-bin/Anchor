@@ -30,7 +30,25 @@ enum AppCopy {
         }
 
         static let lockActive = "지금 앱 잠금 중이에요"
+        static let lockingAppsLabel = "잠금 중인 앱"
         static let lockScheduled = "루틴 시작 후 잠겨요"
+        static let lockHeroBadge = "할 일 완료 → 잠금 해제"
+        static let quickLockButton = "빠른 잠금"
+        /// 오늘 탭 우측 상단 버튼 캡션
+        static let quickLockCaption = "즉시잠금"
+        static let quickLockActive = "즉시 잠금 중"
+        static let quickLockManage = "관리"
+
+        static func quickLockCountdown(seconds: Int) -> String {
+            let h = seconds / 3600
+            let m = (seconds % 3600) / 60
+            let s = seconds % 60
+            if h > 0 {
+                return String(format: "%d:%02d:%02d 남음", h, m, s)
+            }
+            if m > 0 { return "\(m)분 \(s)초 남음" }
+            return "\(s)초 남음"
+        }
 
         static let emptyTitle = "아직 루틴이 없어요"
         static let emptyBody = "루틴 탭에서 +로 첫 루틴을 만들어 주세요"
@@ -49,9 +67,21 @@ enum AppCopy {
         static let undoMessage = "방금 체크를 되돌릴까요?"
         static let undoAction = "되돌리기"
         static let toggleFailed = "잠시 문제가 생겼어요. 다시 시도해 주세요"
+        static let cannotUncheckAfterDeadline = "마감이 지난 루틴은 완료를 취소할 수 없어요"
+        static let liveActivityDisabled = "설정 → 키링 → 라이브 액티비티를 켜 주세요"
+    }
+
+    enum QuickLock {
+        static let subtitle = "루틴 없이 지금 바로 앱을 잠가요"
+        static let close = "닫기"
     }
 
     enum Guide {
+        static let conceptBadge = "키링만의 방식"
+        static let conceptTitle = "시간만 막는 앱이\n아니에요"
+        static let conceptHighlight = "할 일을 다 할 때까지\n선택한 앱만 잠겨요"
+        static let conceptBody = "오늘 루틴을 끝내면 잠금이 바로 풀려요.\n「조금만 더」 하다 하루가 새는 걸, 체크리스트와 함께 막아 줄게요."
+
         static let morningBadge = "아침"
         static let morningTitle = "눈 뜨자마자\n인스타·유튜브 보다가\n오전을 다 날린 적, 있으시죠?"
         static let morningBody = "의지만으로는 어려울 때가 많아요.\n그건 게으른 게 아니라, 습관이 그렇게 만든 거예요."
@@ -150,6 +180,9 @@ enum AppCopy {
         static let scheduleRowAfterEnd = "끝나면"
         static let blockSection = "앱 · 웹 잠금"
         static let blockSectionHint = "미완료일 때 선택한 앱·사이트를 잠가요"
+        static let blockAppsSection = "차단할 앱"
+        static let blockAppsSectionHint = "미완료일 때 잠글 앱을 선택해요 (필수)"
+        static let blockWebOptional = "웹 사이트 차단 (선택)"
         static let endTimeToggle = "종료 시간 설정"
         static let endTimeLabel = "종료 시간"
         static let endTimeNote = "마감 30분 전 알림 · 미완료 시 3회까지 즉시 해제, 이후 30분 뒤 해제"
@@ -157,6 +190,8 @@ enum AppCopy {
         static let lockActive = "앱 잠금 중"
         static let lockScheduled = "시작 후 잠김"
         static let extendDeadline = "30분 연장"
+        static let extendSuccess = "30분 연장했어요"
+        static let extendFailed = "지금은 연장할 수 없어요"
         static let tempUnlockTenMin = "10분 해제"
         static func lockUnlocksAt(_ time: String) -> String { "잠금 \(time)에 해제" }
         static let lockReleasedAfterDeadline = "마감 지남 · 미완료"
@@ -196,6 +231,16 @@ enum AppCopy {
         static let deleteConfirmTitle = "루틴을 삭제할까요?"
         static let deleteConfirmMessage = "항목과 차단 설정도 함께 사라져요. 되돌릴 수 없어요."
         static let deleteConfirmAction = "삭제"
+        static let deletedToast = "루틴이 삭제되었습니다"
+        static let setupRequiredHint = "저장하려면 할 일과 차단할 앱이 필요해요"
+        static let checklistTodos = "할 일"
+        static let checklistApps = "앱 잠금"
+        static let validationNeedTodos = "할 일을 1개 이상 추가해 주세요"
+        static let validationNeedApps = "차단할 앱을 선택해 주세요"
+        static let validationNeedBoth = "할 일과 차단할 앱을 설정해 주세요"
+        static let saveRoutine = "저장"
+        static let todosEmptyHint = "오늘 체크할 할 일을 추가해 주세요"
+        static let appsEmptyHint = "미완료일 때 잠글 앱을 골라 주세요"
         static let duplicate = "루틴 복제"
         static let reorderItems = "항목 순서"
         static let reorderRoutines = "순서 변경"
@@ -346,6 +391,7 @@ enum AppCopy {
         static let appLimitHint = "무료는 앱 \(PremiumLimits.maxAppsPerRoutine)개까지예요."
         static let webLimitHint = "무료는 사이트 \(PremiumLimits.maxWebDomainsPerRoutine)개까지예요."
         static let webDomainNote = "도메인 칩은 Safari 등 브라우저에서 막혀요. 차단 화면은 「사이트 선택」으로 추가해요."
+        static let quickLockAppLimitHint = "무료는 빠른 잠금에서 앱 \(PremiumLimits.maxQuickLockApps)개까지 선택할 수 있어요."
     }
 
     enum Notification {

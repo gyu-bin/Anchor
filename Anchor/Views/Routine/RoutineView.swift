@@ -23,29 +23,59 @@ struct RoutineView: View {
     @State private var paywallReason: PaywallReason?
     @State private var showTemplatePicker = false
     @State private var showAddMenu = false
+    @State private var showDeletedToast = false
+    @State private var deletedToastTask: Task<Void, Never>?
+    @State private var validationToastMessage: String?
+    @State private var validationToastTask: Task<Void, Never>?
 
     private var orderedRoutines: [Routine] {
         routineVM.sortedRoutines(routines)
     }
 
+    private var bottomScrollInset: CGFloat {
+        if validationToastMessage != nil || showDeletedToast { return 88 }
+        return 36
+    }
+
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
-                    header
+            ZStack(alignment: .bottom) {
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
+                            header
 
-                    if orderedRoutines.isEmpty {
-                        emptyState
-                    } else {
-                        VStack(spacing: 10) {
-                            ForEach(orderedRoutines, id: \.id) { routine in
-                                routineCard(for: routine)
-                                    .padding(.horizontal, AnchorLayout.screenHorizontal)
+                            if orderedRoutines.isEmpty {
+                                emptyState
+                            } else {
+                                VStack(spacing: 10) {
+                                    ForEach(orderedRoutines, id: \.id) { routine in
+                                        routineCard(for: routine, scrollProxy: proxy)
+                                            .padding(.horizontal, AnchorLayout.screenHorizontal)
+                                    }
+                                }
                             }
                         }
+                        .padding(.bottom, bottomScrollInset)
                     }
                 }
-                .padding(.bottom, 36)
+
+                VStack(spacing: 8) {
+                    if let validationToastMessage {
+                        AnchorBriefToast(message: validationToastMessage)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    if showDeletedToast {
+                        AnchorBriefToast(
+                            message: AppCopy.Routine.deletedToast,
+                            systemImage: "checkmark.circle.fill",
+                            iconColor: { Color.anchorSuccess($0) }
+                        )
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                }
+                .padding(.horizontal, AnchorLayout.screenHorizontal)
+                .padding(.bottom, 12)
             }
             .anchorScreenBackground()
             .navigationBarTitleDisplayMode(.inline)
@@ -106,7 +136,7 @@ struct RoutineView: View {
     }
 
     @ViewBuilder
-    private func routineCard(for routine: Routine) -> some View {
+    private func routineCard(for routine: Routine, scrollProxy: ScrollViewProxy) -> some View {
         RoutineCardView(
             routine: routine,
             vm: routineVM,
@@ -127,6 +157,20 @@ struct RoutineView: View {
             onFinishEditing: {
                 if focusNameRoutineID == routine.id {
                     focusNameRoutineID = nil
+                }
+            },
+            onDeleted: { presentDeletedToast() },
+            onValidationFailed: { result in
+                presentValidationToast(result.toastMessage)
+                _ = withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
+                    expandedRoutineIDs.insert(routine.id)
+                }
+                if let target = result.scrollTargetID(for: routine.id) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        withAnimation(AnchorMotion.spring(response: 0.35, dampingFraction: 0.85)) {
+                            scrollProxy.scrollTo(target, anchor: .center)
+                        }
+                    }
                 }
             }
         )
@@ -215,7 +259,6 @@ struct RoutineView: View {
         if let focusID = focusNameRoutineID, !ids.contains(focusID) {
             focusNameRoutineID = nil
         }
-        RoutineSync.afterMutation(modelContext: modelContext, refreshShield: false)
     }
 
     private func fulfillPendingNavigation() {
@@ -243,6 +286,39 @@ struct RoutineView: View {
         Task { @MainActor in
             await Task.yield()
             addNewRoutine()
+        }
+    }
+
+    private func presentValidationToast(_ message: String) {
+        guard !message.isEmpty else { return }
+        validationToastTask?.cancel()
+        withAnimation(AnchorMotion.spring(response: 0.32)) {
+            validationToastMessage = message
+        }
+        validationToastTask = Task {
+            try? await Task.sleep(for: .seconds(2.4))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation {
+                    validationToastMessage = nil
+                }
+            }
+        }
+    }
+
+    private func presentDeletedToast() {
+        deletedToastTask?.cancel()
+        withAnimation(AnchorMotion.spring(response: 0.32)) {
+            showDeletedToast = true
+        }
+        deletedToastTask = Task {
+            try? await Task.sleep(for: .seconds(2.2))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation {
+                    showDeletedToast = false
+                }
+            }
         }
     }
 

@@ -43,7 +43,6 @@ final class RoutineViewModel {
         RoutineSchedule.apply(schedule, to: r)
         context.insert(r)
         try? context.save()
-        RoutineSync.afterMutation(modelContext: context)
         return r
     }
 
@@ -51,13 +50,16 @@ final class RoutineViewModel {
         guard RoutineSchedule.isDraftValid(draft) else { return }
         RoutineSchedule.apply(draft, to: routine)
         try? context.save()
-        RoutineSync.afterMutation(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context, refreshShield: false)
     }
 
     func deleteRoutine(_ routine: Routine, context: ModelContext) {
-        context.delete(routine)
-        try? context.save()
-        RoutineSync.afterMutation(modelContext: context)
+        RoutineDeletion.delete(routine, context: context)
+        Task { @MainActor in
+            context.processPendingChanges()
+            await Task.yield()
+            RoutineSync.afterMutation(modelContext: context, immediately: true)
+        }
     }
 
     func addItem(
@@ -102,7 +104,7 @@ final class RoutineViewModel {
             order: nextOrder(in: routines)
         )
         try? context.save()
-        RoutineSync.afterMutation(modelContext: context)
+        RoutineSync.afterMutation(modelContext: context, refreshShield: false)
         return routine
     }
 

@@ -32,35 +32,32 @@ final class TodayViewModel {
     }
 
     func todayLog(for routine: Routine, context: ModelContext, calendar: Calendar = .current) throws -> DailyLog {
-        let day = Date().startOfDay(in: calendar)
-        let rid = routine.id
-        var fd = FetchDescriptor<DailyLog>(
-            predicate: #Predicate { log in
-                log.routineId == rid
-            }
-        )
-        fd.fetchLimit = 200
-        let logs = try context.fetch(fd)
-        if let existing = logs.first(where: { calendar.isDate($0.date, inSameDayAs: day) }) {
-            return existing
+        guard let log = try DailyLogFetcher.todayLog(for: routine, context: context, calendar: calendar) else {
+            throw TodayLogError.missingLog
         }
-        let log = DailyLog(date: day, routineId: routine.id, completedItems: [], isFullyCompleted: false, totalMinutes: 0)
-        context.insert(log)
         return log
     }
 
-    func refreshCompletionState(log: DailyLog, routine: Routine) {
+    func refreshCompletionState(log: DailyLog, routine: Routine, context: ModelContext) {
+        guard let fresh = DailyLogFetcher.log(id: log.id, context: context) else { return }
         let allIds = Set(routine.items.map(\.id))
-        let completed = Set(log.completedItems.filter { allIds.contains($0) })
-        log.completedItems = Array(completed)
-        log.isFullyCompleted = !allIds.isEmpty && allIds.isSubset(of: completed)
-        log.totalMinutes = log.completedItems.count
+        let completed = Set(fresh.completedItems.filter { allIds.contains($0) })
+        fresh.completedItems = Array(completed)
+        fresh.isFullyCompleted = !allIds.isEmpty && allIds.isSubset(of: completed)
+        fresh.totalMinutes = fresh.completedItems.count
     }
 
-    func isRoutineComplete(routine: Routine, log: DailyLog) -> Bool {
+    func isRoutineComplete(routine: Routine, log: DailyLog, context: ModelContext) -> Bool {
+        guard let fresh = DailyLogFetcher.log(id: log.id, context: context) else { return false }
         let allIds = Set(routine.items.map(\.id))
         guard !allIds.isEmpty else { return false }
-        return allIds.isSubset(of: Set(log.completedItems))
+        return allIds.isSubset(of: Set(fresh.completedItems))
+    }
+
+    func isRoutineComplete(routine: Routine, snapshot: TodayLogSnapshot) -> Bool {
+        let allIds = Set(routine.items.map(\.id))
+        guard !allIds.isEmpty else { return false }
+        return allIds.isSubset(of: snapshot.completedItemIds)
     }
 
     /// 루틴 삭제·항목 변경 후 오늘 로그·완료 플래그를 현재 루틴 목록에 맞춥니다.
@@ -71,31 +68,67 @@ final class TodayViewModel {
     ) {
         let day = Date().startOfDay(in: calendar)
         let liveRoutineIds = Set(routines.map(\.id))
+        let dayStart = day
+        let dayEnd = calendar.date(byAdding: .day, value: 1, to: day) ?? day.addingTimeInterval(86400)
 
-        if let allLogs = try? context.fetch(FetchDescriptor<DailyLog>()) {
-            for log in allLogs where calendar.isDate(log.date, inSameDayAs: day) {
-                if !liveRoutineIds.contains(log.routineId) {
-                    context.delete(log)
-                }
+        var todayLogsDescriptor = FetchDescriptor<DailyLog>(
+            predicate: #Predicate<DailyLog> { log in
+                log.date >= dayStart && log.date < dayEnd
             }
+        )
+        todayLogsDescriptor.fetchLimit = 64
+        if let todayLogs = try? context.fetch(todayLogsDescriptor) {
+            for log in todayLogs where !liveRoutineIds.contains(log.routineId) {
+                context.delete(log)
+            }
+        }
+        if context.hasChanges {
+            try? context.save()
+            context.processPendingChanges()
         }
 
         for routine in actionableRoutinesForToday(routines, calendar: calendar) {
             guard let log = try? todayLog(for: routine, context: context, calendar: calendar) else { continue }
-            refreshCompletionState(log: log, routine: routine)
+            refreshCompletionState(log: log, routine: routine, context: context)
         }
+    }
+
+    /// 마감이 지난 뒤 완료된 항목은 체크 해제할 수 없습니다.
+    func canUncheckItem(
+        _ item: RoutineItem,
+        routine: Routine,
+        logId: UUID,
+        context: ModelContext,
+        now: Date = Date(),
+        calendar: Calendar = .current
+    ) -> Bool {
+        guard let fresh = DailyLogFetcher.log(id: logId, context: context) else { return true }
+        guard fresh.completedItems.contains(item.id) else { return true }
+        return !RoutineDeadline.isTodayDeadlinePassed(for: routine, now: now, calendar: calendar)
+    }
+
+    func canUncheckItem(
+        _ item: RoutineItem,
+        routine: Routine,
+        snapshot: TodayLogSnapshot,
+        now: Date = Date(),
+        calendar: Calendar = .current
+    ) -> Bool {
+        guard snapshot.completedItemIds.contains(item.id) else { return true }
+        return !RoutineDeadline.isTodayDeadlinePassed(for: routine, now: now, calendar: calendar)
     }
 
     func toggleCompletion(item: RoutineItem, routine: Routine, context: ModelContext) throws {
         let log = try todayLog(for: routine, context: context)
         var set = Set(log.completedItems)
         if set.contains(item.id) {
+            guard canUncheckItem(item, routine: routine, logId: log.id, context: context) else { return }
             set.remove(item.id)
         } else {
             set.insert(item.id)
         }
         log.completedItems = Array(set)
-        refreshCompletionState(log: log, routine: routine)
+        refreshCompletionState(log: log, routine: routine, context: context)
     }
 
     func setCompletion(
@@ -109,36 +142,36 @@ final class TodayViewModel {
         if completed {
             set.insert(item.id)
         } else {
+            guard canUncheckItem(item, routine: routine, logId: log.id, context: context) else { return }
             set.remove(item.id)
         }
         log.completedItems = Array(set)
-        refreshCompletionState(log: log, routine: routine)
+        refreshCompletionState(log: log, routine: routine, context: context)
     }
 
     func completeNextItem(routines: [Routine], context: ModelContext) throws -> Bool {
         for routine in routinesForToday(routines) {
-            let log = try todayLog(for: routine, context: context)
-            if let item = firstIncompleteItem(routine: routine, log: log) {
-                try setCompletion(item: item, routine: routine, completed: true, context: context)
-                return true
-            }
+            guard let snap = TodayLogSnapshot.capture(for: routine, context: context),
+                  let item = firstIncompleteItem(routine: routine, snapshot: snap) else { continue }
+            try setCompletion(item: item, routine: routine, completed: true, context: context)
+            return true
         }
         return false
     }
 
-    func isCompleted(_ item: RoutineItem, log: DailyLog) -> Bool {
-        log.completedItems.contains(item.id)
+    func isCompleted(_ item: RoutineItem, snapshot: TodayLogSnapshot) -> Bool {
+        snapshot.completedItemIds.contains(item.id)
     }
 
-    func progress(routine: Routine, log: DailyLog) -> Double {
+    func progress(routine: Routine, snapshot: TodayLogSnapshot) -> Double {
         let total = routine.items.count
         guard total > 0 else { return 0 }
-        let done = log.completedItems.filter { id in routine.items.contains(where: { $0.id == id }) }.count
+        let done = snapshot.completedItemIds.filter { id in routine.items.contains(where: { $0.id == id }) }.count
         return Double(done) / Double(total)
     }
 
-    func firstIncompleteItem(routine: Routine, log: DailyLog) -> RoutineItem? {
-        sortedItems(for: routine).first { !log.completedItems.contains($0.id) }
+    func firstIncompleteItem(routine: Routine, snapshot: TodayLogSnapshot) -> RoutineItem? {
+        sortedItems(for: routine).first { !snapshot.completedItemIds.contains($0.id) }
     }
 
     /// 목록 순서대로, 아직 끝내지 않은 첫 루틴을 "진행 중"으로 선택합니다.
@@ -155,9 +188,13 @@ final class TodayViewModel {
         let withItems = actionableRoutinesForToday(routines)
         guard !withItems.isEmpty else { return false }
         for r in withItems {
-            let log = try todayLog(for: r, context: context)
-            if !isRoutineComplete(routine: r, log: log) { return false }
+            guard let snap = TodayLogSnapshot.capture(for: r, context: context) else { return false }
+            if !isRoutineComplete(routine: r, snapshot: snap) { return false }
         }
         return true
     }
+}
+
+enum TodayLogError: Error {
+    case missingLog
 }

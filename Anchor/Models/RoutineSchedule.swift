@@ -212,8 +212,8 @@ enum RoutineSchedule {
                 changed = true
             }
             if routine.createdAt == nil {
-                let fd = FetchDescriptor<DailyLog>()
-                let logs = (try? context.fetch(fd)) ?? []
+                let liveIds = Set(routines.map(\.id))
+                let logs = DailyLogFetcher.fetchedLogs(liveRoutineIds: liveIds, context: context)
                 routine.createdAt = effectiveCreatedDay(for: routine, logs: logs)
                 changed = true
             }

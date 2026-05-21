@@ -14,25 +14,26 @@ struct AppGuideView: View {
 
     @State private var page: Int
 
-    private let pageCount = 7
-
     init(isReplay: Bool = false, initialPage: Int = 0, onFinish: @escaping () -> Void) {
         self.isReplay = isReplay
-        self.initialPage = min(max(0, initialPage), 6)
+        self.initialPage = min(max(0, initialPage), 7)
         self.onFinish = onFinish
-        _page = State(initialValue: min(max(0, initialPage), 6))
+        _page = State(initialValue: min(max(0, initialPage), 7))
     }
+
+    private let pageCount = 8
 
     var body: some View {
         VStack(spacing: 0) {
             TabView(selection: $page) {
-                morningPage.tag(0)
-                eveningPage.tag(1)
-                reliefPage.tag(2)
-                howItWorksPage.tag(3)
-                screenTimePage.tag(4)
-                notificationPage.tag(5)
-                startPage.tag(6)
+                conceptPage.tag(0)
+                morningPage.tag(1)
+                eveningPage.tag(2)
+                reliefPage.tag(3)
+                howItWorksPage.tag(4)
+                screenTimePage.tag(5)
+                notificationPage.tag(6)
+                startPage.tag(7)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .animation(.easeInOut(duration: 0.28), value: page)
@@ -44,6 +45,63 @@ struct AppGuideView: View {
     }
 
     // MARK: - Pages
+
+    private var conceptPage: some View {
+        VStack(spacing: 24) {
+            Spacer(minLength: 16)
+
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.anchorAccent(scheme).opacity(0.28),
+                                Color.anchorAccent(scheme).opacity(0.08),
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 120, height: 120)
+
+                Image(systemName: "checkmark.shield.fill")
+                    .font(.system(size: 48, weight: .medium))
+                    .foregroundStyle(Color.anchorAccent(scheme))
+                    .symbolRenderingMode(.hierarchical)
+            }
+
+            Text(AppCopy.Guide.conceptBadge)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.anchorAccent(scheme))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.anchorAccent(scheme).opacity(0.12))
+                .clipShape(Capsule())
+
+            VStack(spacing: 14) {
+                Text(AppCopy.Guide.conceptTitle)
+                    .font(.system(size: 28, weight: .bold))
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .foregroundStyle(Color.anchorText(scheme))
+
+                Text(AppCopy.Guide.conceptHighlight)
+                    .font(.system(size: 20, weight: .semibold))
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .foregroundStyle(Color.anchorAccent(scheme))
+
+                Text(AppCopy.Guide.conceptBody)
+                    .font(.body)
+                    .lineSpacing(5)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color.anchorSub(scheme))
+            }
+            .padding(.horizontal, 28)
+
+            Spacer(minLength: 16)
+        }
+    }
 
     private var morningPage: some View {
         GuideEmpathyPage(

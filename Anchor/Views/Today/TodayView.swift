@@ -15,6 +15,7 @@ private struct UndoSnapshot {
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
+    @EnvironmentObject private var tabRouter: TabRouter
 
     @Query(sort: [SortDescriptor(\Routine.order)]) private var routines: [Routine]
     @State private var vm = TodayViewModel()
@@ -27,9 +28,17 @@ struct TodayView: View {
     @State private var undoTask: Task<Void, Never>?
     @State private var showErrorToast = false
     @State private var errorToastTask: Task<Void, Never>?
+    @State private var infoToastMessage: String?
+    @State private var infoToastTask: Task<Void, Never>?
+    @State private var todayUIRevision = 0
+    @State private var scheduleClockTimer: Timer?
+    @State private var lastScheduleUISignature = ""
+    @State private var showQuickLock = false
     @State private var isRestToday = RestDayStore.isRestToday()
     @State private var unlockSecondsLeft: Int = 0
     @State private var unlockTimerTask: Task<Void, Never>? = nil
+    @State private var quickLockSecondsLeft: Int = 0
+    @State private var quickLockTimerTask: Task<Void, Never>? = nil
     @State private var tempUnlockUsedToday: Bool = TempUnlockStore.hasBeenUsedToday
 
     private var sortedRoutines: [Routine] {
@@ -45,9 +54,10 @@ struct TodayView: View {
         vm.actionableRoutinesForToday(sortedRoutines)
     }
 
-    private var todayLogs: [DailyLog] {
-        actionableRoutinesToday.compactMap { routine in
-            try? vm.todayLog(for: routine, context: modelContext)
+    private var todayLogSnapshots: [TodayLogSnapshot] {
+        modelContext.processPendingChanges()
+        return actionableRoutinesToday.compactMap {
+            TodayLogSnapshot.capture(for: $0, context: modelContext)
         }
     }
 
@@ -69,7 +79,15 @@ struct TodayView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(alignment: .leading, spacing: AnchorLayout.sectionSpacing) {
-                            AnchorScreenHeader(title: greeting, subtitle: dateTitle)
+                            todayHeader
+
+                            if quickLockSecondsLeft > 0 {
+                                QuickLockStatusCard(
+                                    remainingSeconds: quickLockSecondsLeft,
+                                    blockSummary: ShieldManager.quickLockDisplaySummary(),
+                                    onManage: { showQuickLock = true }
+                                )
+                            }
 
                             if routines.isEmpty, TodayEmptyHintStore.shouldShow {
                                 emptyState
@@ -81,7 +99,12 @@ struct TodayView: View {
                                 if !actionableRoutinesToday.isEmpty {
                                     OverallProgressCard(
                                         routines: actionableRoutinesToday,
-                                        logs: todayLogs,
+                                        logSnapshots: todayLogSnapshots,
+                                        lockSnapshot: TodayProgressSnapshot.make(
+                                            routines: actionableRoutinesToday,
+                                            logSnapshots: todayLogSnapshots,
+                                            modelContext: modelContext
+                                        ),
                                         blockSummary: ShieldManager.aggregatedBlockedSummary(
                                             routines: actionableRoutinesToday,
                                             modelContext: modelContext
@@ -90,10 +113,10 @@ struct TodayView: View {
                                 }
 
                                 ForEach(actionableRoutinesToday, id: \.id) { routine in
-                                    if let log = try? vm.todayLog(for: routine, context: modelContext) {
+                                    if let logSnapshot = TodayLogSnapshot.capture(for: routine, context: modelContext) {
                                         RoutineSectionCard(
                                             routine: routine,
-                                            log: log,
+                                            logSnapshot: logSnapshot,
                                             blockSummary: ShieldManager.displaySummary(
                                                 for: routine,
                                                 modelContext: modelContext
@@ -106,7 +129,7 @@ struct TodayView: View {
                                             tempUnlockUsedToday: tempUnlockUsedToday,
                                             canExtendDeadline: RoutineDeadline.canExtendDeadlineToday(
                                                 for: routine,
-                                                isComplete: log.isFullyCompleted
+                                                isComplete: logSnapshot.isFullyCompleted
                                             ),
                                             onUnlock: { handleTempUnlock() },
                                             onRelockNow: { handleRelockNow() },
@@ -115,7 +138,7 @@ struct TodayView: View {
                                                 toggle(item: item, routine: routine)
                                             }
                                         )
-                                        .id(routine.id)
+                                        .id("\(routine.id)-\(todayUIRevision)")
                                     }
                                 }
                             }
@@ -132,6 +155,10 @@ struct TodayView: View {
                 }
 
                 VStack(spacing: 8) {
+                    if let infoToastMessage {
+                        AnchorBriefToast(message: infoToastMessage)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                     if showErrorToast {
                         AnchorBriefToast(message: AppCopy.Today.toggleFailed)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -151,6 +178,11 @@ struct TodayView: View {
                 isRestToday = RestDayStore.isRestToday()
                 refreshCompletionBannerState()
                 syncAfterTodayChange()
+                refreshTodayScheduleUI()
+                startScheduleClockIfNeeded()
+                if TempUnlockStore.isActive, let expiresAt = TempUnlockStore.expiresAt {
+                    TempUnlockActivityManager.reconcile(expiresAt: expiresAt)
+                }
                 let remaining = TempUnlockStore.remainingSeconds
                 if remaining > 0 {
                     unlockSecondsLeft = remaining
@@ -159,16 +191,43 @@ struct TodayView: View {
                     TempUnlockStore.deactivate()
                     Task { await ShieldManager.refresh(modelContext: modelContext) }
                 }
+                refreshQuickLockState(reconcileLiveActivity: true)
             }
             .onDisappear {
                 unlockTimerTask?.cancel()
                 unlockTimerTask = nil
+                quickLockTimerTask?.cancel()
+                quickLockTimerTask = nil
+                scheduleClockTimer?.invalidate()
+                scheduleClockTimer = nil
             }
-            .onChange(of: routines.map(\.id)) { _, _ in
-                applyRoutineListChange()
+            .onReceive(NotificationCenter.default.publisher(for: .anchorTodayScheduleRefresh)) { _ in
+                refreshTodayScheduleUI()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .anchorRefreshShield)) { _ in
+                refreshTodayScheduleUI()
+            }
+            .onChange(of: routines.map(\.id)) { oldIds, newIds in
+                guard tabRouter.selectedTab == 0 else { return }
+                if newIds.count != oldIds.count {
+                    Task { @MainActor in
+                        modelContext.processPendingChanges()
+                        await Task.yield()
+                        let added = newIds.count > oldIds.count
+                        applyRoutineListChange(syncWidgets: !added)
+                        startScheduleClockIfNeeded()
+                    }
+                } else {
+                    applyRoutineListChange()
+                    startScheduleClockIfNeeded()
+                }
             }
             .onChange(of: routines.map(\.items.count)) { _, _ in
-                applyRoutineListChange()
+                guard tabRouter.selectedTab == 0 else { return }
+                Task { @MainActor in
+                    await Task.yield()
+                    applyRoutineListChange(syncWidgets: false)
+                }
             }
             .onChange(of: actionableRoutinesToday.map(\.id)) { _, ids in
                 if !ids.isEmpty { TodayEmptyHintStore.markSeen() }
@@ -178,6 +237,133 @@ struct TodayView: View {
                     .presentationDetents([.height(300)])
                     .presentationDragIndicator(.visible)
                     .presentationCornerRadius(28)
+            }
+            .sheet(isPresented: $showQuickLock, onDismiss: syncAfterQuickLockDismiss) {
+                NavigationStack {
+                    QuickLockView()
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button(AppCopy.QuickLock.close) {
+                                    showQuickLock = false
+                                }
+                            }
+                        }
+                }
+                .presentationDragIndicator(.visible)
+                .presentationCornerRadius(28)
+            }
+        }
+    }
+
+    private var todayHeader: some View {
+        HStack(alignment: .top, spacing: 12) {
+            AnchorScreenHeader(title: greeting, subtitle: dateTitle)
+            Button {
+                showQuickLock = true
+            } label: {
+                VStack(spacing: 4) {
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "bolt.shield.fill")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(Color.anchorAccent(scheme))
+                            .frame(width: 44, height: 44)
+                            .background(Color.anchorAccent(scheme).opacity(0.12))
+                            .clipShape(Circle())
+                        if QuickLockStore.isActive {
+                            Circle()
+                                .fill(Color.anchorWarning(scheme))
+                                .frame(width: 10, height: 10)
+                                .offset(x: 2, y: -2)
+                        }
+                    }
+                    Text(AppCopy.Today.quickLockCaption)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.anchorSub(scheme))
+                }
+                .frame(width: 52)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(AppCopy.Today.quickLockButton)
+        }
+    }
+
+    private func syncAfterQuickLockDismiss() {
+        refreshQuickLockState(reconcileLiveActivity: true)
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
+    }
+
+    private func refreshQuickLockState(reconcileLiveActivity: Bool = false) {
+        let remaining = QuickLockStore.remainingSeconds
+        if remaining > 0 {
+            quickLockSecondsLeft = remaining
+            startQuickLockCountdown()
+            if reconcileLiveActivity, let expiresAt = QuickLockStore.expiresAt {
+                let count = ShieldManager.quickLockDisplaySummary().appTokens.count
+                QuickLockActivityManager.start(expiresAt: expiresAt, appCount: count)
+            }
+        } else {
+            quickLockTimerTask?.cancel()
+            quickLockTimerTask = nil
+            quickLockSecondsLeft = 0
+            if QuickLockStore.expiresAt != nil {
+                QuickLockStore.deactivate()
+                QuickLockActivityManager.end()
+            }
+        }
+        todayUIRevision += 1
+    }
+
+    private func startQuickLockCountdown() {
+        quickLockTimerTask?.cancel()
+        quickLockTimerTask = Task { @MainActor in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled else { break }
+                let remaining = QuickLockStore.remainingSeconds
+                quickLockSecondsLeft = remaining
+                if remaining == 0 {
+                    QuickLockStore.deactivate()
+                    QuickLockActivityManager.end()
+                    await ShieldManager.refresh(modelContext: modelContext)
+                    break
+                }
+            }
+        }
+    }
+
+    private func refreshTodayScheduleUI() {
+        let signature = ShieldScheduleWatcher.scheduleUISignature(modelContext: modelContext)
+        guard signature != lastScheduleUISignature else { return }
+        lastScheduleUISignature = signature
+        todayUIRevision += 1
+    }
+
+    /// 시작·마감 시각이 다가온 루틴이 있으면 1초마다 UI 상태를 맞춥니다.
+    private func startScheduleClockIfNeeded() {
+        scheduleClockTimer?.invalidate()
+        scheduleClockTimer = nil
+
+        let hasUpcomingBoundary = actionableRoutinesToday.contains { routine in
+            let now = Date()
+            if !ShieldManager.hasRoutineStartedToday(routine, now: now) { return true }
+            if let end = RoutineDeadline.endTimeToday(for: routine, now: now), now < end { return true }
+            return false
+        }
+        guard hasUpcomingBoundary else { return }
+
+        scheduleClockTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            Task { @MainActor in
+                refreshTodayScheduleUI()
+                let stillNeeded = actionableRoutinesToday.contains { routine in
+                    let now = Date()
+                    if !ShieldManager.hasRoutineStartedToday(routine, now: now) { return true }
+                    if let end = RoutineDeadline.endTimeToday(for: routine, now: now), now < end { return true }
+                    return false
+                }
+                if !stillNeeded {
+                    scheduleClockTimer?.invalidate()
+                    scheduleClockTimer = nil
+                }
             }
         }
     }
@@ -219,7 +405,7 @@ struct TodayView: View {
 
     private var bottomScrollInset: CGFloat {
         if showUndoToast { return 88 }
-        if showErrorToast { return 72 }
+        if showErrorToast || infoToastMessage != nil { return 72 }
         return 36
     }
 
@@ -240,7 +426,15 @@ struct TodayView: View {
                 let log = try vm.todayLog(for: routine, context: modelContext)
                 let wasCompleted = log.completedItems.contains(item.id)
 
+                if wasCompleted, !vm.canUncheckItem(item, routine: routine, logId: log.id, context: modelContext) {
+                    UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                    presentInfoToast(AppCopy.Today.cannotUncheckAfterDeadline)
+                    return
+                }
+
+                let completedBefore = log.completedItems
                 try vm.toggleCompletion(item: item, routine: routine, context: modelContext)
+                guard log.completedItems != completedBefore else { return }
                 try modelContext.save()
 
                 if let updatedLog = try? vm.todayLog(for: routine, context: modelContext),
@@ -250,13 +444,15 @@ struct TodayView: View {
                     DeadlineGraceStore.resetMissCount()
                 }
 
-                presentUndo(item: item, routine: routine, wasCompleted: wasCompleted)
+                if !wasCompleted || vm.canUncheckItem(item, routine: routine, logId: log.id, context: modelContext) {
+                    presentUndo(item: item, routine: routine, wasCompleted: wasCompleted)
+                }
 
                 let gen = UINotificationFeedbackGenerator()
                 gen.notificationOccurred(.success)
 
-                if let log = try? vm.todayLog(for: routine, context: modelContext),
-                   let next = vm.firstIncompleteItem(routine: routine, log: log) {
+                if let snap = TodayLogSnapshot.capture(for: routine, context: modelContext),
+                   let next = vm.firstIncompleteItem(routine: routine, snapshot: snap) {
                     scrollTarget = next.id
                 }
 
@@ -294,6 +490,22 @@ struct TodayView: View {
         }
     }
 
+    private func presentInfoToast(_ message: String) {
+        infoToastTask?.cancel()
+        withAnimation(AnchorMotion.spring(response: 0.32)) {
+            infoToastMessage = message
+        }
+        infoToastTask = Task {
+            try? await Task.sleep(for: .seconds(2.2))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation {
+                    infoToastMessage = nil
+                }
+            }
+        }
+    }
+
     private func presentUndo(item: RoutineItem, routine: Routine, wasCompleted: Bool) {
         undoTask?.cancel()
         pendingUndo = UndoSnapshot(item: item, routine: routine, wasCompleted: wasCompleted)
@@ -316,12 +528,28 @@ struct TodayView: View {
         guard let undo = pendingUndo else { return }
         undoTask?.cancel()
         do {
+            let log = try vm.todayLog(for: undo.routine, context: modelContext)
+            if !undo.wasCompleted, !vm.canUncheckItem(undo.item, routine: undo.routine, logId: log.id, context: modelContext) {
+                withAnimation {
+                    showUndoToast = false
+                    pendingUndo = nil
+                }
+                return
+            }
+            let completedBefore = log.completedItems
             try vm.setCompletion(
                 item: undo.item,
                 routine: undo.routine,
                 completed: undo.wasCompleted,
                 context: modelContext
             )
+            guard log.completedItems != completedBefore else {
+                withAnimation {
+                    showUndoToast = false
+                    pendingUndo = nil
+                }
+                return
+            }
             try modelContext.save()
             wasAllComplete = (try? vm.allRoutinesFullyCompletedToday(routines: routines, context: modelContext)) ?? false
             syncAfterTodayChange()
@@ -339,7 +567,8 @@ struct TodayView: View {
         wasAllComplete = allDone
     }
 
-    private func applyRoutineListChange() {
+    private func applyRoutineListChange(syncWidgets: Bool = true) {
+        modelContext.processPendingChanges()
         vm.reconcileTodayState(routines: sortedRoutines, context: modelContext)
         try? modelContext.save()
 
@@ -348,13 +577,22 @@ struct TodayView: View {
             showCompletionSheet = true
         }
         wasAllComplete = allDone
-        syncAfterTodayChange()
+        if syncWidgets {
+            syncAfterTodayChange()
+        }
     }
 
     private func handleExtendDeadline(for routine: Routine) {
-        guard RoutineDeadlineExtensionStore.applyExtension(routineID: routine.id) else { return }
+        guard RoutineDeadlineExtensionStore.applyExtension(routineID: routine.id) else {
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            presentInfoToast(AppCopy.Routine.extendFailed)
+            return
+        }
+        todayUIRevision += 1
+        refreshTodayScheduleUI()
         NotificationManager.refreshTodayDeadlineReminderAfterExtension(for: routine)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
+        presentInfoToast(AppCopy.Routine.extendSuccess)
         Task { await ShieldManager.refresh(modelContext: modelContext) }
     }
 
@@ -364,6 +602,9 @@ struct TodayView: View {
         unlockSecondsLeft = TempUnlockStore.remainingSeconds
         if let expiresAt = TempUnlockStore.expiresAt {
             TempUnlockActivityManager.start(expiresAt: expiresAt)
+            if !TempUnlockActivityManager.areActivitiesEnabled {
+                presentInfoToast(AppCopy.Today.liveActivityDisabled)
+            }
         }
         Task { await ShieldManager.refresh(modelContext: modelContext) }
         startUnlockCountdown()
@@ -400,8 +641,10 @@ struct TodayView: View {
         try? modelContext.save()
         RoutineSync.afterMutation(modelContext: modelContext, refreshShield: true)
         WidgetDataStore.reloadWidgetsImmediately()
+        let liveIds = Set(routines.map(\.id))
+        let logs = DailyLogFetcher.fetchedLogs(liveRoutineIds: liveIds, context: modelContext)
         let fullDays = HistoryAnalytics.weekFullDaysCount(
-            logs: (try? modelContext.fetch(FetchDescriptor<DailyLog>())) ?? [],
+            logs: logs,
             routines: routines.filter { !$0.items.isEmpty },
             now: Date(),
             cal: .current

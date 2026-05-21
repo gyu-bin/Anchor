@@ -14,6 +14,11 @@ enum PremiumLimits {
     static let maxItemsPerRoutine = 5
     static let maxAppsPerRoutine = 5
     static let maxWebDomainsPerRoutine = 3
+    static let maxQuickLockApps = 5
+
+    static func allowedQuickLockAppCount(isPremium: Bool) -> Int {
+        isPremium ? Int.max : maxQuickLockApps
+    }
 
     static func canAddRoutine(currentCount: Int, isPremium: Bool) -> Bool {
         isPremium || currentCount < maxFreeRoutines

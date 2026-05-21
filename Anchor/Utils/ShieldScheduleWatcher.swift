@@ -7,17 +7,18 @@ import FamilyControls
 import Foundation
 import SwiftData
 
-/// 루틴 시작 시각에 맞춰 잠금을 즉시 반영합니다 (앱이 켜져 있을 때).
+/// 루틴 시작·마감 시각에 맞춰 잠금을 반영하고, 오늘 탭 UI를 갱신합니다 (앱이 켜져 있을 때).
 @MainActor
 enum ShieldScheduleWatcher {
-    private static var startTimers: [UUID: Timer] = [:]
+    private static var scheduleTimers: [String: Timer] = [:]
     private static var pollTimer: Timer?
     private static weak var watchedContext: ModelContext?
     private static var lastShouldLock = false
+    private static var lastScheduleUISignature = ""
 
     static func reschedule(modelContext: ModelContext) {
         watchedContext = modelContext
-        cancelStartTimers()
+        cancelScheduleTimers()
 
         guard ShieldManager.authorizationStatus() == .approved,
               !RestDayStore.isRestToday() else { return }
@@ -28,28 +29,42 @@ enum ShieldScheduleWatcher {
         let now = Date()
 
         for routine in routines where RoutineSchedule.isActive(routine, on: now, calendar: calendar) && !routine.items.isEmpty {
-            guard let startToday = startTimeToday(for: routine, calendar: calendar) else { continue }
-
-            if now >= startToday {
-                continue
+            if let startToday = startTimeToday(for: routine, calendar: calendar), now < startToday {
+                scheduleFire(
+                    key: "\(routine.id.uuidString).start",
+                    at: startToday,
+                    modelContext: modelContext
+                )
             }
 
-            let interval = startToday.timeIntervalSince(now)
-            let timer = Timer.scheduledTimer(withTimeInterval: max(0.05, interval), repeats: false) { _ in
-                Task { @MainActor in
-                    NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
-                    if let ctx = watchedContext {
-                        ShieldScheduleWatcher.reschedule(modelContext: ctx)
-                    }
-                }
+            if let endToday = RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar),
+               now < endToday {
+                scheduleFire(
+                    key: "\(routine.id.uuidString).end",
+                    at: endToday,
+                    modelContext: modelContext
+                )
             }
-            startTimers[routine.id] = timer
+
+            if routine.endTime != nil,
+               let unlock = RoutineDeadline.unlockTimeToday(for: routine, now: now, calendar: calendar),
+               now < unlock,
+               unlock != RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar) {
+                scheduleFire(
+                    key: "\(routine.id.uuidString).unlock",
+                    at: unlock,
+                    modelContext: modelContext
+                )
+            }
         }
+
+        publishScheduleUIRefreshIfNeeded(modelContext: modelContext)
     }
 
     static func startPolling(modelContext: ModelContext) {
         watchedContext = modelContext
         pollTimer?.invalidate()
+        publishScheduleUIRefreshIfNeeded(modelContext: modelContext)
         pollTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
             Task { @MainActor in
                 guard let ctx = watchedContext else { return }
@@ -65,23 +80,60 @@ enum ShieldScheduleWatcher {
 
     static func stopAll() {
         stopPolling()
-        cancelStartTimers()
+        cancelScheduleTimers()
         watchedContext = nil
         lastShouldLock = false
+        lastScheduleUISignature = ""
     }
 
     static func syncLockState(modelContext: ModelContext) {
         lastShouldLock = ShieldManager.shouldApplyShieldsNow(modelContext: modelContext)
     }
 
-    private static func cancelStartTimers() {
-        for timer in startTimers.values {
+    static func scheduleUISignature(modelContext: ModelContext, now: Date = Date()) -> String {
+        guard let routines = try? modelContext.fetch(FetchDescriptor<Routine>()) else { return "" }
+        let calendar = Calendar.current
+        var parts: [String] = []
+        for routine in routines where RoutineSchedule.isActive(routine, on: now, calendar: calendar) && !routine.items.isEmpty {
+            let started = ShieldManager.hasRoutineStartedToday(routine, now: now, calendar: calendar)
+            let locking = ShieldManager.isActivelyLocking(routine: routine, modelContext: modelContext)
+            let deadlinePassed = RoutineDeadline.isTodayDeadlinePassed(for: routine, now: now, calendar: calendar)
+            parts.append("\(routine.id.uuidString):\(started):\(locking):\(deadlinePassed)")
+        }
+        return parts.joined(separator: "|")
+    }
+
+    private static func scheduleFire(key: String, at date: Date, modelContext: ModelContext) {
+        let interval = date.timeIntervalSince(Date())
+        let timer = Timer.scheduledTimer(withTimeInterval: max(0.05, interval), repeats: false) { _ in
+            Task { @MainActor in
+                publishScheduleUIRefreshIfNeeded(modelContext: modelContext)
+                NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
+                if let ctx = watchedContext {
+                    ShieldScheduleWatcher.reschedule(modelContext: ctx)
+                }
+            }
+        }
+        scheduleTimers[key] = timer
+    }
+
+    private static func publishScheduleUIRefreshIfNeeded(modelContext: ModelContext) {
+        let signature = scheduleUISignature(modelContext: modelContext)
+        guard signature != lastScheduleUISignature else { return }
+        lastScheduleUISignature = signature
+        NotificationCenter.default.post(name: .anchorTodayScheduleRefresh, object: nil)
+    }
+
+    private static func cancelScheduleTimers() {
+        for timer in scheduleTimers.values {
             timer.invalidate()
         }
-        startTimers.removeAll()
+        scheduleTimers.removeAll()
     }
 
     private static func tick(modelContext: ModelContext) async {
+        publishScheduleUIRefreshIfNeeded(modelContext: modelContext)
+
         let shouldLock = ShieldManager.shouldApplyShieldsNow(modelContext: modelContext)
         if shouldLock != lastShouldLock {
             lastShouldLock = shouldLock

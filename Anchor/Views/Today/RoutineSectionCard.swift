@@ -11,7 +11,7 @@ struct RoutineSectionCard: View {
     @Environment(\.modelContext) private var modelContext
 
     let routine: Routine
-    let log: DailyLog
+    let logSnapshot: TodayLogSnapshot
     let blockSummary: BlockedShieldSummary
     let isActivelyLocking: Bool
     var unlockSecondsLeft: Int = 0
@@ -27,7 +27,7 @@ struct RoutineSectionCard: View {
     }
 
     private var completedCount: Int {
-        log.completedItems.filter { id in routine.items.contains(where: { $0.id == id }) }.count
+        logSnapshot.completedItemIds.filter { id in routine.items.contains(where: { $0.id == id }) }.count
     }
 
     private var totalCount: Int {
@@ -35,7 +35,7 @@ struct RoutineSectionCard: View {
     }
 
     private var isFullyDone: Bool {
-        log.isFullyCompleted
+        logSnapshot.isFullyCompleted
     }
 
     private func formatCountdown(_ seconds: Int) -> String {
@@ -45,7 +45,7 @@ struct RoutineSectionCard: View {
     }
 
     private var firstIncompleteId: UUID? {
-        sortedItems.first { !log.completedItems.contains($0.id) }?.id
+        sortedItems.first { !logSnapshot.completedItemIds.contains($0.id) }?.id
     }
 
     private var hasRoutineStartedToday: Bool {
@@ -82,6 +82,11 @@ struct RoutineSectionCard: View {
         df.locale = Locale(identifier: "ko_KR")
         df.dateFormat = "a h:mm"
         return df.string(from: routine.startTime)
+    }
+
+    private func canUncheckItem(_ item: RoutineItem) -> Bool {
+        guard logSnapshot.completedItemIds.contains(item.id) else { return true }
+        return !RoutineDeadline.isTodayDeadlinePassed(for: routine)
     }
 
     private func lockCapsuleButton(_ title: String, action: @escaping () -> Void) -> some View {
@@ -194,8 +199,9 @@ struct RoutineSectionCard: View {
                     ForEach(sortedItems, id: \.id) { item in
                         RoutineItemRow(
                             item: item,
-                            isCompleted: log.completedItems.contains(item.id),
+                            isCompleted: logSnapshot.completedItemIds.contains(item.id),
                             isCurrent: item.id == firstIncompleteId,
+                            allowsUncheck: canUncheckItem(item),
                             onTap: { onToggle(item) }
                         )
                     }

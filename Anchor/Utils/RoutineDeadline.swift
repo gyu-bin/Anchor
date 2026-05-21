@@ -30,6 +30,18 @@ enum RoutineDeadline {
     return calendar.date(byAdding: .minute, value: extra, to: base)
   }
 
+  /// 오늘 루틴 마감(연장 반영)이 지났는지. `endTime` 없거나 아직 시작 전이면 false.
+  static func isTodayDeadlinePassed(
+    for routine: Routine,
+    now: Date = Date(),
+    calendar: Calendar = .current
+  ) -> Bool {
+    guard routine.endTime != nil, !routine.items.isEmpty else { return false }
+    guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else { return false }
+    guard let end = endTimeToday(for: routine, now: now, calendar: calendar) else { return false }
+    return now >= end
+  }
+
   /// 종료 시간이 있고, 마감 전 1시간~자동 해제 전이며, 오늘 연장 횟수가 남아 있을 때.
   static func canExtendDeadlineToday(
     for routine: Routine,

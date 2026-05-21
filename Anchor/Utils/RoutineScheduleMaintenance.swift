@@ -18,7 +18,7 @@ enum RoutineScheduleMaintenance {
             guard RoutineSchedule.effectiveEndDay(for: routine, calendar: calendar) != nil else { continue }
 
             RoutineTemplateStore.save(from: routine, context: modelContext)
-            modelContext.delete(routine)
+            RoutineDeletion.delete(routine, context: modelContext)
             changed = true
         }
 

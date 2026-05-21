@@ -43,17 +43,17 @@ struct AppStoreScreenshotHost: View {
         Group {
             switch screen {
             case .guideMorning:
-                AppGuideView(initialPage: 0, onFinish: {})
-            case .guideEvening:
                 AppGuideView(initialPage: 1, onFinish: {})
-            case .guideRelief:
+            case .guideEvening:
                 AppGuideView(initialPage: 2, onFinish: {})
-            case .guideHow:
+            case .guideRelief:
                 AppGuideView(initialPage: 3, onFinish: {})
+            case .guideHow:
+                AppGuideView(initialPage: 4, onFinish: {})
             case .guideNotification:
-                AppGuideView(initialPage: 5, onFinish: {})
-            case .guideStart:
                 AppGuideView(initialPage: 6, onFinish: {})
+            case .guideStart:
+                AppGuideView(initialPage: 7, onFinish: {})
             case .paywall:
                 PaywallSheet(reason: .general)
                     .environmentObject(premiumStore)

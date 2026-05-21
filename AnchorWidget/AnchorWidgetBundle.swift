@@ -12,5 +12,6 @@ struct AnchorWidgetBundle: WidgetBundle {
         TodayProgressWidget()       // 홈 화면 small/medium
         LockStatusWidget()          // 잠금화면 inline/circular/rectangular
         TempUnlockLiveActivity()    // 10분 해제 타이머 Dynamic Island
+        QuickLockLiveActivity()     // 빠른 잠금 타이머 Dynamic Island
     }
 }

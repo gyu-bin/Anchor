@@ -19,13 +19,22 @@ struct RoutineCardView: View {
     @Binding var isExpanded: Bool
     var focusNameOnAppear: Bool = false
     var onFinishEditing: (() -> Void)? = nil
+    var onDeleted: (() -> Void)? = nil
+    var onValidationFailed: ((RoutineSetupValidation.Result) -> Void)? = nil
 
     @State private var editingName: String = ""
     @State private var scheduleDraft = RoutineScheduleDraft()
+    @State private var scheduleDraftReady = false
+    @State private var showValidationErrors = false
     @State private var showDeleteConfirm = false
     @FocusState private var nameFieldFocused: Bool
 
     private var itemCount: Int { routine.items.count }
+    private var hasTodos: Bool { itemCount > 0 }
+    private var hasBlockedApps: Bool {
+        RoutineSetupValidation.hasBlockedApps(routine)
+    }
+
     private var startTimeText: String {
         let df = DateFormatter()
         df.locale = Locale(identifier: "ko_KR")
@@ -48,13 +57,19 @@ struct RoutineCardView: View {
                 }
             }
         }
+        .id(routine.id)
         .confirmationDialog(
             AppCopy.Routine.deleteConfirmTitle,
             isPresented: $showDeleteConfirm,
             titleVisibility: .visible
         ) {
             Button(AppCopy.Routine.deleteConfirmAction, role: .destructive) {
-                vm.deleteRoutine(routine, context: modelContext)
+                let id = routine.id
+                collapseExpanded()
+                if let target = allRoutines.first(where: { $0.id == id }) {
+                    vm.deleteRoutine(target, context: modelContext)
+                    onDeleted?()
+                }
             }
             Button(AppCopy.Common.cancel, role: .cancel) {}
         } message: {
@@ -67,8 +82,9 @@ struct RoutineCardView: View {
             Button {
                 withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
                     if isExpanded {
-                        finishEditing()
+                        collapseExpanded()
                     } else {
+                        showValidationErrors = false
                         isExpanded = true
                     }
                 }
@@ -104,7 +120,7 @@ struct RoutineCardView: View {
             } label: {
                 Image(systemName: "trash")
                     .font(.body)
-                    .foregroundStyle(Color.anchorSub(scheme))
+                    .foregroundStyle(Color.anchorDanger(scheme).opacity(0.72))
             }
             .buttonStyle(.borderless)
             .accessibilityLabel("루틴 삭제")
@@ -119,29 +135,21 @@ struct RoutineCardView: View {
     @ViewBuilder
     private var expandedContent: some View {
         VStack(alignment: .leading, spacing: 0) {
-            RoutineEditSection(title: AppCopy.Routine.routineNameLabel, systemImage: "pencil") {
-                TextField(AppCopy.Routine.namePlaceholder, text: $editingName)
-                    .font(.body)
-                    .foregroundStyle(Color.anchorText(scheme))
-                    .submitLabel(.done)
-                    .focused($nameFieldFocused)
-                    .anchorInsetField()
-                    .onAppear {
-                        editingName = routine.name
-                        if focusNameOnAppear {
-                            DispatchQueue.main.async {
-                                nameFieldFocused = true
-                            }
-                        }
-                    }
-                    .onSubmit {
-                        nameFieldFocused = false
-                        commitRoutineName()
-                    }
-                    .onChange(of: nameFieldFocused) { _, focused in
-                        if !focused { commitRoutineName() }
-                    }
-            }
+            routineNameField
+
+            sectionDivider
+
+            setupChecklist
+
+            sectionDivider
+
+            todosSection
+                .id("routine-todos-\(routine.id)")
+
+            sectionDivider
+
+            appsBlockSection
+                .id("routine-apps-\(routine.id)")
 
             sectionDivider
 
@@ -152,44 +160,160 @@ struct RoutineCardView: View {
                 RoutineScheduleEditor(draft: $scheduleDraft)
                     .onAppear {
                         scheduleDraft = RoutineSchedule.draft(from: routine)
+                        scheduleDraftReady = false
+                        DispatchQueue.main.async {
+                            scheduleDraftReady = true
+                        }
+                    }
+                    .onDisappear {
+                        scheduleDraftReady = false
                     }
                     .onChange(of: scheduleDraft) { _, newValue in
+                        guard scheduleDraftReady else { return }
                         guard RoutineSchedule.isDraftValid(newValue) else { return }
+                        let current = RoutineSchedule.draft(from: routine)
+                        guard newValue != current else { return }
                         vm.updateSchedule(routine, draft: newValue, context: modelContext)
-                        RoutineSync.afterMutation(modelContext: modelContext)
                     }
-            }
-
-            sectionDivider
-
-            todosSection
-
-            sectionDivider
-
-            RoutineEditSection(
-                title: AppCopy.Routine.blockSection,
-                subtitle: AppCopy.Routine.blockSectionHint,
-                systemImage: "lock.shield"
-            ) {
-                VStack(alignment: .leading, spacing: 16) {
-                    BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
-                    Divider()
-                        .overlay(Color.anchorBorder(scheme).opacity(0.45))
-                    BlockedWebSection(routine: routine, paywallReason: $paywallReason)
-                }
             }
 
             Button {
-                finishEditing()
+                saveRoutine()
             } label: {
                 HStack(spacing: 8) {
-                    Image(systemName: "checkmark")
-                    Text("완료")
+                    Image(systemName: "checkmark.circle.fill")
+                    Text(AppCopy.Routine.saveRoutine)
                 }
             }
             .buttonStyle(AnchorButtonStyle())
             .padding(.top, 20)
         }
+        .onChange(of: routine.items.count) { _, _ in
+            clearValidationIfReady()
+        }
+        .onChange(of: routine.shieldSelectionData) { _, _ in
+            clearValidationIfReady()
+        }
+    }
+
+    private func clearValidationIfReady() {
+        guard showValidationErrors, RoutineSetupValidation.validate(routine).isValid else { return }
+        showValidationErrors = false
+    }
+
+    private var setupChecklist: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(AppCopy.Routine.setupRequiredHint)
+                .font(.caption)
+                .foregroundStyle(Color.anchorSub(scheme))
+
+            HStack(spacing: 10) {
+                checklistChip(
+                    title: AppCopy.Routine.checklistTodos,
+                    isDone: hasTodos,
+                    isHighlighted: showValidationErrors && !hasTodos
+                )
+                checklistChip(
+                    title: AppCopy.Routine.checklistApps,
+                    isDone: hasBlockedApps,
+                    isHighlighted: showValidationErrors && !hasBlockedApps
+                )
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func checklistChip(title: String, isDone: Bool, isHighlighted: Bool) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(
+                    isDone
+                        ? Color.anchorSuccess(scheme)
+                        : (isHighlighted ? Color.anchorDanger(scheme) : Color.anchorSub(scheme))
+                )
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(
+                    isHighlighted ? Color.anchorDanger(scheme) : Color.anchorText(scheme)
+                )
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            isHighlighted
+                ? Color.anchorDanger(scheme).opacity(0.1)
+                : Color.anchorSubBg(scheme)
+        )
+        .clipShape(Capsule())
+        .overlay(
+            Capsule()
+                .strokeBorder(
+                    isHighlighted ? Color.anchorDanger(scheme).opacity(0.5) : Color.clear,
+                    lineWidth: 1
+                )
+        )
+    }
+
+    private var routineNameField: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(AppCopy.Routine.routineNameLabel)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.anchorText(scheme))
+
+            TextField(AppCopy.Routine.namePlaceholder, text: $editingName)
+                .font(.body)
+                .foregroundStyle(Color.anchorText(scheme))
+                .submitLabel(.done)
+                .focused($nameFieldFocused)
+                .anchorInsetField()
+                .onAppear {
+                    editingName = routine.name
+                    if focusNameOnAppear {
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(420))
+                            guard !Task.isCancelled else { return }
+                            nameFieldFocused = true
+                        }
+                    }
+                }
+                .onSubmit {
+                    nameFieldFocused = false
+                    commitRoutineName()
+                }
+                .onChange(of: nameFieldFocused) { _, focused in
+                    if !focused { commitRoutineName() }
+                }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var appsBlockSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            RoutineEditSection(
+                title: AppCopy.Routine.blockAppsSection,
+                subtitle: AppCopy.Routine.blockAppsSectionHint,
+                systemImage: "lock.shield"
+            ) {
+                BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
+            }
+
+            if showValidationErrors && !hasBlockedApps {
+                BlockedInlineError(message: AppCopy.Routine.validationNeedApps)
+                    .padding(.top, 8)
+            }
+
+            DisclosureGroup {
+                BlockedWebSection(routine: routine, paywallReason: $paywallReason)
+                    .padding(.top, 8)
+            } label: {
+                Text(AppCopy.Routine.blockWebOptional)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.anchorSub(scheme))
+            }
+            .padding(.top, 12)
+        }
+        .overlay(validationBorder(isHighlighted: showValidationErrors && !hasBlockedApps))
     }
 
     private var sectionDivider: some View {
@@ -207,7 +331,17 @@ struct RoutineCardView: View {
             systemImage: "checklist"
         ) {
             VStack(alignment: .leading, spacing: 12) {
-                if !sorted.isEmpty {
+                if sorted.isEmpty {
+                    Text(AppCopy.Routine.todosEmptyHint)
+                        .font(.subheadline)
+                        .foregroundStyle(
+                            showValidationErrors
+                                ? Color.anchorDanger(scheme)
+                                : Color.anchorSub(scheme)
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 4)
+                } else {
                     VStack(spacing: 8) {
                         ForEach(sorted, id: \.id) { item in
                             todoRow(item)
@@ -216,6 +350,7 @@ struct RoutineCardView: View {
                 }
 
                 Button {
+                    showValidationErrors = false
                     editPayload = RoutineItemEditPayload(routine: routine, item: nil)
                 } label: {
                     HStack(spacing: 8) {
@@ -230,6 +365,15 @@ struct RoutineCardView: View {
                 .buttonStyle(AnchorTextButtonStyle())
             }
         }
+        .overlay(validationBorder(isHighlighted: showValidationErrors && !hasTodos))
+    }
+
+    private func validationBorder(isHighlighted: Bool) -> some View {
+        RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous)
+            .strokeBorder(
+                isHighlighted ? Color.anchorDanger(scheme) : Color.clear,
+                lineWidth: isHighlighted ? 1.5 : 0
+            )
     }
 
     private func todoRow(_ item: RoutineItem) -> some View {
@@ -293,15 +437,35 @@ struct RoutineCardView: View {
         routine.name = trimmed.isEmpty ? "새 루틴" : trimmed
         editingName = routine.name
         try? modelContext.save()
-        RoutineSync.afterMutation(modelContext: modelContext)
     }
 
-    private func finishEditing() {
+    private func collapseExpanded() {
         nameFieldFocused = false
         commitRoutineName()
+        showValidationErrors = false
+        withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
+            isExpanded = false
+        }
+    }
+
+    private func saveRoutine() {
+        nameFieldFocused = false
+        commitRoutineName()
+
+        let validation = RoutineSetupValidation.validate(routine)
+        guard validation.isValid else {
+            showValidationErrors = true
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            onValidationFailed?(validation)
+            return
+        }
+
+        showValidationErrors = false
+        RoutineSync.afterMutation(modelContext: modelContext, refreshShield: false)
         onFinishEditing?()
         withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
             isExpanded = false
         }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 }
