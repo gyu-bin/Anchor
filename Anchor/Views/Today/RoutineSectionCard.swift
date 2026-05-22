@@ -196,12 +196,14 @@ struct RoutineSectionCard: View {
                 }
 
                 VStack(spacing: 4) {
+                    let deadlinePassed = RoutineDeadline.isTodayDeadlinePassed(for: routine)
                     ForEach(sortedItems, id: \.id) { item in
                         RoutineItemRow(
                             item: item,
                             isCompleted: logSnapshot.completedItemIds.contains(item.id),
                             isCurrent: item.id == firstIncompleteId,
                             allowsUncheck: canUncheckItem(item),
+                            isDeadlineLocked: deadlinePassed,
                             onTap: { onToggle(item) }
                         )
                     }

@@ -208,7 +208,9 @@ struct SettingsView: View {
                             }
                             .buttonStyle(SettingsRowButtonStyle())
 
-                            if showScreenTime {
+                            // 뷰를 항상 계층에 유지해서 익스텐션 프로세스를 미리 워밍업합니다.
+                            // if 블록으로 제거하면 카드를 열 때마다 익스텐션이 cold-start됩니다.
+                            VStack(spacing: 0) {
                                 SettingsInsetDivider()
                                 ScreenTimeReportSection(
                                     authorizationStatus: screenTimeStatus,
@@ -216,6 +218,10 @@ struct SettingsView: View {
                                 )
                                 .padding(.bottom, 4)
                             }
+                            .frame(maxHeight: showScreenTime ? .infinity : 0, alignment: .top)
+                            .opacity(showScreenTime ? 1 : 0)
+                            .clipped()
+                            .allowsHitTesting(showScreenTime)
                         }
                     }
 

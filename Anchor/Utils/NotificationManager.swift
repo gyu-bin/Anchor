@@ -91,6 +91,46 @@ enum NotificationManager {
         if NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium {
             scheduleWeeklySummary()
         }
+
+        // rescheduleAll이 루틴 완료 직후 호출될 때 마감·리마인더 알림이 재등록되는 문제 방지
+        let calendar = Calendar.current
+        let dayStart = calendar.startOfDay(for: Date())
+        for routine in routines where !routine.items.isEmpty {
+            guard let isComplete = try? routineIsFullyCompleteToday(
+                routine, dayStart: dayStart, calendar: calendar, modelContext: modelContext
+            ), isComplete else { continue }
+            removePendingReminderNotifications(for: routine)
+        }
+    }
+
+    private static func removePendingReminderNotifications(for routine: Routine) {
+        let idBase = routine.id.uuidString
+        var ids: [String] = []
+        switch routine.scheduleKind {
+        case .daily:
+            ids.append("routine-reminder-\(idBase)-daily")
+            ids.append("routine-deadline-\(idBase)-daily")
+        case .weekdays:
+            for weekday in RoutineSchedule.activeWeekdays(for: routine) {
+                ids.append("routine-reminder-\(idBase)-w\(weekday)")
+                ids.append("routine-deadline-\(idBase)-w\(weekday)")
+            }
+        case .period:
+            let weekdays = RoutineSchedule.activeWeekdays(for: routine)
+            if weekdays.isEmpty {
+                ids.append("routine-reminder-\(idBase)-daily")
+                ids.append("routine-deadline-\(idBase)-daily")
+            } else {
+                for weekday in weekdays {
+                    ids.append("routine-reminder-\(idBase)-w\(weekday)")
+                    ids.append("routine-deadline-\(idBase)-w\(weekday)")
+                }
+            }
+        case .once:
+            ids.append("routine-reminder-\(idBase)-once")
+            ids.append("routine-deadline-\(idBase)-once")
+        }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
     }
 
     static func scheduleRoutineNotifications(for routine: Routine) {

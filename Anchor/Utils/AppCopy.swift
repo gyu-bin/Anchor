@@ -68,6 +68,7 @@ enum AppCopy {
         static let undoAction = "되돌리기"
         static let toggleFailed = "잠시 문제가 생겼어요. 다시 시도해 주세요"
         static let cannotUncheckAfterDeadline = "마감이 지난 루틴은 완료를 취소할 수 없어요"
+        static let cannotCheckAfterDeadline = "마감 시간이 지났어요"
         static let liveActivityDisabled = "설정 → 키링 → 라이브 액티비티를 켜 주세요"
     }
 

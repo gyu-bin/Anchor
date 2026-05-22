@@ -9,31 +9,16 @@ import SwiftUI
 struct RoutineCardView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
-    @EnvironmentObject private var premium: PremiumStore
 
     @Bindable var routine: Routine
     var vm: RoutineViewModel
     let allRoutines: [Routine]
-    @Binding var editPayload: RoutineItemEditPayload?
-    @Binding var paywallReason: PaywallReason?
-    @Binding var isExpanded: Bool
-    var focusNameOnAppear: Bool = false
-    var onFinishEditing: (() -> Void)? = nil
+    var onTap: (() -> Void)? = nil
     var onDeleted: (() -> Void)? = nil
-    var onValidationFailed: ((RoutineSetupValidation.Result) -> Void)? = nil
 
-    @State private var editingName: String = ""
-    @State private var scheduleDraft = RoutineScheduleDraft()
-    @State private var scheduleDraftReady = false
-    @State private var showValidationErrors = false
     @State private var showDeleteConfirm = false
-    @FocusState private var nameFieldFocused: Bool
 
     private var itemCount: Int { routine.items.count }
-    private var hasTodos: Bool { itemCount > 0 }
-    private var hasBlockedApps: Bool {
-        RoutineSetupValidation.hasBlockedApps(routine)
-    }
 
     private var startTimeText: String {
         let df = DateFormatter()
@@ -42,20 +27,51 @@ struct RoutineCardView: View {
         return df.string(from: routine.startTime)
     }
 
+    private var summarySubtitle: String {
+        RoutineSchedule.cardSubtitle(for: routine, itemCount: itemCount, startTimeText: startTimeText)
+    }
+
     var body: some View {
-        AnchorCard {
-            VStack(alignment: .leading, spacing: 0) {
-                header
-
-                if isExpanded {
-                    Divider()
-                        .padding(.horizontal, AnchorLayout.cardPadding)
-
-                    expandedContent
-                        .padding(AnchorLayout.cardPadding)
-                        .padding(.top, 8)
+        HStack(alignment: .center, spacing: 0) {
+            Button {
+                onTap?()
+            } label: {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(routine.name)
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(Color.anchorText(scheme))
+                            .lineLimit(1)
+                        Text(summarySubtitle)
+                            .font(.caption)
+                            .foregroundStyle(Color.anchorSub(scheme))
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.anchorSub(scheme).opacity(0.45))
                 }
+                .padding(.leading, 16)
+                .padding(.trailing, 8)
+                .padding(.vertical, 13)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(routine.name)
+            .accessibilityHint("탭하여 편집")
+
+            Button(role: .destructive) {
+                showDeleteConfirm = true
+            } label: {
+                Image(systemName: "trash")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.anchorDanger(scheme).opacity(0.6))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 13)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("루틴 삭제")
         }
         .id(routine.id)
         .confirmationDialog(
@@ -65,7 +81,6 @@ struct RoutineCardView: View {
         ) {
             Button(AppCopy.Routine.deleteConfirmAction, role: .destructive) {
                 let id = routine.id
-                collapseExpanded()
                 if let target = allRoutines.first(where: { $0.id == id }) {
                     vm.deleteRoutine(target, context: modelContext)
                     onDeleted?()
@@ -75,397 +90,5 @@ struct RoutineCardView: View {
         } message: {
             Text(AppCopy.Routine.deleteConfirmMessage)
         }
-    }
-
-    private var header: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Button {
-                withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
-                    if isExpanded {
-                        collapseExpanded()
-                    } else {
-                        showValidationErrors = false
-                        isExpanded = true
-                    }
-                }
-            } label: {
-                HStack(alignment: .center, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(routine.name)
-                            .font(AnchorTypography.cardTitle(scheme))
-                            .foregroundStyle(Color.anchorText(scheme))
-                            .lineLimit(1)
-                            .multilineTextAlignment(.leading)
-
-                        Text(summarySubtitle)
-                            .font(.caption)
-                            .foregroundStyle(Color.anchorSub(scheme))
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Image(systemName: "chevron.down")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.anchorSub(scheme))
-                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(routine.name)
-            .accessibilityHint(isExpanded ? "탭하여 접기" : "탭하여 펼치기")
-
-            Button(role: .destructive) {
-                showDeleteConfirm = true
-            } label: {
-                Image(systemName: "trash")
-                    .font(.body)
-                    .foregroundStyle(Color.anchorDanger(scheme).opacity(0.72))
-            }
-            .buttonStyle(.borderless)
-            .accessibilityLabel("루틴 삭제")
-        }
-        .padding(16)
-    }
-
-    private var summarySubtitle: String {
-        RoutineSchedule.cardSubtitle(for: routine, itemCount: itemCount, startTimeText: startTimeText)
-    }
-
-    @ViewBuilder
-    private var expandedContent: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            routineNameField
-
-            sectionDivider
-
-            setupChecklist
-
-            sectionDivider
-
-            todosSection
-                .id("routine-todos-\(routine.id)")
-
-            sectionDivider
-
-            appsBlockSection
-                .id("routine-apps-\(routine.id)")
-
-            sectionDivider
-
-            RoutineEditSection(
-                title: AppCopy.Routine.scheduleTimeSection,
-                systemImage: "calendar"
-            ) {
-                RoutineScheduleEditor(draft: $scheduleDraft)
-                    .onAppear {
-                        scheduleDraft = RoutineSchedule.draft(from: routine)
-                        scheduleDraftReady = false
-                        DispatchQueue.main.async {
-                            scheduleDraftReady = true
-                        }
-                    }
-                    .onDisappear {
-                        scheduleDraftReady = false
-                    }
-                    .onChange(of: scheduleDraft) { _, newValue in
-                        guard scheduleDraftReady else { return }
-                        guard RoutineSchedule.isDraftValid(newValue) else { return }
-                        let current = RoutineSchedule.draft(from: routine)
-                        guard newValue != current else { return }
-                        vm.updateSchedule(routine, draft: newValue, context: modelContext)
-                    }
-            }
-
-            Button {
-                saveRoutine()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                    Text(AppCopy.Routine.saveRoutine)
-                }
-            }
-            .buttonStyle(AnchorButtonStyle())
-            .padding(.top, 20)
-        }
-        .onChange(of: routine.items.count) { _, _ in
-            clearValidationIfReady()
-        }
-        .onChange(of: routine.shieldSelectionData) { _, _ in
-            clearValidationIfReady()
-        }
-    }
-
-    private func clearValidationIfReady() {
-        guard showValidationErrors, RoutineSetupValidation.validate(routine).isValid else { return }
-        showValidationErrors = false
-    }
-
-    private var setupChecklist: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(AppCopy.Routine.setupRequiredHint)
-                .font(.caption)
-                .foregroundStyle(Color.anchorSub(scheme))
-
-            HStack(spacing: 10) {
-                checklistChip(
-                    title: AppCopy.Routine.checklistTodos,
-                    isDone: hasTodos,
-                    isHighlighted: showValidationErrors && !hasTodos
-                )
-                checklistChip(
-                    title: AppCopy.Routine.checklistApps,
-                    isDone: hasBlockedApps,
-                    isHighlighted: showValidationErrors && !hasBlockedApps
-                )
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func checklistChip(title: String, isDone: Bool, isHighlighted: Bool) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: isDone ? "checkmark.circle.fill" : "circle")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(
-                    isDone
-                        ? Color.anchorSuccess(scheme)
-                        : (isHighlighted ? Color.anchorDanger(scheme) : Color.anchorSub(scheme))
-                )
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(
-                    isHighlighted ? Color.anchorDanger(scheme) : Color.anchorText(scheme)
-                )
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(
-            isHighlighted
-                ? Color.anchorDanger(scheme).opacity(0.1)
-                : Color.anchorSubBg(scheme)
-        )
-        .clipShape(Capsule())
-        .overlay(
-            Capsule()
-                .strokeBorder(
-                    isHighlighted ? Color.anchorDanger(scheme).opacity(0.5) : Color.clear,
-                    lineWidth: 1
-                )
-        )
-    }
-
-    private var routineNameField: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(AppCopy.Routine.routineNameLabel)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color.anchorText(scheme))
-
-            TextField(AppCopy.Routine.namePlaceholder, text: $editingName)
-                .font(.body)
-                .foregroundStyle(Color.anchorText(scheme))
-                .submitLabel(.done)
-                .focused($nameFieldFocused)
-                .anchorInsetField()
-                .onAppear {
-                    editingName = routine.name
-                    if focusNameOnAppear {
-                        Task { @MainActor in
-                            try? await Task.sleep(for: .milliseconds(420))
-                            guard !Task.isCancelled else { return }
-                            nameFieldFocused = true
-                        }
-                    }
-                }
-                .onSubmit {
-                    nameFieldFocused = false
-                    commitRoutineName()
-                }
-                .onChange(of: nameFieldFocused) { _, focused in
-                    if !focused { commitRoutineName() }
-                }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var appsBlockSection: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            RoutineEditSection(
-                title: AppCopy.Routine.blockAppsSection,
-                subtitle: AppCopy.Routine.blockAppsSectionHint,
-                systemImage: "lock.shield"
-            ) {
-                BlockedAppsSection(routine: routine, paywallReason: $paywallReason)
-            }
-
-            if showValidationErrors && !hasBlockedApps {
-                BlockedInlineError(message: AppCopy.Routine.validationNeedApps)
-                    .padding(.top, 8)
-            }
-
-            DisclosureGroup {
-                BlockedWebSection(routine: routine, paywallReason: $paywallReason)
-                    .padding(.top, 8)
-            } label: {
-                Text(AppCopy.Routine.blockWebOptional)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.anchorSub(scheme))
-            }
-            .padding(.top, 12)
-        }
-        .overlay(validationBorder(isHighlighted: showValidationErrors && !hasBlockedApps))
-    }
-
-    private var sectionDivider: some View {
-        Divider()
-            .overlay(Color.anchorBorder(scheme).opacity(0.4))
-            .padding(.vertical, 14)
-    }
-
-    @ViewBuilder
-    private var todosSection: some View {
-        let sorted = routine.items.sorted { $0.order < $1.order }
-
-        RoutineEditSection(
-            title: AppCopy.Routine.todosSection,
-            systemImage: "checklist"
-        ) {
-            VStack(alignment: .leading, spacing: 12) {
-                if sorted.isEmpty {
-                    Text(AppCopy.Routine.todosEmptyHint)
-                        .font(.subheadline)
-                        .foregroundStyle(
-                            showValidationErrors
-                                ? Color.anchorDanger(scheme)
-                                : Color.anchorSub(scheme)
-                        )
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 4)
-                } else {
-                    VStack(spacing: 8) {
-                        ForEach(sorted, id: \.id) { item in
-                            todoRow(item)
-                        }
-                    }
-                }
-
-                Button {
-                    showValidationErrors = false
-                    editPayload = RoutineItemEditPayload(routine: routine, item: nil)
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.body)
-                        Text(AppCopy.Routine.addTodo)
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 13)
-                }
-                .buttonStyle(AnchorTextButtonStyle())
-            }
-        }
-        .overlay(validationBorder(isHighlighted: showValidationErrors && !hasTodos))
-    }
-
-    private func validationBorder(isHighlighted: Bool) -> some View {
-        RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous)
-            .strokeBorder(
-                isHighlighted ? Color.anchorDanger(scheme) : Color.clear,
-                lineWidth: isHighlighted ? 1.5 : 0
-            )
-    }
-
-    private func todoRow(_ item: RoutineItem) -> some View {
-        HStack(spacing: 0) {
-            Button {
-                editPayload = RoutineItemEditPayload(routine: routine, item: item)
-            } label: {
-                HStack(spacing: 12) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(Color.anchorHighlight(scheme))
-                            .frame(width: 40, height: 40)
-                        Image(systemName: item.icon)
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundStyle(Color.anchorAccent(scheme))
-                    }
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(item.name)
-                            .font(.body.weight(.medium))
-                            .foregroundStyle(Color.anchorText(scheme))
-                            .multilineTextAlignment(.leading)
-                        if item.duration > 0 {
-                            Text(AppCopy.Routine.durationMinutes(item.duration))
-                                .font(.caption)
-                                .foregroundStyle(Color.anchorSub(scheme))
-                        }
-                    }
-
-                    Spacer(minLength: 8)
-
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.anchorSub(scheme).opacity(0.6))
-                }
-                .padding(.leading, 12)
-                .padding(.trailing, 4)
-                .padding(.vertical, 10)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("\(item.name) 편집")
-
-            Button(role: .destructive) {
-                vm.deleteItem(item, context: modelContext)
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(Color.anchorSub(scheme).opacity(0.45))
-                    .padding(.horizontal, 12)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("\(item.name) 삭제")
-        }
-        .background(Color.anchorSubBg(scheme))
-        .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
-    }
-
-    private func commitRoutineName() {
-        let trimmed = editingName.trimmingCharacters(in: .whitespacesAndNewlines)
-        routine.name = trimmed.isEmpty ? "새 루틴" : trimmed
-        editingName = routine.name
-        try? modelContext.save()
-    }
-
-    private func collapseExpanded() {
-        nameFieldFocused = false
-        commitRoutineName()
-        showValidationErrors = false
-        withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
-            isExpanded = false
-        }
-    }
-
-    private func saveRoutine() {
-        nameFieldFocused = false
-        commitRoutineName()
-
-        let validation = RoutineSetupValidation.validate(routine)
-        guard validation.isValid else {
-            showValidationErrors = true
-            UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            onValidationFailed?(validation)
-            return
-        }
-
-        showValidationErrors = false
-        RoutineSync.afterMutation(modelContext: modelContext, refreshShield: false)
-        onFinishEditing?()
-        withAnimation(AnchorMotion.spring(response: 0.32, dampingFraction: 0.82)) {
-            isExpanded = false
-        }
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 }

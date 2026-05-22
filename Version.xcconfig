@@ -4,5 +4,5 @@
 // Archive 할 때마다 Scripts/bump_build_number.sh 가 BUILD_NUMBER 를 1씩 올립니다.
 
 MARKETING_VERSION = 1.0
-BUILD_NUMBER = 30
+BUILD_NUMBER = 32
 CURRENT_PROJECT_VERSION = $(BUILD_NUMBER)

@@ -426,6 +426,12 @@ struct TodayView: View {
                 let log = try vm.todayLog(for: routine, context: modelContext)
                 let wasCompleted = log.completedItems.contains(item.id)
 
+                if !wasCompleted && RoutineDeadline.isTodayDeadlinePassed(for: routine) {
+                    UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                    presentInfoToast(AppCopy.Today.cannotCheckAfterDeadline)
+                    return
+                }
+
                 if wasCompleted, !vm.canUncheckItem(item, routine: routine, logId: log.id, context: modelContext) {
                     UINotificationFeedbackGenerator().notificationOccurred(.warning)
                     presentInfoToast(AppCopy.Today.cannotUncheckAfterDeadline)

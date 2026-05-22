@@ -69,18 +69,20 @@ struct ScreenTimeReportSection: View {
                     .padding(.horizontal, AnchorLayout.cardPadding)
                     .padding(.top, 4)
 
-                    // 두 리포트를 항상 살려두고 보이기/숨기기만 해서 재로딩을 방지합니다
-                    DeviceActivityReport(.totalToday, filter: filter(for: .today))
-                        .frame(minHeight: period == .today ? 200 : 0)
-                        .frame(maxHeight: period == .today ? .infinity : 0)
-                        .opacity(period == .today ? 1 : 0)
-                        .clipped()
-
-                    DeviceActivityReport(.totalWeek, filter: filter(for: .thisWeek))
-                        .frame(minHeight: period == .thisWeek ? 200 : 0)
-                        .frame(maxHeight: period == .thisWeek ? .infinity : 0)
-                        .opacity(period == .thisWeek ? 1 : 0)
-                        .clipped()
+                    // ZStack으로 두 리포트를 동시에 렌더링하고 opacity만 바꿔서
+                    // 익스텐션 프로세스가 항상 살아있게 합니다.
+                    // 각 리포트에 개별 minHeight를 주어 익스텐션이 공간을 인식하고
+                    // 즉시 렌더링을 시작하도록 합니다.
+                    ZStack(alignment: .top) {
+                        DeviceActivityReport(.totalToday, filter: filter(for: .today))
+                            .frame(minHeight: 200)
+                            .opacity(period == .today ? 1 : 0)
+                            .allowsHitTesting(period == .today)
+                        DeviceActivityReport(.totalWeek, filter: filter(for: .thisWeek))
+                            .frame(minHeight: 200)
+                            .opacity(period == .thisWeek ? 1 : 0)
+                            .allowsHitTesting(period == .thisWeek)
+                    }
 
                     Text(AppCopy.Settings.screenTimeFootnote)
                         .font(.caption2)
