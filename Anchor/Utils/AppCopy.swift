@@ -126,30 +126,25 @@ enum AppCopy {
         static let lockTitle = "앱 잠금"
         static let lockConnected = "연결됨"
         static let lockNeeded = "연결 필요"
-        static let notifications = "알림"
         static let notificationsMaster = "알림 받기"
         static let routineStart = "루틴 시작 알림"
-        static let reminder = "리마인더"
         static let weeklySummary = "주간 요약 (일요일)"
         static let requestNotification = "알림 허용하기"
         static let notificationOn = "알림이 켜져 있어요"
         static let notificationOff = "알림을 켜면 루틴을 놓치지 않아요"
         static let notificationDenied = "설정 앱에서 알림을 허용해 주세요"
-        static let screenTime = "Screen Time"
         static let screenTimeNeedsPermission =
             "스크린타임을 보려면 위 「앱 잠금」에서 스크린 타임 연결을 허용해 주세요."
         static let screenTimeToday = "오늘"
         static let screenTimeThisWeek = "이번 주"
         static let screenTimeFootnote =
             "설정의 「스크린 타임」과 같게 이 iPhone 기준으로 맞춰요. API 특성상 1~2분 차이는 날 수 있어요."
-        static let about = "앱 정보"
         static let aboutBody = "루틴이 끝날 때까지 선택한 앱을 잠가 드리고, 완료하면 바로 풀어 드려요."
         static let versionRow = "버전"
         static func version(_ label: String) -> String { "버전 \(label)" }
         static let privacyPolicy = "개인정보처리방침"
         static let contact = "문의하기"
         static let openSystemSettings = "설정 앱 열기"
-        static let reminderDelay = "리마인더 시점"
     }
 
     enum Routine {
@@ -186,7 +181,7 @@ enum AppCopy {
         static let blockWebOptional = "웹 사이트 차단 (선택)"
         static let endTimeToggle = "종료 시간 설정"
         static let endTimeLabel = "종료 시간"
-        static let endTimeNote = "마감 30분 전 알림 · 미완료 시 3회까지 즉시 해제, 이후 30분 뒤 해제"
+        static let endTimeNote = "마감 30분 전 알림 · 미완료면 마감 시각에 잠금이 풀려요"
         static let routineNameLabel = "루틴 이름"
         static let lockActive = "앱 잠금 중"
         static let lockScheduled = "시작 후 잠김"
@@ -194,7 +189,6 @@ enum AppCopy {
         static let extendSuccess = "30분 연장했어요"
         static let extendFailed = "지금은 연장할 수 없어요"
         static let tempUnlockTenMin = "10분 해제"
-        static func lockUnlocksAt(_ time: String) -> String { "잠금 \(time)에 해제" }
         static let lockReleasedAfterDeadline = "마감 지남 · 미완료"
         static func sectionProgress(done: Int, total: Int) -> String {
             "\(done)개 / \(total)개 했어요"
@@ -216,15 +210,6 @@ enum AppCopy {
         static let scheduleEndToggle = "종료일 정하기"
         static let untilDate = "~"
         static let periodEveryDay = "기간 중 매일"
-        static let scheduleEndedBadge = "종료됨"
-        static let endedSectionTitle = "종료된 루틴"
-        static let archivedSectionTitle = "숨긴 루틴"
-        static func endedBanner(count: Int) -> String {
-            "종료된 루틴 \(count)개"
-        }
-        static let endedBannerHideAll = "목록에서 숨기기"
-        static let endedBannerDeleteAll = "모두 삭제"
-        static let restoreFromArchive = "다시 보기"
         static let weekdayPresetWeekdays = "평일"
         static let weekdayPresetWeekend = "주말"
         static let presetThisWeek = "이번 주"
@@ -244,7 +229,8 @@ enum AppCopy {
         static let appsEmptyHint = "미완료일 때 잠글 앱을 골라 주세요"
         static let duplicate = "루틴 복제"
         static let reorderItems = "항목 순서"
-        static let reorderRoutines = "순서 변경"
+        static let reorderItemsHint = "≡ 아이콘을 끌어 순서를 바꿔요"
+        static let duplicatedToast = "루틴을 복제했어요"
         static func durationMinutes(_ minutes: Int) -> String { "약 \(minutes)분" }
         static func durationHours(_ hours: Int) -> String { "약 \(hours)시간" }
         static func durationHoursMinutes(hours: Int, minutes: Int) -> String {
@@ -261,12 +247,6 @@ enum AppCopy {
             static let weekdaysNote = "고른 요일마다 반복돼요. 종료일을 정하면 그날까지만 해요."
             static let periodNote = "시작~종료 사이에만 나타나요. 요일을 고르면 그날만 해요."
             static let onceNote = "고른 하루에만 오늘 탭에 나타나요."
-        }
-
-        enum Expiry {
-            static let keepInList = "남기기"
-            static let archive = "숨기기"
-            static let delete = "삭제"
         }
     }
 
@@ -327,29 +307,9 @@ enum AppCopy {
     }
 
     enum Onboarding {
-        static let introBody = "루틴이 끝날 때까지\n선택한 앱을 잠가 드려요.\n다 하시면 바로 풀어 드릴게요."
-        static let start = "시작할게요"
-        static let routineTitle = "루틴 정하기"
-        static let routineSubtitle = "이름과 시작 시간만 알려 주세요. 그때 살짝 알려 드릴게요."
-        static let itemsTitle = "오늘 할 일"
-        static let itemsSubtitle = "골라 주세요. 나중에 언제든 바꿀 수 있어요."
-        static let webTitle = "자주 가는 사이트 (선택)"
-        static let webSubtitle = "메모만 해 두셔도 돼요. 실제 차단은 루틴 탭에서 설정해요."
-        static let screenTimeTitle = "Screen Time"
-        static let screenTimeSubtitle = "허용 후 막을 앱을 골라 주세요. 첫날부터 잠금이 동작해요."
-        static let pickApps = "막을 앱 선택"
-        static let pickedAppsCount = "선택한 앱"
         static let screenTimeAllow = "허용하기"
         static let screenTimeLinked = "연결됐어요"
         static let screenTimeNeeded = "연결이 필요해요"
-        static let finishTitle = "이제 준비됐어요"
-        static let finishBody = "오늘 탭에서 루틴을 진행하고,\n루틴 탭에서 막을 앱을 골라 주세요."
-        static let finishAction = "시작하기"
-        static func screenTimeCaption(approved: Bool, denied: Bool) -> String {
-            if approved { return "루틴을 마치기 전까지 선택한 앱을 잠글 수 있어요." }
-            if denied { return "설정 → Screen Time에서 허용해 주실 수 있어요." }
-            return "한 번만 허용하시면 이후엔 자동이에요."
-        }
     }
 
     enum Premium {
@@ -389,6 +349,8 @@ enum AppCopy {
         static let restoreFailed = "복원에 실패했어요."
         static let restoreEmpty = "복원할 구매 내역이 없어요."
         static let alreadyUnlocked = "이미 열려 있어요"
+        static let routineLimitHint = "무료는 루틴 \(PremiumLimits.maxFreeRoutines)개까지예요."
+        static let itemLimitHint = "무료는 항목 \(PremiumLimits.maxItemsPerRoutine)개까지예요."
         static let appLimitHint = "무료는 앱 \(PremiumLimits.maxAppsPerRoutine)개까지예요."
         static let webLimitHint = "무료는 사이트 \(PremiumLimits.maxWebDomainsPerRoutine)개까지예요."
         static let webDomainNote = "도메인 칩은 Safari 등 브라우저에서 막혀요. 차단 화면은 「사이트 선택」으로 추가해요."

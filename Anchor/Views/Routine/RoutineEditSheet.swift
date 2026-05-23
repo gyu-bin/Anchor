@@ -19,6 +19,7 @@ struct RoutineEditSheet: View {
     var focusNameOnAppear: Bool = false
     var onDeleted: (() -> Void)? = nil
     var onFinishEditing: (() -> Void)? = nil
+    var onDuplicated: ((Routine) -> Void)? = nil
 
     @State private var editPayload: RoutineItemEditPayload?
     @State private var paywallReason: PaywallReason?
@@ -135,11 +136,22 @@ struct RoutineEditSheet: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(role: .destructive) {
-                        showDeleteConfirm = true
-                    } label: {
-                        Image(systemName: "trash")
-                            .foregroundStyle(Color.anchorDanger(scheme))
+                    HStack(spacing: 16) {
+                        Button {
+                            duplicateRoutine()
+                        } label: {
+                            Image(systemName: "doc.on.doc")
+                                .foregroundStyle(Color.anchorAccent(scheme))
+                        }
+                        .accessibilityLabel(AppCopy.Routine.duplicate)
+
+                        Button(role: .destructive) {
+                            showDeleteConfirm = true
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundStyle(Color.anchorDanger(scheme))
+                        }
+                        .accessibilityLabel(AppCopy.Routine.deleteConfirmAction)
                     }
                 }
             }
@@ -272,6 +284,7 @@ struct RoutineEditSheet: View {
 
         RoutineEditSection(
             title: AppCopy.Routine.todosSection,
+            subtitle: todosSectionSubtitle(sorted: sorted),
             systemImage: "checklist"
         ) {
             VStack(alignment: .leading, spacing: 12) {
@@ -288,12 +301,19 @@ struct RoutineEditSheet: View {
                 } else {
                     VStack(spacing: 8) {
                         ForEach(sorted, id: \.id) { item in
-                            todoRow(item)
+                            todoRow(item, sorted: sorted)
                         }
                     }
                 }
 
                 Button {
+                    guard PremiumLimits.canAddItem(
+                        currentCount: routine.items.count,
+                        isPremium: premium.isPremium
+                    ) else {
+                        paywallReason = .itemLimit
+                        return
+                    }
                     showValidationErrors = false
                     editPayload = RoutineItemEditPayload(routine: routine, item: nil)
                 } label: {
@@ -312,8 +332,14 @@ struct RoutineEditSheet: View {
         .overlay(validationBorder(isHighlighted: showValidationErrors && !hasTodos))
     }
 
-    private func todoRow(_ item: RoutineItem) -> some View {
+    private func todoRow(_ item: RoutineItem, sorted: [RoutineItem]) -> some View {
         HStack(spacing: 0) {
+            Image(systemName: "line.3.horizontal")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(Color.anchorSub(scheme).opacity(0.45))
+                .padding(.leading, 12)
+                .accessibilityLabel(AppCopy.Routine.reorderItems)
+
             Button {
                 editPayload = RoutineItemEditPayload(routine: routine, item: item)
             } label: {
@@ -366,6 +392,56 @@ struct RoutineEditSheet: View {
         }
         .background(Color.anchorSubBg(scheme))
         .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
+        .draggable(item.id.uuidString) {
+            Image(systemName: "line.3.horizontal")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(Color.anchorSub(scheme))
+                .padding(8)
+                .background(Color.anchorSubBg(scheme))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .dropDestination(for: String.self) { items, _ in
+            guard let dragged = items.first,
+                  let draggedID = UUID(uuidString: dragged),
+                  draggedID != item.id,
+                  let fromIdx = sorted.firstIndex(where: { $0.id == draggedID }),
+                  let toIdx = sorted.firstIndex(where: { $0.id == item.id }) else {
+                return false
+            }
+            withAnimation(AnchorMotion.spring()) {
+                routineVM.moveItem(
+                    from: IndexSet(integer: fromIdx),
+                    to: toIdx > fromIdx ? toIdx + 1 : toIdx,
+                    in: routine,
+                    context: modelContext
+                )
+            }
+            return true
+        }
+    }
+
+    private func todosSectionSubtitle(sorted: [RoutineItem]) -> String? {
+        if !premium.isPremium,
+           !PremiumLimits.canAddItem(currentCount: routine.items.count, isPremium: false) {
+            return AppCopy.Premium.itemLimitHint
+        }
+        if !sorted.isEmpty {
+            return AppCopy.Routine.reorderItemsHint
+        }
+        return nil
+    }
+
+    private func duplicateRoutine() {
+        guard PremiumLimits.canAddRoutine(
+            currentCount: allRoutines.count,
+            isPremium: premium.isPremium
+        ) else {
+            paywallReason = .routineLimit
+            return
+        }
+        let copy = routineVM.duplicateRoutine(routine, context: modelContext, routines: allRoutines)
+        dismiss()
+        onDuplicated?(copy)
     }
 
     private var appsBlockSection: some View {

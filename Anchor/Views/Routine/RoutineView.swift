@@ -22,13 +22,16 @@ struct RoutineView: View {
     @State private var showAddMenu = false
     @State private var showDeletedToast = false
     @State private var deletedToastTask: Task<Void, Never>?
+    @State private var showDuplicatedToast = false
+    @State private var duplicatedToastTask: Task<Void, Never>?
+    @State private var paywallReason: PaywallReason?
 
     private var orderedRoutines: [Routine] {
         routineVM.sortedRoutines(routines)
     }
 
     private var bottomScrollInset: CGFloat {
-        showDeletedToast ? 88 : 36
+        (showDeletedToast || showDuplicatedToast) ? 88 : 36
     }
 
     var body: some View {
@@ -67,6 +70,15 @@ struct RoutineView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .padding(.horizontal, AnchorLayout.screenHorizontal)
                     .padding(.bottom, 12)
+                } else if showDuplicatedToast {
+                    AnchorBriefToast(
+                        message: AppCopy.Routine.duplicatedToast,
+                        systemImage: "doc.on.doc.fill",
+                        iconColor: { Color.anchorAccent($0) }
+                    )
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .padding(.horizontal, AnchorLayout.screenHorizontal)
+                    .padding(.bottom, 12)
                 }
             }
             .anchorScreenBackground()
@@ -82,6 +94,11 @@ struct RoutineView: View {
                         if focusNameForNewRoutine == routine.id {
                             focusNameForNewRoutine = nil
                         }
+                    },
+                    onDuplicated: { copy in
+                        presentDuplicatedToast()
+                        focusNameForNewRoutine = copy.id
+                        editingRoutine = copy
                     }
                 )
                 .presentationDetents([.large])
@@ -103,9 +120,12 @@ struct RoutineView: View {
                     addNewRoutine()
                 }
                 Button(AppCopy.Routine.loadTemplate) {
-                    showTemplatePicker = true
+                    openTemplatePickerIfAllowed()
                 }
                 Button(AppCopy.Common.cancel, role: .cancel) {}
+            }
+            .sheet(item: $paywallReason) { reason in
+                PaywallSheet(reason: reason)
             }
             .onAppear {
                 RoutineScheduleMaintenance.run(modelContext: modelContext)
@@ -170,10 +190,17 @@ struct RoutineView: View {
 
     private var header: some View {
         HStack(alignment: .top) {
-            AnchorScreenHeader(
-                title: AppCopy.Routine.title,
-                subtitle: AppCopy.Routine.subtitle(count: orderedRoutines.count)
-            )
+            VStack(alignment: .leading, spacing: 4) {
+                AnchorScreenHeader(
+                    title: AppCopy.Routine.title,
+                    subtitle: AppCopy.Routine.subtitle(count: orderedRoutines.count)
+                )
+                if !premium.isPremium, !canAddMoreRoutines {
+                    Text(AppCopy.Premium.routineLimitHint)
+                        .font(.caption)
+                        .foregroundStyle(Color.anchorSub(scheme))
+                }
+            }
 
             Spacer(minLength: 12)
 
@@ -209,7 +236,7 @@ struct RoutineView: View {
             )
             if !templates.isEmpty {
                 Button(AppCopy.Routine.loadTemplate) {
-                    showTemplatePicker = true
+                    openTemplatePickerIfAllowed()
                 }
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.anchorAccent(scheme))
@@ -256,6 +283,8 @@ struct RoutineView: View {
     }
 
     private func presentDeletedToast() {
+        duplicatedToastTask?.cancel()
+        showDuplicatedToast = false
         deletedToastTask?.cancel()
         withAnimation(AnchorMotion.spring(response: 0.32)) {
             showDeletedToast = true
@@ -271,7 +300,41 @@ struct RoutineView: View {
         }
     }
 
+    private func presentDuplicatedToast() {
+        deletedToastTask?.cancel()
+        showDeletedToast = false
+        duplicatedToastTask?.cancel()
+        withAnimation(AnchorMotion.spring(response: 0.32)) {
+            showDuplicatedToast = true
+        }
+        duplicatedToastTask = Task {
+            try? await Task.sleep(for: .seconds(2.2))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation {
+                    showDuplicatedToast = false
+                }
+            }
+        }
+    }
+
+    private var canAddMoreRoutines: Bool {
+        PremiumLimits.canAddRoutine(currentCount: routines.count, isPremium: premium.isPremium)
+    }
+
+    private func openTemplatePickerIfAllowed() {
+        guard canAddMoreRoutines else {
+            paywallReason = .routineLimit
+            return
+        }
+        showTemplatePicker = true
+    }
+
     private func addNewRoutine() {
+        guard canAddMoreRoutines else {
+            paywallReason = .routineLimit
+            return
+        }
         let routine = routineVM.addRoutine(
             name: "새 루틴",
             schedule: RoutineScheduleDraft(),

@@ -89,6 +89,10 @@ struct TodayView: View {
                                 )
                             }
 
+                            if !isRestToday, !routines.isEmpty {
+                                restDayActivateRow
+                            }
+
                             if routines.isEmpty, TodayEmptyHintStore.shouldShow {
                                 emptyState
                             } else if scheduledRoutinesToday.isEmpty, TodayEmptyHintStore.shouldShow {
@@ -368,6 +372,30 @@ struct TodayView: View {
         }
     }
 
+    private var restDayActivateRow: some View {
+        Button {
+            activateRestToday()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "moon.zzz.fill")
+                    .font(.subheadline.weight(.semibold))
+                Text(AppCopy.Today.restDayButton)
+                    .font(.subheadline.weight(.semibold))
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .opacity(0.5)
+            }
+            .foregroundStyle(Color.anchorSub(scheme))
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color.anchorSubBg(scheme))
+            .clipShape(RoundedRectangle(cornerRadius: AnchorLayout.rowRadius, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(AppCopy.Today.restDayButton)
+    }
+
     private var restDayCard: some View {
         AnchorCard {
             VStack(alignment: .leading, spacing: 14) {
@@ -386,12 +414,22 @@ struct TodayView: View {
         }
     }
 
+    private func activateRestToday() {
+        withAnimation(AnchorMotion.spring(response: 0.35, dampingFraction: 0.8)) {
+            RestDayStore.setRestToday()
+            isRestToday = true
+        }
+        syncAfterTodayChange()
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
+    }
+
     private func clearRestToday() {
         withAnimation(AnchorMotion.spring(response: 0.35, dampingFraction: 0.8)) {
             RestDayStore.clearRestToday()
             isRestToday = false
         }
         syncAfterTodayChange()
+        Task { await ShieldManager.refresh(modelContext: modelContext) }
     }
 
     private var noScheduleTodayState: some View {
@@ -447,7 +485,6 @@ struct TodayView: View {
                    updatedLog.isFullyCompleted {
                     NotificationManager.cancelReminders(for: routine)
                     AppReviewManager.recordRoutineFullyCompleted()
-                    DeadlineGraceStore.resetMissCount()
                 }
 
                 if !wasCompleted || vm.canUncheckItem(item, routine: routine, logId: log.id, context: modelContext) {

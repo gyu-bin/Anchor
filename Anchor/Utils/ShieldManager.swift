@@ -82,13 +82,6 @@ enum ShieldManager {
             return
         }
 
-        processDeadlineGrace(
-            routines: routines,
-            dayStart: dayStart,
-            calendar: calendar,
-            modelContext: modelContext
-        )
-
         let apps = activeBlockedApplicationTokens(
             routines: routines,
             dayStart: dayStart,
@@ -245,48 +238,9 @@ enum ShieldManager {
         guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else {
             return AppCopy.Routine.lockScheduled
         }
-        guard let end = RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar),
-              let unlock = RoutineDeadline.unlockTimeToday(for: routine, now: now, calendar: calendar),
-              now >= end else {
-            return AppCopy.Routine.lockScheduled
-        }
-        if now >= unlock {
+        if RoutineDeadline.isTodayDeadlinePassed(for: routine, now: now, calendar: calendar) {
             return AppCopy.Routine.lockReleasedAfterDeadline
         }
-        let df = DateFormatter()
-        df.locale = Locale(identifier: "ko_KR")
-        df.dateFormat = "a h:mm"
-        return AppCopy.Routine.lockUnlocksAt(df.string(from: unlock))
-    }
-
-    private static func processDeadlineGrace(
-        routines: [Routine],
-        dayStart: Date,
-        calendar: Calendar,
-        modelContext: ModelContext,
-        now: Date = Date()
-    ) {
-        let dayKey = DeadlineGraceStore.dayKey(for: now, calendar: calendar)
-        var missedDeadlineToday = false
-
-        for routine in routines where RoutineSchedule.isActive(routine, on: now, calendar: calendar) && !routine.items.isEmpty {
-            guard routine.endTime != nil else { continue }
-            let complete = (try? routineIsFullyCompleteToday(
-                routine,
-                dayStart: dayStart,
-                calendar: calendar,
-                modelContext: modelContext
-            )) ?? false
-            if complete { continue }
-            guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else { continue }
-            guard let end = RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar),
-                  now >= end else { continue }
-            missedDeadlineToday = true
-            break
-        }
-
-        if missedDeadlineToday {
-            DeadlineGraceStore.recordMissForTodayIfNeeded(dayKey: dayKey)
-        }
+        return AppCopy.Routine.lockScheduled
     }
 }

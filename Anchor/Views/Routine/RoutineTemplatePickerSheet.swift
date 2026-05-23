@@ -10,12 +10,15 @@ struct RoutineTemplatePickerSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var scheme
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var premium: PremiumStore
 
     @Query(sort: [SortDescriptor(\RoutineTemplate.savedAt, order: .reverse)]) private var templates: [RoutineTemplate]
 
     let routines: [Routine]
     let routineVM: RoutineViewModel
     var onCreated: (Routine) -> Void
+
+    @State private var paywallReason: PaywallReason?
 
     var body: some View {
         NavigationStack {
@@ -56,10 +59,20 @@ struct RoutineTemplatePickerSheet: View {
                     Button(AppCopy.Common.cancel) { dismiss() }
                 }
             }
+            .sheet(item: $paywallReason) { reason in
+                PaywallSheet(reason: reason)
+            }
         }
     }
 
     private func create(from template: RoutineTemplate) {
+        guard PremiumLimits.canAddRoutine(
+            currentCount: routines.count,
+            isPremium: premium.isPremium
+        ) else {
+            paywallReason = .routineLimit
+            return
+        }
         let routine = routineVM.createRoutine(
             from: template,
             context: modelContext,

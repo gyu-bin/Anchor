@@ -69,19 +69,10 @@ enum RoutineDeadline {
   /// 미완료 시 잠금이 풀리는 시각. `endTime` 없으면 nil(완료할 때까지 유지).
   static func unlockTimeToday(
     for routine: Routine,
-    graceMissCount: Int = DeadlineGraceStore.missCount,
     now: Date = Date(),
     calendar: Calendar = .current
   ) -> Date? {
-    guard let end = endTimeToday(for: routine, now: now, calendar: calendar) else { return nil }
-    if graceMissCount < DeadlineGraceStore.maxImmediateUnlockMisses {
-      return end
-    }
-    return calendar.date(
-      byAdding: .minute,
-      value: DeadlineGraceStore.delayedUnlockMinutes,
-      to: end
-    )
+    endTimeToday(for: routine, now: now, calendar: calendar)
   }
 
   /// 시작 후 · 미완료 · (마감 전이거나 아직 unlock 시각 전)이면 잠금 유지.
@@ -89,24 +80,14 @@ enum RoutineDeadline {
     routine: Routine,
     isComplete: Bool,
     now: Date = Date(),
-    calendar: Calendar = .current,
-    graceMissCount: Int = DeadlineGraceStore.missCount
+    calendar: Calendar = .current
   ) -> Bool {
     if isComplete || routine.items.isEmpty { return false }
     guard hasRoutineStartedToday(routine, now: now, calendar: calendar) else { return false }
-    guard let unlock = unlockTimeToday(
-      for: routine,
-      graceMissCount: graceMissCount,
-      now: now,
-      calendar: calendar
-    ) else {
+    guard let unlock = unlockTimeToday(for: routine, now: now, calendar: calendar) else {
       return true
     }
     return now < unlock
-  }
-
-  static func remainingGraceUnlocks(graceMissCount: Int = DeadlineGraceStore.missCount) -> Int {
-    max(0, DeadlineGraceStore.maxImmediateUnlockMisses - graceMissCount)
   }
 
   static func isFutureDay(_ day: Date, calendar: Calendar = .current, now: Date = Date()) -> Bool {

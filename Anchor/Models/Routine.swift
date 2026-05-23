@@ -29,10 +29,6 @@ final class Routine {
     var scheduleStartDate: Date?
     /// 일정 종료일 0시 (inclusive)
     var scheduleEndDate: Date?
-    /// `RoutineExpiryAction` raw
-    var expiryActionRaw: String?
-    /// 만료 후 목록에서 숨김
-    var isArchived: Bool?
     /// 루틴 종료 시간 (nil = 설정 안함)
     var endTime: Date?
     /// 루틴을 만든 날(기록·달력에서 이전 날짜는 미완료로 치지 않음)
@@ -51,9 +47,7 @@ final class Routine {
         activeWeekdays: [Int]? = Array(1...7),
         oneTimeDate: Date? = nil,
         scheduleStartDate: Date? = nil,
-        scheduleEndDate: Date? = nil,
-        expiryActionRaw: String? = nil,
-        isArchived: Bool? = false
+        scheduleEndDate: Date? = nil
     ) {
         self.id = id
         self.name = name
@@ -68,8 +62,6 @@ final class Routine {
         self.oneTimeDate = oneTimeDate
         self.scheduleStartDate = scheduleStartDate
         self.scheduleEndDate = scheduleEndDate
-        self.expiryActionRaw = expiryActionRaw
-        self.isArchived = isArchived
         self.createdAt = Date()
     }
 }

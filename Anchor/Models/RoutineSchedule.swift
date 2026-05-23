@@ -24,22 +24,6 @@ enum RoutineScheduleKind: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum RoutineExpiryAction: String, CaseIterable, Identifiable, Codable {
-    case keepInList
-    case archive
-    case delete
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .keepInList: return AppCopy.Routine.Expiry.keepInList
-        case .archive: return AppCopy.Routine.Expiry.archive
-        case .delete: return AppCopy.Routine.Expiry.delete
-        }
-    }
-}
-
 struct RoutineScheduleDraft: Equatable {
     var kind: RoutineScheduleKind = .daily
     var activeWeekdays: Set<Int> = [2, 3, 4, 5, 6]
@@ -120,10 +104,6 @@ enum RoutineSchedule {
         return draft
     }
 
-    static func defaultExpiryAction(for kind: RoutineScheduleKind) -> RoutineExpiryAction {
-        kind == .once ? .archive : .keepInList
-    }
-
     /// 저장값이 없으면 일정 종류에 맞는 기본 요일을 돌려줍니다.
     static func activeWeekdays(for routine: Routine) -> [Int] {
         if let stored = routine.activeWeekdays {
@@ -185,18 +165,6 @@ enum RoutineSchedule {
         return today > end
     }
 
-    static func isArchived(_ routine: Routine) -> Bool {
-        routine.isArchived == true
-    }
-
-    static func isListedInActiveSection(_ routine: Routine, calendar: Calendar = .current) -> Bool {
-        !isArchived(routine) && !isExpired(routine, calendar: calendar)
-    }
-
-    static func isListedInEndedSection(_ routine: Routine, calendar: Calendar = .current) -> Bool {
-        !isArchived(routine) && isExpired(routine, calendar: calendar)
-    }
-
     /// 스키마 추가 이전에 저장된 루틴에 기본 일정 값을 채웁니다.
     @MainActor
     static func repairLegacyRoutines(in context: ModelContext) {
@@ -215,14 +183,6 @@ enum RoutineSchedule {
                 let liveIds = Set(routines.map(\.id))
                 let logs = DailyLogFetcher.fetchedLogs(liveRoutineIds: liveIds, context: context)
                 routine.createdAt = effectiveCreatedDay(for: routine, logs: logs)
-                changed = true
-            }
-            if routine.isArchived == nil {
-                routine.isArchived = false
-                changed = true
-            }
-            if routine.expiryActionRaw == nil {
-                routine.expiryActionRaw = defaultExpiryAction(for: routine.scheduleKind).rawValue
                 changed = true
             }
             if routine.scheduleKind == .once,
@@ -427,12 +387,5 @@ extension Routine {
             RoutineScheduleKind(rawValue: scheduleKindRaw ?? RoutineScheduleKind.daily.rawValue) ?? .daily
         }
         set { scheduleKindRaw = newValue.rawValue }
-    }
-
-    var expiryAction: RoutineExpiryAction {
-        get {
-            RoutineExpiryAction(rawValue: expiryActionRaw ?? "") ?? RoutineSchedule.defaultExpiryAction(for: scheduleKind)
-        }
-        set { expiryActionRaw = newValue.rawValue }
     }
 }

@@ -19,7 +19,9 @@ struct RoutineItemEditSheet: View {
 
     let payload: RoutineItemEditPayload
     @Environment(RoutineViewModel.self) private var routineVM
+    @EnvironmentObject private var premium: PremiumStore
 
+    @State private var paywallReason: PaywallReason?
     @State private var name: String
     @State private var icon: String
     @State private var durationMinutes: Int
@@ -93,6 +95,9 @@ struct RoutineItemEditSheet: View {
                     .accessibilityLabel("저장")
                 }
             }
+            .sheet(item: $paywallReason) { reason in
+                PaywallSheet(reason: reason)
+            }
         }
     }
 
@@ -107,6 +112,13 @@ struct RoutineItemEditSheet: View {
                 context: modelContext
             )
         } else {
+            guard PremiumLimits.canAddItem(
+                currentCount: payload.routine.items.count,
+                isPremium: premium.isPremium
+            ) else {
+                paywallReason = .itemLimit
+                return
+            }
             routineVM.addItem(
                 to: payload.routine,
                 name: trimmed,

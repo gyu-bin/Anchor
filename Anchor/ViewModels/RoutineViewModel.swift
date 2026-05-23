@@ -125,9 +125,7 @@ final class RoutineViewModel {
             activeWeekdays: source.activeWeekdays,
             oneTimeDate: source.oneTimeDate,
             scheduleStartDate: source.scheduleStartDate,
-            scheduleEndDate: source.scheduleEndDate,
-            expiryActionRaw: source.expiryActionRaw,
-            isArchived: false
+            scheduleEndDate: source.scheduleEndDate
         )
         copy.endTime = source.endTime
         context.insert(copy)
