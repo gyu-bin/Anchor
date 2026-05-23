@@ -9,13 +9,8 @@ import UserNotifications
 
 enum NotificationManager {
     private static let routineCategoryId = "ROUTINE_START"
-    private static let reminderCategoryId = "ROUTINE_REMINDER"
     private static let deadlineCategoryId = "ROUTINE_DEADLINE"
     private static let weeklyCategoryId = "WEEKLY_SUMMARY"
-    private static let incompleteDayCategoryId = "INCOMPLETE_DAY_NUDGE"
-    private static let dayCelebrationCategoryId = "DAY_CELEBRATION"
-    private static let incompleteTodayId = "end-of-day-incomplete-today"
-    private static let celebrationTodayId = "end-of-day-celebration-today"
 
     static func registerCategories() {
         let openToday = UNNotificationAction(
@@ -31,12 +26,6 @@ enum NotificationManager {
                 options: []
             ),
             UNNotificationCategory(
-                identifier: reminderCategoryId,
-                actions: [openToday],
-                intentIdentifiers: [],
-                options: []
-            ),
-            UNNotificationCategory(
                 identifier: deadlineCategoryId,
                 actions: [openToday],
                 intentIdentifiers: [],
@@ -45,18 +34,6 @@ enum NotificationManager {
             UNNotificationCategory(
                 identifier: weeklyCategoryId,
                 actions: [openToday],
-                intentIdentifiers: [],
-                options: []
-            ),
-            UNNotificationCategory(
-                identifier: incompleteDayCategoryId,
-                actions: [openToday],
-                intentIdentifiers: [],
-                options: []
-            ),
-            UNNotificationCategory(
-                identifier: dayCelebrationCategoryId,
-                actions: [],
                 intentIdentifiers: [],
                 options: []
             ),
@@ -80,55 +57,51 @@ enum NotificationManager {
         let fd = FetchDescriptor<Routine>()
         let routines = try modelContext.fetch(fd)
 
-        if NotificationPreferences.notificationsEnabled {
-            for routine in routines {
-                scheduleRoutineNotifications(for: routine)
-            }
+        for routine in routines {
+            scheduleRoutineNotifications(for: routine)
         }
-
-        refreshDailyClosureNotifications(modelContext: modelContext)
 
         if NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium {
             scheduleWeeklySummary()
         }
 
-        // rescheduleAll이 루틴 완료 직후 호출될 때 마감·리마인더 알림이 재등록되는 문제 방지
+        // rescheduleAll이 루틴 완료 직후 호출될 때 마감·미완료 알림이 재등록되는 문제 방지
         let calendar = Calendar.current
         let dayStart = calendar.startOfDay(for: Date())
         for routine in routines where !routine.items.isEmpty {
             guard let isComplete = try? routineIsFullyCompleteToday(
                 routine, dayStart: dayStart, calendar: calendar, modelContext: modelContext
             ), isComplete else { continue }
-            removePendingReminderNotifications(for: routine)
+            removePendingDeadlineNotifications(for: routine)
         }
     }
 
-    private static func removePendingReminderNotifications(for routine: Routine) {
+    private static func removePendingDeadlineNotifications(for routine: Routine) {
         let idBase = routine.id.uuidString
         var ids: [String] = []
         switch routine.scheduleKind {
         case .daily:
-            ids.append("routine-reminder-\(idBase)-daily")
             ids.append("routine-deadline-\(idBase)-daily")
+            ids.append("routine-incomplete-\(idBase)-daily")
         case .weekdays:
             for weekday in RoutineSchedule.activeWeekdays(for: routine) {
-                ids.append("routine-reminder-\(idBase)-w\(weekday)")
                 ids.append("routine-deadline-\(idBase)-w\(weekday)")
+                ids.append("routine-incomplete-\(idBase)-w\(weekday)")
             }
         case .period:
             let weekdays = RoutineSchedule.activeWeekdays(for: routine)
             if weekdays.isEmpty {
-                ids.append("routine-reminder-\(idBase)-daily")
                 ids.append("routine-deadline-\(idBase)-daily")
+                ids.append("routine-incomplete-\(idBase)-daily")
             } else {
                 for weekday in weekdays {
-                    ids.append("routine-reminder-\(idBase)-w\(weekday)")
                     ids.append("routine-deadline-\(idBase)-w\(weekday)")
+                    ids.append("routine-incomplete-\(idBase)-w\(weekday)")
                 }
             }
         case .once:
-            ids.append("routine-reminder-\(idBase)-once")
             ids.append("routine-deadline-\(idBase)-once")
+            ids.append("routine-incomplete-\(idBase)-once")
         }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
     }
@@ -278,39 +251,8 @@ enum NotificationManager {
             UNUserNotificationCenter.current().add(startReq)
         }
 
-        if NotificationPreferences.reminderEnabled {
-            let offset = NotificationPreferences.reminderOffsetMinutes
-            let anchor = calendar.date(from: startComponents)
-                ?? calendar.date(bySettingHour: startComponents.hour ?? 0, minute: startComponents.minute ?? 0, second: 0, of: Date())
-                ?? routine.startTime
-            let reminderDate = calendar.date(byAdding: .minute, value: offset, to: anchor) ?? anchor
-            var reminderComps = startComponents
-            reminderComps.hour = calendar.component(.hour, from: reminderDate)
-            reminderComps.minute = calendar.component(.minute, from: reminderDate)
-
-            let reminderTrigger = UNCalendarNotificationTrigger(dateMatching: reminderComps, repeats: repeats)
-            let reminderContent = UNMutableNotificationContent()
-            let reminder = AppCopy.Notification.reminder(name: routine.name)
-            reminderContent.title = reminder.title
-            reminderContent.body = reminder.body
-            reminderContent.sound = .default
-            reminderContent.categoryIdentifier = reminderCategoryId
-            reminderContent.userInfo = [
-                "openToday": true,
-                "routineId": routine.id.uuidString,
-                "isReminder": true,
-            ]
-
-            let reminderReq = UNNotificationRequest(
-                identifier: "routine-reminder-\(routine.id.uuidString)-\(idSuffix)",
-                content: reminderContent,
-                trigger: reminderTrigger
-            )
-            UNUserNotificationCenter.current().add(reminderReq)
-        }
-
         if routine.endTime != nil, NotificationPreferences.notificationsEnabled {
-            addDeadlineNotification(
+            addDeadlineNotifications(
                 routine: routine,
                 startComponents: startComponents,
                 repeats: repeats,
@@ -320,7 +262,7 @@ enum NotificationManager {
         }
     }
 
-    private static func addDeadlineNotification(
+    private static func addDeadlineNotifications(
         routine: Routine,
         startComponents: DateComponents,
         repeats: Bool,
@@ -329,38 +271,61 @@ enum NotificationManager {
     ) {
         guard let endTime = routine.endTime else { return }
         let endComps = calendar.dateComponents([.hour, .minute], from: endTime)
-        var merged = startComponents
-        merged.hour = endComps.hour
-        merged.minute = endComps.minute
-        guard let endDate = calendar.date(from: merged),
-              let notifyDate = calendar.date(byAdding: .minute, value: -30, to: endDate) else { return }
+        var endTriggerComps = startComponents
+        endTriggerComps.hour = endComps.hour
+        endTriggerComps.minute = endComps.minute
 
-        var triggerComps = startComponents
-        triggerComps.hour = calendar.component(.hour, from: notifyDate)
-        triggerComps.minute = calendar.component(.minute, from: notifyDate)
+        // 종료 30분 전 알림
+        if let endDate = calendar.date(from: endTriggerComps),
+           let notifyDate = calendar.date(byAdding: .minute, value: -30, to: endDate) {
+            var triggerComps = startComponents
+            triggerComps.hour = calendar.component(.hour, from: notifyDate)
+            triggerComps.minute = calendar.component(.minute, from: notifyDate)
 
-        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: repeats)
-        let content = UNMutableNotificationContent()
-        let copy = AppCopy.Notification.deadlineReminder(name: routine.name)
-        content.title = copy.title
-        content.body = copy.body
-        content.sound = .default
-        content.categoryIdentifier = deadlineCategoryId
-        content.userInfo = [
+            let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComps, repeats: repeats)
+            let content = UNMutableNotificationContent()
+            let copy = AppCopy.Notification.deadlineReminder(name: routine.name)
+            content.title = copy.title
+            content.body = copy.body
+            content.sound = .default
+            content.categoryIdentifier = deadlineCategoryId
+            content.userInfo = [
+                "openToday": true,
+                "routineId": routine.id.uuidString,
+                "isDeadlineReminder": true,
+            ]
+
+            let request = UNNotificationRequest(
+                identifier: "routine-deadline-\(routine.id.uuidString)-\(idSuffix)",
+                content: content,
+                trigger: trigger
+            )
+            UNUserNotificationCenter.current().add(request)
+        }
+
+        // 종료 시간 정각 미완료 알림
+        let endTrigger = UNCalendarNotificationTrigger(dateMatching: endTriggerComps, repeats: repeats)
+        let incompleteContent = UNMutableNotificationContent()
+        let incomplete = AppCopy.Notification.routineIncomplete(name: routine.name)
+        incompleteContent.title = incomplete.title
+        incompleteContent.body = incomplete.body
+        incompleteContent.sound = .default
+        incompleteContent.categoryIdentifier = deadlineCategoryId
+        incompleteContent.userInfo = [
             "openToday": true,
             "routineId": routine.id.uuidString,
             "isDeadlineReminder": true,
         ]
 
-        let request = UNNotificationRequest(
-            identifier: "routine-deadline-\(routine.id.uuidString)-\(idSuffix)",
-            content: content,
-            trigger: trigger
+        let incompleteReq = UNNotificationRequest(
+            identifier: "routine-incomplete-\(routine.id.uuidString)-\(idSuffix)",
+            content: incompleteContent,
+            trigger: endTrigger
         )
-        UNUserNotificationCenter.current().add(request)
+        UNUserNotificationCenter.current().add(incompleteReq)
     }
 
-    /// 오늘 해당 루틴을 이미 완료했으면 리마인더를 보내지 않습니다.
+    /// 오늘 해당 루틴을 이미 완료했으면 알림을 보내지 않습니다.
     static func shouldDeliverReminder(
         routineId: UUID,
         modelContext: ModelContext
@@ -381,43 +346,64 @@ enum NotificationManager {
         return !complete
     }
 
-    /// 오늘 마감 연장 후, 연장된 시각 기준 30분 전 일회 알림을 다시 잡습니다.
+    /// 오늘 마감 연장 후, 연장된 시각 기준 30분 전과 종료 시각 일회 알림을 다시 잡습니다.
     static func refreshTodayDeadlineReminderAfterExtension(for routine: Routine) {
         guard NotificationPreferences.notificationsEnabled else { return }
         guard routine.endTime != nil else { return }
 
         let calendar = Calendar.current
         let dayKey = RoutineDeadlineExtensionStore.dayKey(for: Date(), calendar: calendar)
-        let identifier = "routine-deadline-ext-\(routine.id.uuidString)-\(dayKey)"
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+        let deadlineId = "routine-deadline-ext-\(routine.id.uuidString)-\(dayKey)"
+        let incompleteId = "routine-incomplete-ext-\(routine.id.uuidString)-\(dayKey)"
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [deadlineId, incompleteId])
 
         guard let end = RoutineDeadline.endTimeToday(for: routine),
-              let notifyDate = calendar.date(byAdding: .minute, value: -30, to: end),
-              notifyDate > Date() else { return }
+              end > Date() else { return }
 
-        let content = UNMutableNotificationContent()
-        let copy = AppCopy.Notification.deadlineReminder(name: routine.name)
-        content.title = copy.title
-        content.body = copy.body
-        content.sound = .default
-        content.categoryIdentifier = deadlineCategoryId
-        content.userInfo = [
+        // 종료 30분 전 알림
+        if let notifyDate = calendar.date(byAdding: .minute, value: -30, to: end),
+           notifyDate > Date() {
+            let content = UNMutableNotificationContent()
+            let copy = AppCopy.Notification.deadlineReminder(name: routine.name)
+            content.title = copy.title
+            content.body = copy.body
+            content.sound = .default
+            content.categoryIdentifier = deadlineCategoryId
+            content.userInfo = [
+                "openToday": true,
+                "routineId": routine.id.uuidString,
+                "isDeadlineReminder": true,
+            ]
+            let interval = max(1, notifyDate.timeIntervalSinceNow)
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+            let request = UNNotificationRequest(identifier: deadlineId, content: content, trigger: trigger)
+            UNUserNotificationCenter.current().add(request)
+        }
+
+        // 종료 시간 정각 미완료 알림
+        let incompleteContent = UNMutableNotificationContent()
+        let incomplete = AppCopy.Notification.routineIncomplete(name: routine.name)
+        incompleteContent.title = incomplete.title
+        incompleteContent.body = incomplete.body
+        incompleteContent.sound = .default
+        incompleteContent.categoryIdentifier = deadlineCategoryId
+        incompleteContent.userInfo = [
             "openToday": true,
             "routineId": routine.id.uuidString,
             "isDeadlineReminder": true,
         ]
-
-        let interval = max(1, notifyDate.timeIntervalSinceNow)
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request)
+        let endInterval = max(1, end.timeIntervalSinceNow)
+        let endTrigger = UNTimeIntervalNotificationTrigger(timeInterval: endInterval, repeats: false)
+        let endReq = UNNotificationRequest(identifier: incompleteId, content: incompleteContent, trigger: endTrigger)
+        UNUserNotificationCenter.current().add(endReq)
     }
 
     static func cancelReminders(for routine: Routine) {
         let prefixes = [
-            "routine-reminder-\(routine.id.uuidString)-",
             "routine-deadline-\(routine.id.uuidString)-",
             "routine-deadline-ext-\(routine.id.uuidString)-",
+            "routine-incomplete-\(routine.id.uuidString)-",
+            "routine-incomplete-ext-\(routine.id.uuidString)-",
         ]
         UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
             let ids = requests.filter { req in
@@ -498,167 +484,5 @@ enum NotificationManager {
             trigger: trigger
         )
         UNUserNotificationCenter.current().add(request)
-    }
-}
-
-// MARK: - Daily closure (저녁·밤 알림)
-
-extension NotificationManager {
-    /// 오늘 기준: 미완료면 저녁 알림, 전부 완료면 밤 격려 알림 예약
-    static func refreshDailyClosureNotifications(modelContext: ModelContext) {
-        guard NotificationPreferences.notificationsEnabled else {
-            cancelDailyClosureNotifications()
-            return
-        }
-
-        cancelDailyClosureNotifications()
-
-        let calendar = Calendar.current
-        let now = Date()
-
-        guard !RestDayStore.isRestToday(calendar: calendar) else { return }
-
-        do {
-            let routines = try actionableRoutinesToday(modelContext: modelContext, calendar: calendar)
-            guard !routines.isEmpty else { return }
-
-            let allComplete = try isAllRoutinesCompleteToday(
-                routines: routines,
-                modelContext: modelContext,
-                calendar: calendar
-            )
-
-            if allComplete {
-                scheduleCelebrationForTodayIfNeeded(now: now, calendar: calendar)
-            } else {
-                scheduleIncompleteNudgeForTodayIfNeeded(now: now, calendar: calendar)
-            }
-        } catch {
-            return
-        }
-    }
-
-    static func shouldDeliverIncompleteDayNudge(modelContext: ModelContext) -> Bool {
-        let calendar = Calendar.current
-        if RestDayStore.isRestToday(calendar: calendar) { return false }
-        guard let routines = try? actionableRoutinesToday(modelContext: modelContext, calendar: calendar),
-              !routines.isEmpty else { return false }
-        let complete = (try? isAllRoutinesCompleteToday(
-            routines: routines,
-            modelContext: modelContext,
-            calendar: calendar
-        )) ?? false
-        return !complete
-    }
-
-    static func shouldDeliverDayCelebration(modelContext: ModelContext) -> Bool {
-        let calendar = Calendar.current
-        if RestDayStore.isRestToday(calendar: calendar) { return false }
-        guard let routines = try? actionableRoutinesToday(modelContext: modelContext, calendar: calendar),
-              !routines.isEmpty else { return false }
-        return (try? isAllRoutinesCompleteToday(
-            routines: routines,
-            modelContext: modelContext,
-            calendar: calendar
-        )) ?? false
-    }
-
-    private static func cancelDailyClosureNotifications() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(
-            withIdentifiers: [incompleteTodayId, celebrationTodayId]
-        )
-    }
-
-    private static func scheduleIncompleteNudgeForTodayIfNeeded(now: Date, calendar: Calendar) {
-        guard let fireDate = todayAt(
-            hour: NotificationPreferences.incompleteDayNudgeHour,
-            minute: NotificationPreferences.incompleteDayNudgeMinute,
-            calendar: calendar
-        ), fireDate > now else { return }
-
-        let content = UNMutableNotificationContent()
-        content.title = AppCopy.Notification.incompleteDayTitle
-        content.body = AppCopy.Notification.incompleteDayBody
-        content.sound = .default
-        content.categoryIdentifier = incompleteDayCategoryId
-        content.userInfo = ["openToday": true, "isIncompleteDayNudge": true]
-
-        let trigger = UNTimeIntervalNotificationTrigger(
-            timeInterval: fireDate.timeIntervalSince(now),
-            repeats: false
-        )
-        let request = UNNotificationRequest(
-            identifier: incompleteTodayId,
-            content: content,
-            trigger: trigger
-        )
-        UNUserNotificationCenter.current().add(request)
-    }
-
-    private static func scheduleCelebrationForTodayIfNeeded(now: Date, calendar: Calendar) {
-        guard let fireDate = todayAt(
-            hour: NotificationPreferences.dayCelebrationHour,
-            minute: NotificationPreferences.dayCelebrationMinute,
-            calendar: calendar
-        ), fireDate > now else { return }
-
-        let content = UNMutableNotificationContent()
-        content.title = AppCopy.Notification.dayCelebrationTitle
-        content.body = AppCopy.Notification.dayCelebrationBody
-        content.sound = .default
-        content.categoryIdentifier = dayCelebrationCategoryId
-        content.userInfo = ["isDayCelebration": true]
-
-        let trigger = UNTimeIntervalNotificationTrigger(
-            timeInterval: fireDate.timeIntervalSince(now),
-            repeats: false
-        )
-        let request = UNNotificationRequest(
-            identifier: celebrationTodayId,
-            content: content,
-            trigger: trigger
-        )
-        UNUserNotificationCenter.current().add(request)
-    }
-
-    private static func todayAt(hour: Int, minute: Int, calendar: Calendar) -> Date? {
-        var comps = calendar.dateComponents([.year, .month, .day], from: Date())
-        comps.hour = hour
-        comps.minute = minute
-        comps.second = 0
-        return calendar.date(from: comps)
-    }
-
-    private static func actionableRoutinesToday(
-        modelContext: ModelContext,
-        calendar: Calendar
-    ) throws -> [Routine] {
-        let all = try modelContext.fetch(FetchDescriptor<Routine>())
-        return all.filter {
-            !$0.items.isEmpty && RoutineSchedule.isActive($0, on: Date(), calendar: calendar)
-        }
-    }
-
-    private static func isAllRoutinesCompleteToday(
-        routines: [Routine],
-        modelContext: ModelContext,
-        calendar: Calendar
-    ) throws -> Bool {
-        let dayStart = calendar.startOfDay(for: Date())
-        for routine in routines {
-            let rid = routine.id
-            var fd = FetchDescriptor<DailyLog>(
-                predicate: #Predicate { log in
-                    log.routineId == rid
-                }
-            )
-            fd.fetchLimit = 200
-            let logs = try modelContext.fetch(fd)
-            guard let log = logs.first(where: { calendar.isDate($0.date, inSameDayAs: dayStart) }),
-                  log.isFullyCompleted else {
-                return false
-            }
-        }
-        return true
     }
 }

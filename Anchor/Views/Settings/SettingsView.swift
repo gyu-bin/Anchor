@@ -18,9 +18,7 @@ struct SettingsView: View {
 
     @AppStorage(NotificationPreferencesKey.enabled) private var notificationsEnabled = true
     @AppStorage(NotificationPreferencesKey.routineStart) private var routineStartEnabled = true
-    @AppStorage(NotificationPreferencesKey.reminder) private var reminderEnabled = true
     @AppStorage(NotificationPreferencesKey.weeklySummary) private var weeklySummaryEnabled = true
-    @AppStorage(NotificationPreferencesKey.reminderOffset) private var reminderOffsetMinutes = 30
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.defaultMode.rawValue
 
     @State private var showGuide = false
@@ -75,27 +73,6 @@ struct SettingsView: View {
                                     Toggle(AppCopy.Settings.routineStart, isOn: $routineStartEnabled)
                                         .padding(.horizontal, AnchorLayout.cardPadding)
                                         .padding(.vertical, 12)
-
-                                    SettingsInsetDivider()
-
-                                    HStack {
-                                        Text(AppCopy.Settings.reminder)
-                                        Spacer()
-                                        if reminderEnabled {
-                                            Picker("", selection: $reminderOffsetMinutes) {
-                                                ForEach(NotificationPreferences.reminderOffsetChoices, id: \.minutes) { choice in
-                                                    Text(choice.label).tag(choice.minutes)
-                                                }
-                                            }
-                                            .labelsHidden()
-                                            .pickerStyle(.menu)
-                                        }
-                                        Toggle("", isOn: $reminderEnabled)
-                                            .labelsHidden()
-                                            .fixedSize()
-                                    }
-                                    .padding(.horizontal, AnchorLayout.cardPadding)
-                                    .padding(.vertical, 12)
 
                                     SettingsInsetDivider()
                                     weeklySummaryRow
@@ -305,9 +282,7 @@ struct SettingsView: View {
             }
             .onChange(of: notificationsEnabled) { _, _ in applyNotificationPrefs() }
             .onChange(of: routineStartEnabled) { _, _ in applyNotificationPrefs() }
-            .onChange(of: reminderEnabled) { _, _ in applyNotificationPrefs() }
             .onChange(of: weeklySummaryEnabled) { _, _ in applyNotificationPrefs() }
-            .onChange(of: reminderOffsetMinutes) { _, _ in applyNotificationPrefs() }
             .fullScreenCover(isPresented: $showGuide) {
                 AppGuideView(isReplay: true) {
                     showGuide = false
@@ -464,9 +439,7 @@ struct SettingsView: View {
     private func syncNotificationPrefs() {
         NotificationPreferences.notificationsEnabled = notificationsEnabled
         NotificationPreferences.routineStartEnabled = routineStartEnabled
-        NotificationPreferences.reminderEnabled = reminderEnabled
         NotificationPreferences.weeklySummaryEnabled = weeklySummaryEnabled
-        NotificationPreferences.reminderOffsetMinutes = reminderOffsetMinutes
     }
 
     private func applyNotificationPrefs() {
@@ -575,7 +548,5 @@ private struct SettingsChevronRow: View {
 enum NotificationPreferencesKey {
     static let enabled = "notifications.enabled"
     static let routineStart = "notifications.routineStart"
-    static let reminder = "notifications.reminder"
     static let weeklySummary = "notifications.weeklySummary"
-    static let reminderOffset = "notifications.reminderOffsetMinutes"
 }

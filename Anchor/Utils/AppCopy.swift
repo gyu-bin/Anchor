@@ -399,13 +399,9 @@ enum AppCopy {
         static func routineStart(name: String) -> (title: String, body: String) {
             ("\(name), 시작할 시간이에요", "오늘도 천천히 함께해요")
         }
-        static func reminder(name: String) -> (title: String, body: String) {
-            ("아직 \(name)이 남아 있어요", "조금만 더 해볼까요?")
+        static func routineIncomplete(name: String) -> (title: String, body: String) {
+            ("\(name), 시간이 지났어요", "아직 완료하지 않았어요. 지금이라도 마무리해볼까요?")
         }
-        static let incompleteDayTitle = "오늘 루틴, 아직 남았어요"
-        static let incompleteDayBody = "하루가 끝나기 전에 조금만 더 해볼까요?"
-        static let dayCelebrationTitle = "오늘도 고생 많으셨어요"
-        static let dayCelebrationBody = "루틴을 모두 마치셨네요. 편히 쉬세요"
         static func deadlineReminder(name: String) -> (title: String, body: String) {
             ("\(name) 마감 30분 전이에요", "아직 완료 전이라면 지금 시작해 보세요!")
         }

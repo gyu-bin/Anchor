@@ -62,7 +62,6 @@ enum RoutineSync {
 
         try? NotificationManager.rescheduleAll(modelContext: modelContext)
         WidgetSync.refresh(modelContext: modelContext, routines: routines)
-        NotificationManager.refreshDailyClosureNotifications(modelContext: modelContext)
         WidgetDataStore.reloadWidgetsImmediately()
         if refreshShield {
             Task { await ShieldManager.refresh(modelContext: modelContext) }
