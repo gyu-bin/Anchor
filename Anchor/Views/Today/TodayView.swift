@@ -89,16 +89,16 @@ struct TodayView: View {
                                 )
                             }
 
-                            if !isRestToday, !routines.isEmpty {
+                            if !isRestToday, !scheduledRoutinesToday.isEmpty {
                                 restDayActivateRow
                             }
 
                             if routines.isEmpty, TodayEmptyHintStore.shouldShow {
                                 emptyState
-                            } else if scheduledRoutinesToday.isEmpty, TodayEmptyHintStore.shouldShow {
-                                noScheduleTodayState
                             } else if isRestToday {
                                 restDayCard
+                            } else if scheduledRoutinesToday.isEmpty {
+                                noScheduleTodayState
                             } else {
                                 if !actionableRoutinesToday.isEmpty {
                                     OverallProgressCard(
@@ -438,7 +438,6 @@ struct TodayView: View {
             title: AppCopy.Today.noScheduleTitle,
             message: AppCopy.Today.noScheduleBody
         )
-        .onAppear { TodayEmptyHintStore.markSeen() }
     }
 
     private var bottomScrollInset: CGFloat {
