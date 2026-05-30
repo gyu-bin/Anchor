@@ -28,7 +28,7 @@ struct AppStorePaywallFromSettingsExportView: View {
         }
         .onAppear {
             UserDefaults.standard.set(true, forKey: AppGuideStorage.hasSeenGuideKey)
-            PremiumStorage.setPremium(false)
+            PremiumStorage.setPurchased(false)
             premium.previewShowsPurchaseUI = true
             premium.errorMessage = nil
             showPaywall = true

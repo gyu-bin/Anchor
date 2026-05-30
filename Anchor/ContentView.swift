@@ -10,7 +10,9 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var tabRouter: TabRouter
+    @EnvironmentObject private var premium: PremiumStore
     @State private var routineViewModel = RoutineViewModel()
+    @State private var paywallReason: PaywallReason?
 
     @AppStorage(AppGuideStorage.hasSeenGuideKey) private var hasSeenAppGuide = false
     @AppStorage("appearanceMode") private var appearanceModeRaw = AppearanceMode.defaultMode.rawValue
@@ -50,6 +52,9 @@ struct ContentView: View {
             guard hasSeenAppGuide, !showGuide else { return }
             switch phase {
             case .active:
+                premium.refreshAccessState()
+                presentTrialExpiredPaywallIfNeeded()
+                try? NotificationManager.rescheduleAll(modelContext: modelContext)
                 RoutineScheduleMaintenance.run(modelContext: modelContext)
                 ShieldScheduleWatcher.startPolling(modelContext: modelContext)
                 consumeIntentFlags()
@@ -70,8 +75,19 @@ struct ContentView: View {
             } else {
                 ShieldScheduleWatcher.startPolling(modelContext: modelContext)
                 consumeIntentFlags()
+                presentTrialExpiredPaywallIfNeeded()
             }
         }
+        .sheet(item: $paywallReason) { reason in
+            PaywallSheet(reason: reason)
+        }
+    }
+
+    private func presentTrialExpiredPaywallIfNeeded() {
+        guard hasSeenAppGuide, !showGuide else { return }
+        guard paywallReason == nil else { return }
+        guard premium.consumeTrialExpiredPaywallPrompt() else { return }
+        paywallReason = .trialExpired
     }
 
     private var mainTabs: some View {

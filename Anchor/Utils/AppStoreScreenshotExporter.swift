@@ -15,9 +15,9 @@ enum AppStoreScreenshotExporter {
 
     @MainActor
     static func exportAll(to directory: URL? = nil) throws -> ExportResult {
-        let wasPremium = PremiumStorage.isPremium
-        PremiumStorage.setPremium(true)
-        defer { PremiumStorage.setPremium(wasPremium) }
+        let wasPremium = PremiumStorage.isPurchased
+        PremiumStorage.setPurchased(true)
+        defer { PremiumStorage.setPurchased(wasPremium) }
 
         let seed = try AppStoreScreenshotData.makeSeed()
         let outDir = directory ?? defaultOutputDirectory()
@@ -56,10 +56,10 @@ enum AppStoreScreenshotExporter {
         screens: [AppStoreScreenshotHost.Screen],
         to directory: URL
     ) throws -> ExportResult {
-        let wasPremium = PremiumStorage.isPremium
-        PremiumStorage.setPremium(true)
+        let wasPremium = PremiumStorage.isPurchased
+        PremiumStorage.setPurchased(true)
         UserDefaults.standard.set(true, forKey: AppGuideStorage.hasSeenGuideKey)
-        defer { PremiumStorage.setPremium(wasPremium) }
+        defer { PremiumStorage.setPurchased(wasPremium) }
 
         let seed = try AppStoreScreenshotData.makeSeed()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

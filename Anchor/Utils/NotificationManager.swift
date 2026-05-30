@@ -61,7 +61,7 @@ enum NotificationManager {
             scheduleRoutineNotifications(for: routine)
         }
 
-        if NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium {
+        if NotificationPreferences.weeklySummaryEnabled, PremiumAccess.hasFullAccess {
             scheduleWeeklySummary()
         }
 
@@ -461,7 +461,7 @@ enum NotificationManager {
 
     /// 앱 실행 시 이번 주 완료 일수로 주간 알림 문구 갱신
     static func updateWeeklySummaryContent(fullDays: Int) {
-        guard NotificationPreferences.weeklySummaryEnabled, PremiumStorage.isPremium else { return }
+        guard NotificationPreferences.weeklySummaryEnabled, PremiumAccess.hasFullAccess else { return }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["weekly-summary"])
 
         var comps = DateComponents()

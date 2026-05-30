@@ -73,13 +73,21 @@ enum PremiumLimits {
 enum PremiumStorage {
     static let unlockedKey = "premium.isUnlocked"
 
-    static var isPremium: Bool {
+    /// StoreKit 평생 구매 여부 (체험 기간과 무관).
+    static var isPurchased: Bool {
         if UserDefaults.standard.bool(forKey: unlockedKey) { return true }
         return UserDefaults(suiteName: SharedShieldStore.appGroupID)?.bool(forKey: unlockedKey) == true
     }
 
-    static func setPremium(_ unlocked: Bool) {
+    static func setPurchased(_ unlocked: Bool) {
         UserDefaults.standard.set(unlocked, forKey: unlockedKey)
         UserDefaults(suiteName: SharedShieldStore.appGroupID)?.set(unlocked, forKey: unlockedKey)
+    }
+}
+
+/// Paywall·한도 판단에 쓰는 접근 권한 (구매 또는 체험 중).
+enum PremiumAccess {
+    static var hasFullAccess: Bool {
+        PremiumStorage.isPurchased || PremiumTrialStore.isTrialActive
     }
 }

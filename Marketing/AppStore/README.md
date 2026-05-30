@@ -45,6 +45,8 @@ Xcode만 사용할 때: **Product → Test** 후 `AppStoreScreenshotExportTests`
 
 [App Store · Keyring](https://www.figma.com/design/2Ob7o24gjnGI22Vkn3KpZv) — 스크린샷 10 + 미리보기 3 프레임. `raw/*.png` Export 후 Figma에 교체하거나 스크립트 실행 뒤 Figma 업로드.
 
+**4.3 재제출:** 스크린샷 순서·메타데이터·영문 Reply → `4.3-RESUBMISSION-v2.md` · `copy-ko.md` v2
+
 ## 마케팅 문구 (이미지 위 헤드라인용)
 
 `copy-ko.md` 참고. Figma·Canva에서 목업 위에 올리면 됩니다.

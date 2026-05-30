@@ -141,6 +141,7 @@ struct PaywallSheet: View {
         case .webLimit: return AppCopy.Premium.reasonWeb
         case .history: return AppCopy.Premium.reasonHistory
         case .weeklyNotification: return AppCopy.Premium.reasonWeekly
+        case .trialExpired: return AppCopy.Premium.reasonTrialExpired
         case .general: return AppCopy.Premium.reasonGeneral
         }
     }

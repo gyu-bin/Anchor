@@ -227,9 +227,8 @@ struct SettingsView: View {
                                 devTapCount += 1
                                 if devTapCount >= 5 {
                                     devTapCount = 0
-                                    let next = !PremiumStorage.isPremium
-                                    PremiumStorage.setPremium(next)
-                                    premium.syncFromStorage()
+                                    let next = !PremiumStorage.isPurchased
+                                    premium.setPurchasedForDebug(next)
                                     bannerMessage = next ? "[DEV] 프리미엄 활성화됨" : "[DEV] 프리미엄 해제됨"
                                 }
                             }
@@ -328,10 +327,31 @@ struct SettingsView: View {
                     }
                 }
 
-                if premium.isPremium {
+                if premium.isPurchased {
                     Text(AppCopy.Premium.settingsUnlocked)
                         .font(.subheadline)
                         .foregroundStyle(Color.anchorSub(scheme))
+                } else if premium.isTrialActive {
+                    Text(AppCopy.Premium.trialActive(days: premium.trialDaysRemaining))
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Color.anchorAccent(scheme))
+                    Text(AppCopy.Premium.settingsTrialNote)
+                        .font(.caption)
+                        .foregroundStyle(Color.anchorSub(scheme))
+                } else if PremiumTrialStore.hasTrialExpired {
+                    Text(AppCopy.Premium.trialExpiredSettings)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.anchorSub(scheme))
+                    Button(AppCopy.Premium.settingsOpen) {
+                        paywallReason = .trialExpired
+                    }
+                    .buttonStyle(AnchorButtonStyle())
+                    Button(AppCopy.Premium.restore) {
+                        Task { await premium.restore() }
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.anchorAccent(scheme))
+                    .frame(maxWidth: .infinity)
                 } else {
                     Text(AppCopy.Premium.settingsLocked)
                         .font(.subheadline)

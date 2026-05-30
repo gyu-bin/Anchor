@@ -14,6 +14,7 @@ enum PaywallReason: String, Identifiable {
     case webLimit
     case history
     case weeklyNotification
+    case trialExpired
     case general
 
     var id: String { rawValue }
@@ -21,7 +22,11 @@ enum PaywallReason: String, Identifiable {
 
 @MainActor
 final class PremiumStore: ObservableObject {
-    @Published private(set) var isPremium: Bool = PremiumStorage.isPremium
+    /// 전체 기능 사용 가능 (평생 구매 또는 체험 중).
+    @Published private(set) var isPremium: Bool = PremiumAccess.hasFullAccess
+    @Published private(set) var isPurchased: Bool = PremiumStorage.isPurchased
+    @Published private(set) var isTrialActive: Bool = PremiumTrialStore.isTrialActive
+    @Published private(set) var trialDaysRemaining: Int = PremiumTrialStore.trialDaysRemaining
     @Published private(set) var product: Product?
     @Published private(set) var isLoading = false
     @Published private(set) var productLoadFailed = false
@@ -30,8 +35,9 @@ final class PremiumStore: ObservableObject {
     @Published var previewShowsPurchaseUI = false
 
     func bootstrap() async {
-        isPremium = PremiumStorage.isPremium
+        PremiumTrialStore.ensureStarted()
         await refreshEntitlements()
+        refreshAccessState()
         await loadProduct()
         listenForTransactions()
     }
@@ -106,12 +112,24 @@ final class PremiumStore: ObservableObject {
         do {
             try await AppStore.sync()
             await refreshEntitlements()
-            if !isPremium {
+            if !isPurchased {
                 errorMessage = AppCopy.Premium.restoreEmpty
             }
         } catch {
             errorMessage = AppCopy.Premium.restoreFailed
         }
+    }
+
+    /// 체험 종료 직후 한 번만 Paywall을 띄울지 여부.
+    func consumeTrialExpiredPaywallPrompt() -> Bool {
+        PremiumTrialStore.consumeExpiredPaywallPrompt()
+    }
+
+    func refreshAccessState() {
+        isPurchased = PremiumStorage.isPurchased
+        isTrialActive = PremiumTrialStore.isTrialActive
+        trialDaysRemaining = PremiumTrialStore.trialDaysRemaining
+        isPremium = PremiumAccess.hasFullAccess
     }
 
     private func refreshEntitlements() async {
@@ -123,7 +141,7 @@ final class PremiumStore: ObservableObject {
                 break
             }
         }
-        applyPremium(unlocked)
+        applyPurchased(unlocked)
     }
 
     private func listenForTransactions() {
@@ -149,13 +167,18 @@ final class PremiumStore: ObservableObject {
 
     #if DEBUG
     func syncFromStorage() {
-        isPremium = PremiumStorage.isPremium
+        refreshAccessState()
+    }
+
+    func setPurchasedForDebug(_ unlocked: Bool) {
+        PremiumStorage.setPurchased(unlocked)
+        refreshAccessState()
     }
     #endif
 
-    private func applyPremium(_ unlocked: Bool) {
-        isPremium = unlocked
-        PremiumStorage.setPremium(unlocked)
+    private func applyPurchased(_ unlocked: Bool) {
+        PremiumStorage.setPurchased(unlocked)
+        refreshAccessState()
     }
 
     private enum StoreError: Error {
