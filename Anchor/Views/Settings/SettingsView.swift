@@ -338,6 +338,16 @@ struct SettingsView: View {
                     Text(AppCopy.Premium.settingsTrialNote)
                         .font(.caption)
                         .foregroundStyle(Color.anchorSub(scheme))
+                    Button(AppCopy.Premium.settingsOpen) {
+                        paywallReason = .general
+                    }
+                    .buttonStyle(AnchorSecondaryButtonStyle())
+                    Button(AppCopy.Premium.restore) {
+                        Task { await premium.restore() }
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.anchorAccent(scheme))
+                    .frame(maxWidth: .infinity)
                 } else if PremiumTrialStore.hasTrialExpired {
                     Text(AppCopy.Premium.trialExpiredSettings)
                         .font(.subheadline)
