@@ -53,7 +53,6 @@ struct ContentView: View {
             switch phase {
             case .active:
                 premium.refreshAccessState()
-                presentTrialExpiredPaywallIfNeeded()
                 try? NotificationManager.rescheduleAll(modelContext: modelContext)
                 RoutineScheduleMaintenance.run(modelContext: modelContext)
                 ShieldScheduleWatcher.startPolling(modelContext: modelContext)
@@ -75,19 +74,11 @@ struct ContentView: View {
             } else {
                 ShieldScheduleWatcher.startPolling(modelContext: modelContext)
                 consumeIntentFlags()
-                presentTrialExpiredPaywallIfNeeded()
             }
         }
         .sheet(item: $paywallReason) { reason in
             PaywallSheet(reason: reason)
         }
-    }
-
-    private func presentTrialExpiredPaywallIfNeeded() {
-        guard hasSeenAppGuide, !showGuide else { return }
-        guard paywallReason == nil else { return }
-        guard premium.consumeTrialExpiredPaywallPrompt() else { return }
-        paywallReason = .trialExpired
     }
 
     private var mainTabs: some View {

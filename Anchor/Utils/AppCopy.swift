@@ -320,17 +320,7 @@ enum AppCopy {
         static let reasonWeb = "웹 차단을 더 쓰려면 전체 기능을 열어 주세요."
         static let reasonHistory = "이번 달이 아닌 기록을 보려면 전체 기능을 열어 주세요."
         static let reasonWeekly = "주간 요약 알림은 전체 기능에서 쓸 수 있어요."
-        static let reasonTrialExpired =
-            "2주 체험이 끝났어요. 전체 기능을 계속 쓰려면 한 번만 열어 주세요."
         static let reasonGeneral = "루틴·잠금·기록 제한 없이 쓰실 수 있어요."
-        static func trialActive(days: Int) -> String {
-            if days <= 0 { return "오늘까지 전체 기능 체험 중" }
-            if days == 1 { return "전체 기능 체험 · 내일까지" }
-            return "전체 기능 체험 · \(days)일 남음"
-        }
-        static let trialExpiredSettings = "체험이 끝났어요. 무료 한도로 전환됐어요"
-        static let settingsTrialNote =
-            "처음 \(PremiumTrialStore.trialDurationDays)일은 전체 기능을 무료로 써요. 이후에는 무료 한도가 적용돼요."
         static let freeTierTitle = "지금 무료로 쓰는 것"
         static let freeTierSummary =
             "루틴 \(PremiumLimits.maxFreeRoutines)개 · 항목 \(PremiumLimits.maxItemsPerRoutine)개 · 앱 \(PremiumLimits.maxAppsPerRoutine)개 · 웹 \(PremiumLimits.maxWebDomainsPerRoutine)개 · 기록 이번 달"
@@ -347,7 +337,7 @@ enum AppCopy {
         static let footnote = "구독이 아니에요. 한 번만 결제하면 이 기기에서 계속 쓸 수 있어요."
         static let settingsTitle = "전체 기능"
         static let settingsUnlocked = "전체 기능을 쓰고 있어요"
-        static let settingsLocked = "1회 결제로 제한 없이"
+        static let settingsLocked = "무료 한도로 이용 중"
         static let settingsOpen = "전체 기능 열기"
         static let historyBanner = "지난달부터의 기록은 전체 기능에서 볼 수 있어요."
         static let weeklyLocked = "전체 기능"

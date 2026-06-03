@@ -85,9 +85,9 @@ enum PremiumStorage {
     }
 }
 
-/// Paywall·한도 판단에 쓰는 접근 권한 (구매 또는 체험 중).
+/// Paywall·한도 판단에 쓰는 접근 권한 (평생 구매).
 enum PremiumAccess {
     static var hasFullAccess: Bool {
-        PremiumStorage.isPurchased || PremiumTrialStore.isTrialActive
+        PremiumStorage.isPurchased
     }
 }
