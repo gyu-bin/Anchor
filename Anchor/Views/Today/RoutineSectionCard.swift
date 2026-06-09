@@ -195,9 +195,9 @@ struct RoutineSectionCard: View {
                     }
                 }
 
-                VStack(spacing: 4) {
+                VStack(spacing: 0) {
                     let deadlinePassed = RoutineDeadline.isTodayDeadlinePassed(for: routine)
-                    ForEach(sortedItems, id: \.id) { item in
+                    ForEach(Array(sortedItems.enumerated()), id: \.element.id) { index, item in
                         RoutineItemRow(
                             item: item,
                             isCompleted: logSnapshot.completedItemIds.contains(item.id),
@@ -206,6 +206,11 @@ struct RoutineSectionCard: View {
                             isDeadlineLocked: deadlinePassed,
                             onTap: { onToggle(item) }
                         )
+                        if index < sortedItems.count - 1 {
+                            Divider()
+                                .padding(.leading, 72)
+                                .padding(.trailing, AnchorLayout.cardPadding)
+                        }
                     }
                 }
                 .padding(.bottom, 8)

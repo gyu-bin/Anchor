@@ -54,11 +54,10 @@ struct RoutineItemRow: View {
                 statusIcon
             }
             .padding(.horizontal, AnchorLayout.cardPadding)
-            .padding(.vertical, 14)
-            .background(rowBackground)
+            .padding(.vertical, 12)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(RoutineRowButtonStyle())
         .opacity(!isCompleted && isDeadlineLocked ? 0.55 : 1)
         .accessibilityLabel(item.name)
         .accessibilityHint(accessibilityHintText)
@@ -96,10 +95,22 @@ struct RoutineItemRow: View {
     private var iconForeground: Color {
         isCompleted ? Color.anchorAccent(scheme) : Color.anchorAccent(scheme)
     }
+}
 
-    private var rowBackground: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .fill(Color.anchorSubBg(scheme))
-            .padding(.horizontal, 8)
+struct RoutineRowButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) private var scheme
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                configuration.isPressed
+                    ? (scheme == .dark ? Color.white.opacity(0.04) : Color.black.opacity(0.03))
+                    : Color.clear
+            )
+            .scaleEffect(configuration.isPressed ? 0.995 : 1.0)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+            .sensoryFeedback(.impact(weight: .light), trigger: configuration.isPressed) { _, isPressed in
+                isPressed
+            }
     }
 }

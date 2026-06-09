@@ -104,6 +104,7 @@ private enum ScreenTimeAggregation {
     }
 }
 
+@MainActor
 struct TodayActivityReport: DeviceActivityReportScene {
     let context: DeviceActivityReport.Context = .totalToday
     let content: (ScreenTimeSummary) -> TotalActivityView
@@ -113,6 +114,7 @@ struct TodayActivityReport: DeviceActivityReportScene {
     }
 }
 
+@MainActor
 struct WeekActivityReport: DeviceActivityReportScene {
     let context: DeviceActivityReport.Context = .totalWeek
     let content: (ScreenTimeSummary) -> TotalActivityView

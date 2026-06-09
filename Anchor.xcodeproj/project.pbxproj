@@ -54,7 +54,7 @@
 		1D1FDF7D2FBD73CA00375B72 /* Embed ExtensionKit Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
 				1D1FDF782FBD73CA00375B72 /* AnchorDeviceActivityReport.appex in Embed ExtensionKit Extensions */,

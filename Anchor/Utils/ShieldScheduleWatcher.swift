@@ -32,8 +32,7 @@ enum ShieldScheduleWatcher {
             if let startToday = startTimeToday(for: routine, calendar: calendar), now < startToday {
                 scheduleFire(
                     key: "\(routine.id.uuidString).start",
-                    at: startToday,
-                    modelContext: modelContext
+                    at: startToday
                 )
             }
 
@@ -41,8 +40,7 @@ enum ShieldScheduleWatcher {
                now < endToday {
                 scheduleFire(
                     key: "\(routine.id.uuidString).end",
-                    at: endToday,
-                    modelContext: modelContext
+                    at: endToday
                 )
             }
 
@@ -52,8 +50,7 @@ enum ShieldScheduleWatcher {
                unlock != RoutineDeadline.endTimeToday(for: routine, now: now, calendar: calendar) {
                 scheduleFire(
                     key: "\(routine.id.uuidString).unlock",
-                    at: unlock,
-                    modelContext: modelContext
+                    at: unlock
                 )
             }
         }
@@ -103,15 +100,14 @@ enum ShieldScheduleWatcher {
         return parts.joined(separator: "|")
     }
 
-    private static func scheduleFire(key: String, at date: Date, modelContext: ModelContext) {
+    private static func scheduleFire(key: String, at date: Date) {
         let interval = date.timeIntervalSince(Date())
         let timer = Timer.scheduledTimer(withTimeInterval: max(0.05, interval), repeats: false) { _ in
             Task { @MainActor in
-                publishScheduleUIRefreshIfNeeded(modelContext: modelContext)
+                guard let ctx = watchedContext else { return }
+                publishScheduleUIRefreshIfNeeded(modelContext: ctx)
                 NotificationCenter.default.post(name: .anchorRefreshShield, object: nil)
-                if let ctx = watchedContext {
-                    ShieldScheduleWatcher.reschedule(modelContext: ctx)
-                }
+                reschedule(modelContext: ctx)
             }
         }
         scheduleTimers[key] = timer

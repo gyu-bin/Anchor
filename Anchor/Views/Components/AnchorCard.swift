@@ -28,12 +28,12 @@ struct AnchorCard<Content: View>: View {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(Color.anchorBorder(scheme).opacity(0.45), lineWidth: 0.5)
+                    .strokeBorder(Color.anchorBorder(scheme).opacity(0.3), lineWidth: 0.5)
             )
             .shadow(
-                color: elevated ? Color.black.opacity(0.03) : .clear,
-                radius: elevated ? 10 : 0,
-                y: elevated ? 3 : 0
+                color: elevated ? Color.black.opacity(0.02) : .clear,
+                radius: elevated ? 12 : 0,
+                y: elevated ? 2 : 0
             )
     }
 }

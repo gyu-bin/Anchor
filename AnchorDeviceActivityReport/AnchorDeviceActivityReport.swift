@@ -7,6 +7,7 @@ import DeviceActivity
 import ExtensionKit
 import SwiftUI
 
+@MainActor
 @main
 struct AnchorDeviceActivityReport: DeviceActivityReportExtension {
     var body: some DeviceActivityReportScene {

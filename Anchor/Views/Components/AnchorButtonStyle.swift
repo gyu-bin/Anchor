@@ -19,9 +19,12 @@ struct AnchorButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: AnchorLayout.buttonRadius, style: .continuous)
                     .fill(Color.anchorAccent(scheme))
             )
-            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .opacity(configuration.isPressed ? 0.92 : 1)
-            .animation(AnchorMotion.spring(response: 0.26, dampingFraction: 0.72), value: configuration.isPressed)
+            .animation(AnchorMotion.spring(response: 0.22, dampingFraction: 0.75), value: configuration.isPressed)
+            .sensoryFeedback(.impact(weight: .light), trigger: configuration.isPressed) { _, isPressed in
+                isPressed
+            }
     }
 }
 
@@ -37,7 +40,11 @@ struct AnchorTextButtonStyle: ButtonStyle {
             .background(Color.anchorHighlight(scheme))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .opacity(configuration.isPressed ? 0.88 : 1)
-            .animation(AnchorMotion.spring(response: 0.24, dampingFraction: 0.8), value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(AnchorMotion.spring(response: 0.22, dampingFraction: 0.78), value: configuration.isPressed)
+            .sensoryFeedback(.impact(weight: .light), trigger: configuration.isPressed) { _, isPressed in
+                isPressed
+            }
     }
 }
 
@@ -58,7 +65,10 @@ struct AnchorSecondaryButtonStyle: ButtonStyle {
                     .strokeBorder(Color.anchorBorder(scheme), lineWidth: 1)
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(response: 0.26, dampingFraction: 0.72), value: configuration.isPressed)
+            .animation(AnchorMotion.spring(response: 0.22, dampingFraction: 0.75), value: configuration.isPressed)
+            .sensoryFeedback(.impact(weight: .light), trigger: configuration.isPressed) { _, isPressed in
+                isPressed
+            }
     }
 }
 
@@ -69,6 +79,9 @@ struct SettingsRowButtonStyle: ButtonStyle {
             .contentShape(Rectangle())
             .opacity(configuration.isPressed ? 0.88 : 1)
             .scaleEffect(configuration.isPressed ? 0.985 : 1)
-            .animation(.spring(response: 0.24, dampingFraction: 0.8), value: configuration.isPressed)
+            .animation(.spring(response: 0.22, dampingFraction: 0.8), value: configuration.isPressed)
+            .sensoryFeedback(.impact(weight: .light), trigger: configuration.isPressed) { _, isPressed in
+                isPressed
+            }
     }
 }
